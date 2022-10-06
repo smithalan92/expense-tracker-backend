@@ -2,7 +2,6 @@
 
 A simple API to proxy auth requests for the Spotify API.
 
-
 # Configuration
 
 The following environment variables need to be set
@@ -18,7 +17,7 @@ Depending on what your app does, you may need to change the scopes in `/src/cons
 
 Either build the app using `tsc` and run `node dist/index.js` or install `ts-node` globally and run `ts-node src/index.ts` This will start the api on the provided port, or 3420.
 
-If you want to deploy on a web server, you can use Nginx to configure a [reverse proxy](https://docs.nginx.com/nginx/admin-guide/web-server/reverse-proxy/) to access the api. A sample server block could be 
+If you want to deploy on a web server, you can use Nginx to configure a [reverse proxy](https://docs.nginx.com/nginx/admin-guide/web-server/reverse-proxy/) to access the api. A sample server block could be
 
 ```
 server {

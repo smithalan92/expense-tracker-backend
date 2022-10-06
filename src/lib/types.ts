@@ -1,8 +1,8 @@
-import { FastifyInstance } from "fastify";
-import AuthController from "../controllers/AuthController";
-import UserRepository from "../repository/UserRepository";
-import AuthRouter from "../routes/AuthRoutes";
-import DBAgent from "./DBAgent";
+import { FastifyInstance } from 'fastify';
+import AuthController from '../controllers/AuthController';
+import UserRepository from '../repository/UserRepository';
+import AuthRouter from '../routes/AuthRoutes';
+import DBAgent from './DBAgent';
 
 export interface Env {
   serviceName: string;

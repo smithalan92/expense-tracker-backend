@@ -1,12 +1,12 @@
-import * as awilix from "awilix";
-import Server from "./lib/Server";
+import * as awilix from 'awilix';
+import Server from './lib/Server';
 
 async function makeServer(container: awilix.AwilixContainer) {
   const server = new Server(container.cradle);
 
   // Load all repositories to the container
-  container.loadModules(["repository/**"], {
-    formatName: "camelCase",
+  container.loadModules(['repository/**'], {
+    formatName: 'camelCase',
     cwd: __dirname,
     resolverOptions: {
       lifetime: awilix.Lifetime.SCOPED,
@@ -14,19 +14,19 @@ async function makeServer(container: awilix.AwilixContainer) {
   });
 
   // Load all controllers to the container
-  container.loadModules(["controllers/**"], {
-    formatName: "camelCase",
+  container.loadModules(['controllers/**'], {
+    formatName: 'camelCase',
     cwd: __dirname,
     resolverOptions: {
       lifetime: awilix.Lifetime.SCOPED,
     },
   });
 
-  const routesPath = "routes/**";
+  const routesPath = 'routes/**';
 
   // Load routes
   container.loadModules([routesPath], {
-    formatName: "camelCase",
+    formatName: 'camelCase',
     cwd: __dirname,
     resolverOptions: {
       lifetime: awilix.Lifetime.SCOPED,

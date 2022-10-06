@@ -1,6 +1,6 @@
-import DBAgent from "../lib/DBAgent";
-import { ContainerCradle } from "../lib/types";
-import { DBUserResult } from "../types/models/user.types";
+import DBAgent from '../lib/DBAgent';
+import { ContainerCradle } from '../lib/types';
+import { DBUserResult } from '../types/models/user.types';
 
 class UserRepository {
   dbAgent: DBAgent;
@@ -11,7 +11,7 @@ class UserRepository {
 
   async getUserByEmail(email: string) {
     const [user] = await this.dbAgent.runQuery<DBUserResult[]>({
-      query: "SELECT * FROM users WHERE email = ?",
+      query: 'SELECT * FROM users WHERE email = ?',
       values: [email],
     });
 

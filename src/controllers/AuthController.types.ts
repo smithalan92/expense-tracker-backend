@@ -1,5 +1,3 @@
-import { DBUserResult } from "../types/models/user.types";
-
 export interface LoginRequest {
   email: string;
   password: string;

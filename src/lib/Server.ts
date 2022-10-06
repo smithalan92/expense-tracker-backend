@@ -1,6 +1,6 @@
-import Fastify, { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
-import cors from "@fastify/cors";
-import { Env, Router } from "./types";
+import Fastify, { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
+import cors from '@fastify/cors';
+import { Env, Router } from './types';
 
 class Server {
   server: FastifyInstance;
@@ -14,13 +14,13 @@ class Server {
   createServer() {
     const server = Fastify({
       logger: {
-        level: "info",
+        level: 'info',
       },
     });
 
-    server.register(cors);
+    void server.register(cors);
 
-    server.addHook("onResponse", (request: FastifyRequest, reply: FastifyReply, done) => {
+    server.addHook('onResponse', (request: FastifyRequest, reply: FastifyReply, done) => {
       console.log(`${request.method.toUpperCase()} ${request.routerPath} ${reply.statusCode}`);
       done();
     });

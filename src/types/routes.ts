@@ -1,10 +1,4 @@
-import {
-  RawReplyDefaultExpression,
-  RawRequestDefaultExpression,
-  RawServerDefault,
-  RouteHandler as FastifyRouteHandler,
-  RouteHandlerMethod,
-} from "fastify";
+import { RawReplyDefaultExpression, RawRequestDefaultExpression, RawServerDefault, RouteHandlerMethod } from 'fastify';
 
 export type RouteHandler<Body, Reply> = RouteHandlerMethod<
   RawServerDefault,

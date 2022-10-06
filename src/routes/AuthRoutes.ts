@@ -1,8 +1,8 @@
-import { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
-import AuthController from "../controllers/AuthController";
-import { Router, ContainerCradle } from "../lib/types";
-import { LoginRequest, LoginResponse } from "../controllers/AuthController.types";
-import { PossibleErrorResponse } from "../types/routes";
+import { FastifyInstance } from 'fastify';
+import AuthController from '../controllers/AuthController';
+import { Router, ContainerCradle } from '../lib/types';
+import { LoginRequest, LoginResponse } from '../controllers/AuthController.types';
+import { PossibleErrorResponse } from '../types/routes';
 
 class AuthRoutes implements Router {
   controller: AuthController;
@@ -16,8 +16,8 @@ class AuthRoutes implements Router {
       Body: LoginRequest;
       Reply: PossibleErrorResponse<LoginResponse>;
     }>({
-      method: "POST",
-      url: "/login",
+      method: 'POST',
+      url: '/login',
       handler: this.controller.login,
     });
   }

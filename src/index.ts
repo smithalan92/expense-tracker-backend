@@ -1,6 +1,7 @@
-import configureContainer from "./container";
-import { Env } from "./lib/types";
-import makeServer from "./server";
+/* eslint-disable @typescript-eslint/no-floating-promises */
+import configureContainer from './container';
+import { Env } from './lib/types';
+import makeServer from './server';
 
 (async () => {
   let container;
@@ -13,7 +14,7 @@ import makeServer from "./server";
     process.exit(1);
   }
 
-  const env: Env = container.resolve("env");
+  const env: Env = container.resolve('env');
 
   try {
     const server = await makeServer(container);
