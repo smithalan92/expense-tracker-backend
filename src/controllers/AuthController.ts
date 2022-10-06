@@ -1,46 +1,41 @@
-import { ResponseToolkit } from "@hapi/hapi";
-import DBAgent from "../lib/DBAgent";
-import { ContainerCradle, Env } from "../lib/types";
-import { LoginRequest } from "./AuthController.types";
+import { ContainerCradle } from "../lib/types";
 import { isSame } from "../lib/crypto";
-import { DBUserResult } from "../types/models/user.types";
+import { PossibleErrorResponse, RouteHandler } from "../types/routes";
+import { LoginRequest, LoginResponse } from "./AuthController.types";
+import UserRepository from "../repository/UserRepository";
 
-class AppController {
-  env: Env;
-  dbAgent: DBAgent;
+class AuthController {
+  userRepository: UserRepository;
 
-  constructor({ env, dbAgent }: ContainerCradle) {
-    this.env = env;
-    this.dbAgent = dbAgent;
+  constructor({ userRepository }: ContainerCradle) {
+    this.userRepository = userRepository;
   }
 
-  async login(req: LoginRequest, h: ResponseToolkit) {
-    const { email, password } = req.payload;
+  login: RouteHandler<LoginRequest, PossibleErrorResponse<LoginResponse>> = async (req, reply) => {
+    const { email, password } = req.body;
 
-    const [user] = await this.dbAgent.runQuery<DBUserResult[]>({
-      query: "SELECT * FROM users WHERE email = ?",
-      values: [email],
-    });
+    const user = await this.userRepository.getUserByEmail(email);
 
     if (!user) {
-      return h.response({ error: "Incorrect user name or password" }).code(401);
+      return reply.send({ error: "Incorrect user name or password" }).code(401);
     }
 
     if (!isSame(password, user.password)) {
-      return h.response({ error: "Incorrect user name or password" }).code(401);
+      return reply.send({ error: "Incorrect user name or password" }).code(401);
     }
 
-    return h
-      .response({
+    return reply
+      .send({
         user: {
           id: user.id,
           email: user.email,
           firstName: user.firstName,
           lastName: user.lastName,
         },
+        token: "1234",
       })
       .code(200);
-  }
+  };
 }
 
-export default AppController;
+export default AuthController;

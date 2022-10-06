@@ -19,7 +19,7 @@ import makeServer from "./server";
     const server = await makeServer(container);
 
     server.start();
-    console.log(`${env.serviceName} started on ${server.server.info.port}`);
+    console.log(`${env.serviceName} started on ${server.port}`);
   } catch (err) {
     console.error(err);
   }

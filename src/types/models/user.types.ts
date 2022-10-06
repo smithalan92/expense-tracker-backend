@@ -1,7 +1,7 @@
 import mysql from "mysql2/promise";
 
 export interface DBUserResult extends mysql.RowDataPacket {
-  id: string;
+  id: number;
   firstName: string;
   lastName: string;
   email: string;

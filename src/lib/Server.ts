@@ -1,52 +1,28 @@
-import Hapi, { Request, ResponseToolkit } from "@hapi/hapi";
+import Fastify, { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
+import cors from "@fastify/cors";
 import { Env, Router } from "./types";
 
 class Server {
-  server: Hapi.Server;
+  server: FastifyInstance;
+  port: number;
 
   constructor({ env }: { env: Env }) {
-    this.server = this.createServer(env.SERVER_PORT);
+    this.server = this.createServer();
+    this.port = env.SERVER_PORT;
   }
 
-  createServer(port: number) {
-    const server = Hapi.server({
-      port: port,
-      host: "localhost",
-      routes: {
-        cors: true,
+  createServer() {
+    const server = Fastify({
+      logger: {
+        level: "info",
       },
     });
 
-    server.ext("onRequest", (request: Request, h: ResponseToolkit) => {
-      if (request.method === "options") {
-        const response = h.response({});
-        response.header("Access-Control-Allow-Origin", "*");
-        response.header("Access-Control-Allow-Headers", "*");
-        return h.response(response).takeover();
-      }
+    server.register(cors);
 
-      return h.continue;
-    });
-
-    server.ext("onPreResponse", (request, h) => {
-      // Cant get the correct type for req.response?
-      const { response }: { response: any } = request;
-
-      if (response && response.isBoom && response.isServer) {
-        const error = response.error || response.message;
-
-        if (!response.data) {
-          console.error(error);
-          console.log(response.stack);
-        }
-      }
-
-      return response;
-    });
-
-    server.events.on("response", (req) => {
-      // @ts-ignore - Cant get the correct type for req.response?
-      console.log(`${req.method.toUpperCase()} ${req.path} ${req.response.statusCode}`);
+    server.addHook("onResponse", (request: FastifyRequest, reply: FastifyReply, done) => {
+      console.log(`${request.method.toUpperCase()} ${request.routerPath} ${reply.statusCode}`);
+      done();
     });
 
     return server;
@@ -57,7 +33,7 @@ class Server {
   }
 
   async start() {
-    await this.server.start();
+    await this.server.listen({ port: this.port });
   }
 }
 

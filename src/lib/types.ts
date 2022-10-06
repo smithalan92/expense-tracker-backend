@@ -1,7 +1,7 @@
-import Hapi from "@hapi/hapi";
+import { FastifyInstance } from "fastify";
 import AuthController from "../controllers/AuthController";
+import UserRepository from "../repository/UserRepository";
 import AuthRouter from "../routes/AuthRoutes";
-import awilix from 'awilix'
 import DBAgent from "./DBAgent";
 
 export interface Env {
@@ -17,8 +17,9 @@ export interface ContainerCradle {
   authController: AuthController;
   authRoutes: AuthRouter;
   dbAgent: DBAgent;
+  userRepository: UserRepository;
 }
 
 export interface Router {
-  configure: (server: Hapi.Server) => void;
+  configure: (server: FastifyInstance) => void;
 }

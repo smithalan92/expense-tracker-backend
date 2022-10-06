@@ -4,6 +4,15 @@ import Server from "./lib/Server";
 async function makeServer(container: awilix.AwilixContainer) {
   const server = new Server(container.cradle);
 
+  // Load all repositories to the container
+  container.loadModules(["repository/**"], {
+    formatName: "camelCase",
+    cwd: __dirname,
+    resolverOptions: {
+      lifetime: awilix.Lifetime.SCOPED,
+    },
+  });
+
   // Load all controllers to the container
   container.loadModules(["controllers/**"], {
     formatName: "camelCase",

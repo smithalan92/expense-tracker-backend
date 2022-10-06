@@ -1,19 +1,24 @@
-import { Server } from "@hapi/hapi";
-import AppController from "../controllers/AuthController";
+import { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
+import AuthController from "../controllers/AuthController";
 import { Router, ContainerCradle } from "../lib/types";
+import { LoginRequest, LoginResponse } from "../controllers/AuthController.types";
+import { PossibleErrorResponse } from "../types/routes";
 
 class AuthRoutes implements Router {
-  controller: AppController;
+  controller: AuthController;
 
   constructor({ authController }: ContainerCradle) {
     this.controller = authController;
   }
 
-  configure(server: Server) {
-    server.route({
+  configure(server: FastifyInstance) {
+    server.route<{
+      Body: LoginRequest;
+      Reply: PossibleErrorResponse<LoginResponse>;
+    }>({
       method: "POST",
-      path: "/login",
-      handler: this.controller.login.bind(this.controller),
+      url: "/login",
+      handler: this.controller.login,
     });
   }
 }
