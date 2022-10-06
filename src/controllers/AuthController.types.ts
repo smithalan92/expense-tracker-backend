@@ -10,7 +10,12 @@ export interface LoginUser {
   lastName: string;
 }
 
+export interface LoginToken {
+  expiry: string;
+  token: string;
+}
+
 export interface LoginResponse {
   user: LoginUser;
-  token: string;
+  token: LoginToken;
 }

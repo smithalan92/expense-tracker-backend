@@ -1,6 +1,6 @@
 import DBAgent from '../lib/DBAgent';
 import { ContainerCradle } from '../lib/types';
-import { DBUserResult } from '../types/models/user.types';
+import { DBUserResult } from './UserRepository.types';
 
 class UserRepository {
   dbAgent: DBAgent;

@@ -1,3 +1,3 @@
-export function getUnixTimestamp() {
-  return Math.floor(Date.now() / 1000);
+export function getUnixTimestampFromJSDate(date: Date) {
+  return Math.floor(date.getTime() / 1000);
 }

@@ -1,5 +1,6 @@
 import { FastifyInstance } from 'fastify';
 import AuthController from '../controllers/AuthController';
+import TokenRepository from '../repository/TokenRepository';
 import UserRepository from '../repository/UserRepository';
 import AuthRouter from '../routes/AuthRoutes';
 import DBAgent from './DBAgent';
@@ -18,6 +19,7 @@ export interface ContainerCradle {
   authRoutes: AuthRouter;
   dbAgent: DBAgent;
   userRepository: UserRepository;
+  tokenRepository: TokenRepository;
 }
 
 export interface Router {
