@@ -9,3 +9,7 @@ export interface CreateUserTokenResult {
   token: string;
   expiry: string;
 }
+
+export interface DBUserIDForTokenResult extends mysql.RowDataPacket {
+  id: number;
+}

@@ -2,7 +2,7 @@ import { randomUUID } from 'crypto';
 import mysql from 'mysql2';
 import DBAgent from '../lib/DBAgent';
 import { ContainerCradle } from '../lib/types';
-import { CreateUserTokenResult, DBFindValidTokenResult } from './TokenRepository.types';
+import { CreateUserTokenResult, DBFindValidTokenResult, DBUserIDForTokenResult } from './TokenRepository.types';
 import { addWeeks, format } from 'date-fns';
 
 class TokenRepository {
@@ -47,6 +47,20 @@ class TokenRepository {
     } else {
       throw new Error('Failed to add new token');
     }
+  }
+
+  async getUserIdForToken(token: string) {
+    const [result] = await this.dbAgent.runQuery<DBUserIDForTokenResult[]>({
+      query: `
+        SELECT u.id from users u
+        LEFT JOIN auth_tokens t ON t.userId = u.id
+        WHERE t.token = ?
+        AND t.expiry > NOW();
+      `,
+      values: [token],
+    });
+
+    return result ? result.id : null;
   }
 }
 

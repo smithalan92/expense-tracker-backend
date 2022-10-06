@@ -2,8 +2,6 @@ import * as awilix from 'awilix';
 import Server from './lib/Server';
 
 async function makeServer(container: awilix.AwilixContainer) {
-  const server = new Server(container.cradle);
-
   // Load all repositories to the container
   container.loadModules(['repository/**'], {
     formatName: 'camelCase',
@@ -32,6 +30,9 @@ async function makeServer(container: awilix.AwilixContainer) {
       lifetime: awilix.Lifetime.SCOPED,
     },
   });
+
+  // We need to create the server here as the routes need access to it
+  const server = new Server(container.cradle);
 
   // Then register routes
   awilix
