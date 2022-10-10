@@ -1,4 +1,6 @@
-export interface DBTripResult {
+import mysql from 'mysql2';
+
+export interface DBTripResult extends mysql.RowDataPacket {
   id: number;
   name: string;
   startDate: string;

@@ -25,7 +25,7 @@ class Server {
     void server.register(cors);
     void server.register(fastifyRequestContextPlugin, {
       defaultStoreValues: {
-        user: { id: 'system' },
+        userId: 0,
       },
     });
 
@@ -46,7 +46,7 @@ class Server {
         return reply.code(401).send({ error: 'Not authorised' });
       }
 
-      request.requestContext.set('user', { id: userId });
+      request.requestContext.set('userId', userId);
     });
 
     server.addHook('onResponse', (request: FastifyRequest, reply: FastifyReply, done) => {
