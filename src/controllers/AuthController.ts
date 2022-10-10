@@ -1,6 +1,6 @@
 import { ContainerCradle } from '../lib/types';
 import { isSame } from '../lib/crypto';
-import { PossibleErrorResponse, RouteHandler } from '../types/routes';
+import { PossibleErrorResponse, RouteHandlerWithBody } from '../types/routes';
 import { LoginRequest, LoginResponse } from './AuthController.types';
 import UserRepository from '../repository/UserRepository';
 import TokenRepository from '../repository/TokenRepository';
@@ -14,7 +14,7 @@ class AuthController {
     this.tokenRepository = tokenRepository;
   }
 
-  login: RouteHandler<LoginRequest, PossibleErrorResponse<LoginResponse>> = async (req, reply) => {
+  login: RouteHandlerWithBody<LoginRequest, PossibleErrorResponse<LoginResponse>> = async (req, reply) => {
     const { email, password } = req.body;
 
     const user = await this.userRepository.getUserByEmail(email);

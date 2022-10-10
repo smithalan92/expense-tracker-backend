@@ -1,8 +1,11 @@
 import { FastifyInstance } from 'fastify';
+import AuthRouter from '../routes/AuthRoutes';
+import TripRoutes from '../routes/TripRoutes';
 import AuthController from '../controllers/AuthController';
+import TripController from '../controllers/TripController';
 import TokenRepository from '../repository/TokenRepository';
 import UserRepository from '../repository/UserRepository';
-import AuthRouter from '../routes/AuthRoutes';
+import TripRepository from '../repository/TripRepository';
 import DBAgent from './DBAgent';
 
 export interface Env {
@@ -17,9 +20,12 @@ export interface ContainerCradle {
   env: Env;
   authController: AuthController;
   authRoutes: AuthRouter;
+  tripRoutes: TripRoutes;
+  tripController: TripController;
   dbAgent: DBAgent;
   userRepository: UserRepository;
   tokenRepository: TokenRepository;
+  tripRepository: TripRepository;
 }
 
 export interface Router {

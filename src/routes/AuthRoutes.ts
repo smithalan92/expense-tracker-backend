@@ -20,15 +20,6 @@ class AuthRoutes implements Router {
       url: '/login',
       handler: this.controller.login,
     });
-
-    server.route({
-      method: 'GET',
-      url: '/test',
-      handler: (req, reply) => {
-        const user: { id: number } = req.requestContext.get('user');
-        return reply.send({ user }).code(200);
-      },
-    });
   }
 }
 

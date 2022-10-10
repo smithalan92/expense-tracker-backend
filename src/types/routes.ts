@@ -1,10 +1,19 @@
 import { RawReplyDefaultExpression, RawRequestDefaultExpression, RawServerDefault, RouteHandlerMethod } from 'fastify';
 
-export type RouteHandler<Body, Reply> = RouteHandlerMethod<
+export type RouteHandlerWithBody<Body, Reply> = RouteHandlerMethod<
   RawServerDefault,
   RawRequestDefaultExpression,
   RawReplyDefaultExpression,
   { Reply: Reply; Body: Body }
+>;
+
+export type RouteHandler<Reply> = RouteHandlerMethod<RawServerDefault, RawRequestDefaultExpression, RawReplyDefaultExpression, { Reply: Reply }>;
+
+export type RouteHandlerWithQueryString<QueryString, Reply> = RouteHandlerMethod<
+  RawServerDefault,
+  RawRequestDefaultExpression,
+  RawReplyDefaultExpression,
+  { Reply: Reply; Querystring: QueryString }
 >;
 
 export interface ErrorResponse {
