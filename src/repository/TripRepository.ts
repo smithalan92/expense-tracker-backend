@@ -12,7 +12,7 @@ class TripRepository {
   async findTripsForUserId(userId: number) {
     const results = await this.dbAgent.runQuery<DBTripResult[]>({
       query: `
-        SELECT t.id, t.name, t.startDate, t.endDate, t.status
+        SELECT t.id, t.name, t.startDate, t.endDate, t.status, t.image
         FROM user_trips ut
         LEFT JOIN trips t ON t.id = ut.tripId
         WHERE ut.userId = ?;`,
