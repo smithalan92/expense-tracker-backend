@@ -1,5 +1,6 @@
 import * as awilix from 'awilix';
 import Server from './lib/Server';
+import { Job } from './types/job.types';
 
 async function makeServer(container: awilix.AwilixContainer) {
   // Load all repositories to the container
@@ -19,6 +20,29 @@ async function makeServer(container: awilix.AwilixContainer) {
       lifetime: awilix.Lifetime.SCOPED,
     },
   });
+
+  const jobsPath = 'jobs/**';
+
+  // Load jobs
+  container.loadModules([jobsPath], {
+    formatName: 'camelCase',
+    cwd: __dirname,
+    resolverOptions: {
+      lifetime: awilix.Lifetime.SCOPED,
+    },
+  });
+
+  // Then schedule jobs
+  awilix
+    .listModules([jobsPath], {
+      cwd: __dirname,
+    })
+    .forEach((moduleDesc) => {
+      let { name } = moduleDesc;
+      name = name.slice(0, 1).toLowerCase() + name.slice(1);
+      const job: Job = container.resolve(name);
+      job.start();
+    });
 
   const routesPath = 'routes/**';
 

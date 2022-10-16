@@ -8,6 +8,7 @@ import UserRepository from '../repository/UserRepository';
 import TripRepository from '../repository/TripRepository';
 import ExpenseRepository from '../repository/ExpenseRepository';
 import DBAgent from './DBAgent';
+import CurrencyRepository from '../repository/CurrencyRepository';
 
 export interface Env {
   serviceName: string;
@@ -28,6 +29,7 @@ export interface ContainerCradle {
   tokenRepository: TokenRepository;
   tripRepository: TripRepository;
   expenseRepository: ExpenseRepository;
+  currencyRepository: CurrencyRepository;
 }
 
 export interface Router {
