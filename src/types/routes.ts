@@ -9,6 +9,13 @@ export type RouteHandlerWithBody<Body, Reply> = RouteHandlerMethod<
 
 export type RouteHandler<Reply> = RouteHandlerMethod<RawServerDefault, RawRequestDefaultExpression, RawReplyDefaultExpression, { Reply: Reply }>;
 
+export type RouterHandlerWithParams<Params, Reply> = RouteHandlerMethod<
+  RawServerDefault,
+  RawRequestDefaultExpression,
+  RawReplyDefaultExpression,
+  { Params: Params; Reply: Reply }
+>;
+
 export type RouteHandlerWithQueryString<QueryString, Reply> = RouteHandlerMethod<
   RawServerDefault,
   RawRequestDefaultExpression,

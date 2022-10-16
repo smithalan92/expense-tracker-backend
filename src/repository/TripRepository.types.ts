@@ -7,4 +7,6 @@ export interface DBTripResult extends mysql.RowDataPacket {
   endDate: string;
   status: 'active' | 'deleted';
   image: string;
+  totalLocalAmount: number;
+  totalExpenseAmount: number;
 }

@@ -1,6 +1,6 @@
 import { FastifyInstance } from 'fastify';
 import TripController from '../controllers/TripController';
-import { GetTripReponse } from '../controllers/TripController.types';
+import { GetExpensesForTripParams, GetExpensesForTripReponse, GetTripReponse } from '../controllers/TripController.types';
 import { Router, ContainerCradle } from '../lib/types';
 import { PossibleErrorResponse } from '../types/routes';
 
@@ -18,6 +18,15 @@ class TripRoutes implements Router {
       method: 'GET',
       url: '/trips',
       handler: this.controller.getTrips,
+    });
+
+    server.route<{
+      Params: GetExpensesForTripParams;
+      Reply: PossibleErrorResponse<GetExpensesForTripReponse>;
+    }>({
+      method: 'GET',
+      url: '/trips/:tripId/expenses',
+      handler: this.controller.getExpensesForTrip,
     });
   }
 }

@@ -6,6 +6,7 @@ import TripController from '../controllers/TripController';
 import TokenRepository from '../repository/TokenRepository';
 import UserRepository from '../repository/UserRepository';
 import TripRepository from '../repository/TripRepository';
+import ExpenseRepository from '../repository/ExpenseRepository';
 import DBAgent from './DBAgent';
 
 export interface Env {
@@ -26,6 +27,7 @@ export interface ContainerCradle {
   userRepository: UserRepository;
   tokenRepository: TokenRepository;
   tripRepository: TripRepository;
+  expenseRepository: ExpenseRepository;
 }
 
 export interface Router {
