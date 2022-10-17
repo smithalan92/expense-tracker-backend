@@ -12,7 +12,7 @@ class CurrencySyncJob implements Job {
   }
 
   start() {
-    cron.schedule('30 6 * * *', () => {
+    cron.schedule('0 23 * * *', () => {
       this.run().catch((err) => {
         console.error(err);
       });
