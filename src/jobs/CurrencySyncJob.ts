@@ -12,15 +12,18 @@ class CurrencySyncJob implements Job {
   }
 
   start() {
-    cron.schedule('0 23 * * *', () => {
+    // Server time is UTC
+    const job = cron.schedule('8 22 * * *', () => {
       this.run().catch((err) => {
         console.error(err);
       });
     });
+    job.start();
     console.log('Scheduled CurrencySyncJob');
   }
 
   async run() {
+    console.log('Running currency sync');
     const { date, eur: fxRates } = await getExchangeRatesForEUR();
     const currencies = await this.currencyRepository.getCurrencies();
 
