@@ -1,17 +1,20 @@
 import { ContainerCradle } from '../lib/types';
 import { PossibleErrorResponse, RouteHandler, RouterHandlerWithParams } from '../types/routes';
 import TripRepository from '../repository/TripRepository';
-import { GetTripReponse, GetExpensesForTripReponse, GetExpensesForTripParams } from './TripController.types';
+import { GetTripReponse, GetExpensesForTripReponse, GetExpensesForTripParams, ResponseTrip } from './TripController.types';
 import { format } from 'date-fns';
 import ExpenseRepository from '../repository/ExpenseRepository';
+import CountryRepository from '../repository/CountryRepository';
 
 class TripController {
   tripRepository: TripRepository;
   expenseRepository: ExpenseRepository;
+  countryRepository: CountryRepository;
 
-  constructor({ tripRepository, expenseRepository }: ContainerCradle) {
+  constructor({ tripRepository, expenseRepository, countryRepository }: ContainerCradle) {
     this.tripRepository = tripRepository;
     this.expenseRepository = expenseRepository;
+    this.countryRepository = countryRepository;
   }
 
   getTrips: RouteHandler<PossibleErrorResponse<GetTripReponse>> = async (req, reply) => {
@@ -19,9 +22,17 @@ class TripController {
 
     const trips = await this.tripRepository.findTripsForUserId(userId);
 
-    const tripsWithFormattedDates = trips.map((trip) => {
-      trip.startDate = format(new Date(trip.startDate), 'dd MMM yyyy');
-      trip.endDate = format(new Date(trip.endDate), 'dd MMM yyyy');
+    const countriesIdsForTrips = trips.map((trip) => trip.id);
+
+    const countries = await this.countryRepository.getCountriesForTrips(countriesIdsForTrips);
+
+    const tripsWithFormattedDates = trips.map<ResponseTrip>((t) => {
+      const trip: ResponseTrip = {
+        ...t,
+        countries: countries.filter((c) => c.tripId === t.id),
+      };
+      trip.startDate = format(new Date(t.startDate), 'dd MMM yyyy');
+      trip.endDate = format(new Date(t.endDate), 'dd MMM yyyy');
       return trip;
     });
 

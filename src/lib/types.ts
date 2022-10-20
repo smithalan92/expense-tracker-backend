@@ -9,6 +9,7 @@ import TripRepository from '../repository/TripRepository';
 import ExpenseRepository from '../repository/ExpenseRepository';
 import DBAgent from './DBAgent';
 import CurrencyRepository from '../repository/CurrencyRepository';
+import CountryRepository from '../repository/CountryRepository';
 
 export interface Env {
   serviceName: string;
@@ -30,6 +31,7 @@ export interface ContainerCradle {
   tripRepository: TripRepository;
   expenseRepository: ExpenseRepository;
   currencyRepository: CurrencyRepository;
+  countryRepository: CountryRepository;
 }
 
 export interface Router {

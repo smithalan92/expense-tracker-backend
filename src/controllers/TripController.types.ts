@@ -1,8 +1,13 @@
+import { DBGetCountriesByIDResult } from '../repository/CountryRepository.types';
 import { DBExpenseResult } from '../repository/ExpenseRepository.types';
 import { DBTripResult } from '../repository/TripRepository.types';
 
+export interface ResponseTrip extends DBTripResult {
+  countries: DBGetCountriesByIDResult[];
+}
+
 export interface GetTripReponse {
-  trips: DBTripResult[];
+  trips: ResponseTrip[];
 }
 
 export interface GetExpensesForTripReponse {
