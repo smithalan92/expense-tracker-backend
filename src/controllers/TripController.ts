@@ -1,7 +1,14 @@
 import { ContainerCradle } from '../lib/types';
 import { PossibleErrorResponse, RouteHandler, RouterHandlerWithParams } from '../types/routes';
 import TripRepository from '../repository/TripRepository';
-import { GetTripReponse, GetExpensesForTripReponse, GetExpensesForTripParams, ResponseTrip } from './TripController.types';
+import {
+  GetTripReponse,
+  GetExpensesForTripReponse,
+  GetExpensesForTripParams,
+  ResponseTrip,
+  GetCountriesForTripParams,
+  GetCountriesForTripResponse,
+} from './TripController.types';
 import { format } from 'date-fns';
 import ExpenseRepository from '../repository/ExpenseRepository';
 import CountryRepository from '../repository/CountryRepository';
@@ -64,6 +71,24 @@ class TripController {
     };
 
     return reply.send({ trip, expenses }).code(200);
+  };
+
+  getCountriesForTrip: RouterHandlerWithParams<GetCountriesForTripParams, PossibleErrorResponse<GetCountriesForTripResponse>> = async (
+    req,
+    reply
+  ) => {
+    const userId: number = req.requestContext.get('userId');
+    const tripId: number = req.params.tripId;
+
+    const trip = await this.tripRepository.findTripById({ userId, tripId });
+
+    if (!trip) {
+      return reply.code(400).send({ error: 'Trip not found' });
+    }
+
+    const countries = await this.countryRepository.getCountriesForTrips([tripId]);
+
+    return reply.send({ countries });
   };
 }
 

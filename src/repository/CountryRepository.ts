@@ -1,6 +1,6 @@
 import DBAgent from '../lib/DBAgent';
 import { ContainerCradle } from '../lib/types';
-import { DBGetCountriesByIDResult } from './CountryRepository.types';
+import { DBGetCountriesByTripIDResult } from './CountryRepository.types';
 
 class CountryRepository {
   dbAgent: DBAgent;
@@ -10,7 +10,7 @@ class CountryRepository {
   }
 
   async getCountriesForTrips(tripIds: number[]) {
-    const results = await this.dbAgent.runQuery<DBGetCountriesByIDResult[]>({
+    const results = await this.dbAgent.runQuery<DBGetCountriesByTripIDResult[]>({
       query: `
         SELECT c.id, c.name, tc.tripId
         FROM trip_countries tc

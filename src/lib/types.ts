@@ -10,6 +10,8 @@ import ExpenseRepository from '../repository/ExpenseRepository';
 import DBAgent from './DBAgent';
 import CurrencyRepository from '../repository/CurrencyRepository';
 import CountryRepository from '../repository/CountryRepository';
+import CityRepository from '../repository/CityRepository';
+import CountryController from '../controllers/CountryController';
 
 export interface Env {
   serviceName: string;
@@ -25,6 +27,7 @@ export interface ContainerCradle {
   authRoutes: AuthRouter;
   tripRoutes: TripRoutes;
   tripController: TripController;
+  countryController: CountryController;
   dbAgent: DBAgent;
   userRepository: UserRepository;
   tokenRepository: TokenRepository;
@@ -32,6 +35,7 @@ export interface ContainerCradle {
   expenseRepository: ExpenseRepository;
   currencyRepository: CurrencyRepository;
   countryRepository: CountryRepository;
+  cityRepository: CityRepository;
 }
 
 export interface Router {

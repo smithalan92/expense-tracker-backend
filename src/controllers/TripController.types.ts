@@ -1,9 +1,9 @@
-import { DBGetCountriesByIDResult } from '../repository/CountryRepository.types';
+import { DBGetCountriesByTripIDResult } from '../repository/CountryRepository.types';
 import { DBExpenseResult } from '../repository/ExpenseRepository.types';
 import { DBTripResult } from '../repository/TripRepository.types';
 
 export interface ResponseTrip extends DBTripResult {
-  countries: DBGetCountriesByIDResult[];
+  countries: DBGetCountriesByTripIDResult[];
 }
 
 export interface GetTripReponse {
@@ -17,4 +17,12 @@ export interface GetExpensesForTripReponse {
 
 export interface GetExpensesForTripParams {
   tripId: number;
+}
+
+export interface GetCountriesForTripParams {
+  tripId: number;
+}
+
+export interface GetCountriesForTripResponse {
+  countries: DBGetCountriesByTripIDResult[];
 }
