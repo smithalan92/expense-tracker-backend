@@ -15,6 +15,7 @@ class CurrencyRepository {
       query: `
         SELECT id, code, name
         FROM currencies
+        ORDER BY name;
       `,
     });
 

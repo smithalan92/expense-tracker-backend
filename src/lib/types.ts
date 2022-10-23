@@ -13,6 +13,8 @@ import CountryRepository from '../repository/CountryRepository';
 import CityRepository from '../repository/CityRepository';
 import CountryController from '../controllers/CountryController';
 import CurrencyController from '../controllers/CurrencyController';
+import CategoryRepository from '../repository/CategoryRepository';
+import CategoryController from '../controllers/CategoryController';
 
 export interface Env {
   serviceName: string;
@@ -30,6 +32,7 @@ export interface ContainerCradle {
   tripController: TripController;
   countryController: CountryController;
   currencyController: CurrencyController;
+  categoryController: CategoryController;
   dbAgent: DBAgent;
   userRepository: UserRepository;
   tokenRepository: TokenRepository;
@@ -38,6 +41,7 @@ export interface ContainerCradle {
   currencyRepository: CurrencyRepository;
   countryRepository: CountryRepository;
   cityRepository: CityRepository;
+  categoryRepository: CategoryRepository;
 }
 
 export interface Router {
