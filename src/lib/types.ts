@@ -12,6 +12,7 @@ import CurrencyRepository from '../repository/CurrencyRepository';
 import CountryRepository from '../repository/CountryRepository';
 import CityRepository from '../repository/CityRepository';
 import CountryController from '../controllers/CountryController';
+import CurrencyController from '../controllers/CurrencyController';
 
 export interface Env {
   serviceName: string;
@@ -28,6 +29,7 @@ export interface ContainerCradle {
   tripRoutes: TripRoutes;
   tripController: TripController;
   countryController: CountryController;
+  currencyController: CurrencyController;
   dbAgent: DBAgent;
   userRepository: UserRepository;
   tokenRepository: TokenRepository;

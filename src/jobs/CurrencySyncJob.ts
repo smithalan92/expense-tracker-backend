@@ -25,7 +25,7 @@ class CurrencySyncJob implements Job {
   async run() {
     console.log('Running currency sync');
     const { date, eur: fxRates } = await getExchangeRatesForEUR();
-    const currencies = await this.currencyRepository.getCurrencies();
+    const currencies = await this.currencyRepository.getCurrenciesForSyncJob();
 
     const updateData: Array<{ id: number; fxRate: number }> = [];
 

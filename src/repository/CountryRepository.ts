@@ -12,9 +12,10 @@ class CountryRepository {
   async getCountriesForTrips(tripIds: number[]) {
     const results = await this.dbAgent.runQuery<DBGetCountriesByTripIDResult[]>({
       query: `
-        SELECT c.id, c.name, tc.tripId
+        SELECT c.id, c.name, tc.tripId, cur.code as currencyCode, cur.id as currencyId
         FROM trip_countries tc
-        LEFT JOIN countries c on c.id = tc.countryId
+        JOIN countries c on c.id = tc.countryId
+        JOIN currencies cur on cur.id = c.currencyId
         WHERE tc.tripId = ?;
       `,
       values: [tripIds],

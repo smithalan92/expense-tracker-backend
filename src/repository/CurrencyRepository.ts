@@ -1,7 +1,7 @@
 import { OkPacket } from 'mysql2';
 import DBAgent from '../lib/DBAgent';
 import { ContainerCradle } from '../lib/types';
-import { DBCurrencyResult } from './CurrencyRepository.types';
+import { DBGetCurrenciesForSyncJobResult, DBGetCurrenciesResult } from './CurrencyRepository.types';
 
 class CurrencyRepository {
   dbAgent: DBAgent;
@@ -11,11 +11,23 @@ class CurrencyRepository {
   }
 
   async getCurrencies() {
-    const results = await this.dbAgent.runQuery<DBCurrencyResult[]>({
+    const results = await this.dbAgent.runQuery<DBGetCurrenciesResult[]>({
+      query: `
+        SELECT id, code, name
+        FROM currencies
+      `,
+    });
+
+    return results;
+  }
+
+  async getCurrenciesForSyncJob() {
+    const results = await this.dbAgent.runQuery<DBGetCurrenciesForSyncJobResult[]>({
       query: `
         SELECT id, code, exchangeRate
         FROM currencies
-        WHERE isBaseCurrency = 0;
+        WHERE isBaseCurrency = 0
+        AND isManuallyUpdated = 0;
       `,
     });
 
