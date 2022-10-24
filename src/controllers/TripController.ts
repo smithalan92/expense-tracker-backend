@@ -1,5 +1,5 @@
 import { ContainerCradle } from '../lib/types';
-import { PossibleErrorResponse, RouteHandler, RouterHandlerWithParams } from '../types/routes';
+import { PossibleErrorResponse, RouteHandler, RouteHandlerWithBodyAndParams, RouterHandlerWithParams } from '../types/routes';
 import TripRepository from '../repository/TripRepository';
 import {
   GetTripReponse,
@@ -8,6 +8,8 @@ import {
   ResponseTrip,
   GetCountriesForTripParams,
   GetCountriesForTripResponse,
+  AddExpenseForTripBody,
+  AddExpenseForTripParams,
 } from './TripController.types';
 import { format } from 'date-fns';
 import ExpenseRepository from '../repository/ExpenseRepository';
@@ -89,6 +91,10 @@ class TripController {
     const countries = await this.countryRepository.getCountriesForTrips([tripId]);
 
     return reply.send({ countries });
+  };
+
+  addExpenseForTrip: RouteHandlerWithBodyAndParams<AddExpenseForTripParams, AddExpenseForTripBody, PossibleErrorResponse> = async (req, reply) => {
+    return reply.status(201).send();
   };
 }
 

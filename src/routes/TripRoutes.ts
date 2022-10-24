@@ -1,6 +1,8 @@
 import { FastifyInstance } from 'fastify';
 import TripController from '../controllers/TripController';
 import {
+  AddExpenseForTripBody,
+  AddExpenseForTripParams,
   GetCountriesForTripParams,
   GetCountriesForTripResponse,
   GetExpensesForTripParams,
@@ -42,6 +44,16 @@ class TripRoutes implements Router {
       method: 'GET',
       url: '/trips/:tripId/countries',
       handler: this.controller.getCountriesForTrip,
+    });
+
+    server.route<{
+      Params: AddExpenseForTripParams;
+      Body: AddExpenseForTripBody;
+      Reply: PossibleErrorResponse;
+    }>({
+      method: 'POST',
+      url: '/trips/:tripId/expense',
+      handler: this.controller.addExpenseForTrip,
     });
   }
 }

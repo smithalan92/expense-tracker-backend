@@ -26,3 +26,15 @@ export interface GetCountriesForTripParams {
 export interface GetCountriesForTripResponse {
   countries: DBGetCountriesByTripIDResult[];
 }
+
+export interface AddExpenseForTripParams {
+  tripId: number;
+}
+
+export interface AddExpenseForTripBody {
+  cityId: number;
+  amount: number;
+  currencyId: number;
+  categoryId: number;
+  description: string;
+}

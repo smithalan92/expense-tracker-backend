@@ -16,6 +16,13 @@ export type RouterHandlerWithParams<Params, Reply> = RouteHandlerMethod<
   { Params: Params; Reply: Reply }
 >;
 
+export type RouteHandlerWithBodyAndParams<Params, Body, Reply> = RouteHandlerMethod<
+  RawServerDefault,
+  RawRequestDefaultExpression,
+  RawReplyDefaultExpression,
+  { Params: Params; Body: Body; Reply: Reply }
+>;
+
 export type RouteHandlerWithQueryString<QueryString, Reply> = RouteHandlerMethod<
   RawServerDefault,
   RawRequestDefaultExpression,
@@ -27,4 +34,4 @@ export interface ErrorResponse {
   error: string;
 }
 
-export type PossibleErrorResponse<T> = T | ErrorResponse;
+export type PossibleErrorResponse<T = {}> = T | ErrorResponse;
