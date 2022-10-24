@@ -11,3 +11,7 @@ export interface DBGetCurrenciesResult extends mysql.RowDataPacket {
   code: number;
   name: string;
 }
+
+export interface DBGetCurrencyFXRateResult extends mysql.RowDataPacket {
+  exchangeRate: number;
+}

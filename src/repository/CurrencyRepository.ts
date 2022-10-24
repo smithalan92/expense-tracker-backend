@@ -1,7 +1,7 @@
 import { OkPacket } from 'mysql2';
 import DBAgent from '../lib/DBAgent';
 import { ContainerCradle } from '../lib/types';
-import { DBGetCurrenciesForSyncJobResult, DBGetCurrenciesResult } from './CurrencyRepository.types';
+import { DBGetCurrenciesForSyncJobResult, DBGetCurrenciesResult, DBGetCurrencyFXRateResult } from './CurrencyRepository.types';
 
 class CurrencyRepository {
   dbAgent: DBAgent;
@@ -20,6 +20,23 @@ class CurrencyRepository {
     });
 
     return results;
+  }
+
+  async getCurrencyFXRate(currencyId: number) {
+    const [result] = await this.dbAgent.runQuery<DBGetCurrencyFXRateResult[]>({
+      query: `
+        SELECT exchangeRate
+        FROM currencies
+        WHERE id = ?
+      `,
+      values: [currencyId],
+    });
+
+    if (!result) {
+      throw new Error(`Could not find currency id ${currencyId}`);
+    }
+
+    return result.exchangeRate;
   }
 
   async getCurrenciesForSyncJob() {

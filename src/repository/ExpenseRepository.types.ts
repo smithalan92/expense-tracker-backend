@@ -10,3 +10,15 @@ export interface DBExpenseResult extends mysql.RowDataPacket {
   categoryId: number;
   categoryName: string;
 }
+
+export interface NewExpenseRecord {
+  tripId: number;
+  amount: number;
+  currencyId: number;
+  euroAmount: number;
+  localDateTime: string;
+  description: string;
+  categoryId: number;
+  cityId: number;
+  userId: number;
+}

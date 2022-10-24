@@ -1,6 +1,7 @@
+import { OkPacket } from 'mysql2';
 import DBAgent from '../lib/DBAgent';
 import { ContainerCradle } from '../lib/types';
-import { DBExpenseResult } from './ExpenseRepository.types';
+import { DBExpenseResult, NewExpenseRecord } from './ExpenseRepository.types';
 
 class ExpenseRepository {
   dbAgent: DBAgent;
@@ -16,12 +17,37 @@ class ExpenseRepository {
         FROM trip_expenses te
         JOIN expense_categories ec ON te.categoryId = ec.id
         JOIN currencies cu ON cu.id=te.currencyId
-        WHERE te.tripId = ?;
+        WHERE te.tripId = ?
+        ORDER BY localDateTime DESC;
       `,
       values: [tripId],
     });
 
     return results;
+  }
+
+  async addExpenseForTrip(expense: NewExpenseRecord) {
+    const result = await this.dbAgent.runQuery<OkPacket>({
+      query: `
+        INSERT INTO trip_expenses (tripId, amount, currencyId, euroAmount, localDateTime, description, categoryId, cityId, userId)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `,
+      values: [
+        expense.tripId,
+        expense.amount,
+        expense.currencyId,
+        expense.euroAmount,
+        expense.localDateTime,
+        expense.description,
+        expense.categoryId,
+        expense.cityId,
+        expense.userId,
+      ],
+    });
+
+    if (!result.insertId) {
+      throw new Error('Failed to insert new expense');
+    }
   }
 }
 

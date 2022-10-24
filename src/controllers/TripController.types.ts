@@ -32,6 +32,7 @@ export interface AddExpenseForTripParams {
 }
 
 export interface AddExpenseForTripBody {
+  localDateTime: string;
   cityId: number;
   amount: number;
   currencyId: number;

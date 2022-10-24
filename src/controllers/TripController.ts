@@ -14,16 +14,20 @@ import {
 import { format } from 'date-fns';
 import ExpenseRepository from '../repository/ExpenseRepository';
 import CountryRepository from '../repository/CountryRepository';
+import { NewExpenseRecord } from '../repository/ExpenseRepository.types';
+import CurrencyRepository from '../repository/CurrencyRepository';
 
 class TripController {
   tripRepository: TripRepository;
   expenseRepository: ExpenseRepository;
   countryRepository: CountryRepository;
+  currencyRepository: CurrencyRepository;
 
-  constructor({ tripRepository, expenseRepository, countryRepository }: ContainerCradle) {
+  constructor({ tripRepository, expenseRepository, countryRepository, currencyRepository }: ContainerCradle) {
     this.tripRepository = tripRepository;
     this.expenseRepository = expenseRepository;
     this.countryRepository = countryRepository;
+    this.currencyRepository = currencyRepository;
   }
 
   getTrips: RouteHandler<PossibleErrorResponse<GetTripReponse>> = async (req, reply) => {
@@ -94,6 +98,36 @@ class TripController {
   };
 
   addExpenseForTrip: RouteHandlerWithBodyAndParams<AddExpenseForTripParams, AddExpenseForTripBody, PossibleErrorResponse> = async (req, reply) => {
+    const { tripId } = req.params;
+    const userId: number = req.requestContext.get('userId');
+    const trip = await this.tripRepository.findTripById({ userId, tripId });
+
+    if (!trip) {
+      return reply.code(400).send({ error: 'Trip not found' });
+    }
+
+    const { localDateTime, cityId, amount, currencyId, categoryId, description } = req.body;
+
+    const currencyToEurFXRate = await this.currencyRepository.getCurrencyFXRate(currencyId);
+
+    const euroAmount = parseFloat((amount / currencyToEurFXRate).toFixed(2));
+
+    const expense: NewExpenseRecord = {
+      tripId,
+      amount,
+      currencyId,
+      euroAmount,
+      localDateTime,
+      description,
+      categoryId,
+      cityId,
+      userId,
+    };
+
+    console.log(expense);
+
+    await this.expenseRepository.addExpenseForTrip(expense);
+
     return reply.status(201).send();
   };
 }
