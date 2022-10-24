@@ -13,10 +13,31 @@ class ExpenseRepository {
   async findExpensesForTrip(tripId: number) {
     const results = await this.dbAgent.runQuery<DBExpenseResult[]>({
       query: `
-        SELECT te.id,te.amount,te.euroAmount,te.localDateTime as date,te.description,ec.name as categoryName,cu.code as currencyCode
+        SELECT
+          te.id,
+          te.amount,
+          te.currencyId,
+          cu.code as currencyCode,
+          cu.name as currencyName,
+          te.euroAmount,
+          te.localDateTime,
+          te.description,
+          te.categoryId,
+          ca.name as categoryName,
+          te.cityId,
+          ci.name as cityName,
+          ci.timezoneName as cityTimeZone,
+          co.id as countryId,
+          co.name as countryName,
+          te.userId,
+          te.createdAt,
+          te.updatedAt
         FROM trip_expenses te
         JOIN expense_categories ec ON te.categoryId = ec.id
         JOIN currencies cu ON cu.id=te.currencyId
+        JOIN expense_categories ca ON ca.id = te.categoryId
+        JOIN cities ci ON ci.id = te.cityId
+        JOIN countries co ON co.id = ci.countryId
         WHERE te.tripId = ?
         ORDER BY localDateTime DESC;
       `,

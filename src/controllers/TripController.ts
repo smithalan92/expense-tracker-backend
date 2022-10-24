@@ -10,6 +10,7 @@ import {
   GetCountriesForTripResponse,
   AddExpenseForTripBody,
   AddExpenseForTripParams,
+  ProcessedTripExpense,
 } from './TripController.types';
 import { format } from 'date-fns';
 import ExpenseRepository from '../repository/ExpenseRepository';
@@ -62,12 +63,39 @@ class TripController {
       return reply.code(400).send({ error: 'Trip not found' });
     }
 
-    let expenses = await this.expenseRepository.findExpensesForTrip(tripId);
+    const expenses = await this.expenseRepository.findExpensesForTrip(tripId);
 
-    expenses = expenses.map((expense) => {
-      expense.date = format(new Date(expense.date), 'dd MMM yyyy');
-      expense.euroAmount = parseFloat(expense.euroAmount.toFixed(2));
-      return expense;
+    const processedExpenses = expenses.map<ProcessedTripExpense>((expense) => {
+      const processedExpense: ProcessedTripExpense = {
+        id: expense.id,
+        amount: expense.amount.toFixed(2),
+        currency: {
+          id: expense.currencyId,
+          code: expense.currencyCode,
+          name: expense.currencyName,
+        },
+        euroAmount: expense.euroAmount.toFixed(2),
+        localDateTime: expense.localDateTime,
+        description: expense.description,
+        category: {
+          id: expense.categoryId,
+          name: expense.categoryName,
+        },
+        city: {
+          id: expense.cityId,
+          name: expense.cityName,
+          timezone: expense.cityTimeZone,
+        },
+        country: {
+          id: expense.countryId,
+          name: expense.countryName,
+        },
+        userId: expense.userId,
+        createdAt: expense.createdAt,
+        updatedAt: expense.updatedAt,
+      };
+
+      return processedExpense;
     });
 
     trip = {
@@ -76,7 +104,7 @@ class TripController {
       endDate: format(new Date(trip.endDate), 'dd MMM yyyy'),
     };
 
-    return reply.send({ trip, expenses }).code(200);
+    return reply.send({ trip, expenses: processedExpenses }).code(200);
   };
 
   getCountriesForTrip: RouterHandlerWithParams<GetCountriesForTripParams, PossibleErrorResponse<GetCountriesForTripResponse>> = async (

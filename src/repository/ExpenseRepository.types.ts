@@ -3,12 +3,22 @@ import mysql from 'mysql2';
 export interface DBExpenseResult extends mysql.RowDataPacket {
   id: number;
   amount: number;
-  euroAmount: number;
+  currencyId: number;
   currencyCode: string;
-  date: string;
+  currencyName: string;
+  euroAmount: number;
+  localDateTime: string;
   description: string;
   categoryId: number;
   categoryName: string;
+  cityId: number;
+  cityName: string;
+  cityTimeZone: string;
+  countryId: number;
+  countryName: string;
+  userId: number;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface NewExpenseRecord {
