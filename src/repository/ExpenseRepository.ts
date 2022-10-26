@@ -31,13 +31,16 @@ class ExpenseRepository {
           co.name as countryName,
           te.userId,
           te.createdAt,
-          te.updatedAt
+          te.updatedAt,
+          us.id,
+          us.firstName
         FROM trip_expenses te
         JOIN expense_categories ec ON te.categoryId = ec.id
         JOIN currencies cu ON cu.id=te.currencyId
         JOIN expense_categories ca ON ca.id = te.categoryId
         JOIN cities ci ON ci.id = te.cityId
         JOIN countries co ON co.id = ci.countryId
+        JOIN users us ON te.userId = us.id
         WHERE te.tripId = ?
         ORDER BY localDateTime DESC;
       `,

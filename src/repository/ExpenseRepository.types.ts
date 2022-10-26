@@ -16,9 +16,10 @@ export interface DBExpenseResult extends mysql.RowDataPacket {
   cityTimeZone: string;
   countryId: number;
   countryName: string;
-  userId: number;
   createdAt: string;
   updatedAt: string;
+  userId: number;
+  firstName: string;
 }
 
 export interface NewExpenseRecord {

@@ -31,6 +31,11 @@ export interface ExpenseCountry {
   name: string;
 }
 
+export interface ExpenseUser {
+  id: number;
+  firstName: string;
+}
+
 export interface ProcessedTripExpense {
   id: number;
   amount: string;
@@ -41,9 +46,9 @@ export interface ProcessedTripExpense {
   category: ExpenseCategory;
   city: ExpenseCity;
   country: ExpenseCountry;
-  userId: number;
   createdAt: string;
   updatedAt: string;
+  user: ExpenseUser;
 }
 
 export interface GetExpensesForTripReponse {

@@ -90,7 +90,10 @@ class TripController {
           id: expense.countryId,
           name: expense.countryName,
         },
-        userId: expense.userId,
+        user: {
+          id: expense.userId,
+          firstName: expense.firstName,
+        },
         createdAt: expense.createdAt,
         updatedAt: expense.updatedAt,
       };
