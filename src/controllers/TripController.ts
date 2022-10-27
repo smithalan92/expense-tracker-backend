@@ -6,29 +6,35 @@ import {
   GetExpensesForTripReponse,
   GetExpensesForTripParams,
   ResponseTrip,
-  GetCountriesForTripParams,
-  GetCountriesForTripResponse,
   AddExpenseForTripBody,
   AddExpenseForTripParams,
-  ProcessedTripExpense,
+  GetTripDataResponse,
 } from './TripController.types';
 import { format } from 'date-fns';
 import ExpenseRepository from '../repository/ExpenseRepository';
 import CountryRepository from '../repository/CountryRepository';
 import { NewExpenseRecord } from '../repository/ExpenseRepository.types';
 import CurrencyRepository from '../repository/CurrencyRepository';
+import CityRepository from '../repository/CityRepository';
+import CategoryRepository from '../repository/CategoryRepository';
+import { parseExpenseForResponse } from '../utils/expenseParser';
+import { ProcessedTripExpense } from '../utils/expenseParser.types';
 
 class TripController {
   tripRepository: TripRepository;
   expenseRepository: ExpenseRepository;
   countryRepository: CountryRepository;
   currencyRepository: CurrencyRepository;
+  cityRepository: CityRepository;
+  categoryRepository: CategoryRepository;
 
-  constructor({ tripRepository, expenseRepository, countryRepository, currencyRepository }: ContainerCradle) {
+  constructor({ tripRepository, expenseRepository, countryRepository, currencyRepository, cityRepository, categoryRepository }: ContainerCradle) {
     this.tripRepository = tripRepository;
     this.expenseRepository = expenseRepository;
     this.countryRepository = countryRepository;
     this.currencyRepository = currencyRepository;
+    this.cityRepository = cityRepository;
+    this.categoryRepository = categoryRepository;
   }
 
   getTrips: RouteHandler<PossibleErrorResponse<GetTripReponse>> = async (req, reply) => {
@@ -53,67 +59,7 @@ class TripController {
     return reply.send({ trips: tripsWithFormattedDates }).code(200);
   };
 
-  getExpensesForTrip: RouterHandlerWithParams<GetExpensesForTripParams, PossibleErrorResponse<GetExpensesForTripReponse>> = async (req, reply) => {
-    const userId: number = req.requestContext.get('userId');
-    const tripId: number = req.params.tripId;
-
-    let trip = await this.tripRepository.findTripById({ userId, tripId });
-
-    if (!trip) {
-      return reply.code(400).send({ error: 'Trip not found' });
-    }
-
-    const expenses = await this.expenseRepository.findExpensesForTrip(tripId);
-
-    const processedExpenses = expenses.map<ProcessedTripExpense>((expense) => {
-      const processedExpense: ProcessedTripExpense = {
-        id: expense.id,
-        amount: expense.amount.toFixed(2),
-        currency: {
-          id: expense.currencyId,
-          code: expense.currencyCode,
-          name: expense.currencyName,
-        },
-        euroAmount: expense.euroAmount.toFixed(2),
-        localDateTime: expense.localDateTime,
-        description: expense.description,
-        category: {
-          id: expense.categoryId,
-          name: expense.categoryName,
-        },
-        city: {
-          id: expense.cityId,
-          name: expense.cityName,
-          timezone: expense.cityTimeZone,
-        },
-        country: {
-          id: expense.countryId,
-          name: expense.countryName,
-        },
-        user: {
-          id: expense.userId,
-          firstName: expense.firstName,
-        },
-        createdAt: expense.createdAt,
-        updatedAt: expense.updatedAt,
-      };
-
-      return processedExpense;
-    });
-
-    trip = {
-      ...trip,
-      startDate: format(new Date(trip.startDate), 'dd MMM yyyy'),
-      endDate: format(new Date(trip.endDate), 'dd MMM yyyy'),
-    };
-
-    return reply.send({ trip, expenses: processedExpenses }).code(200);
-  };
-
-  getCountriesForTrip: RouterHandlerWithParams<GetCountriesForTripParams, PossibleErrorResponse<GetCountriesForTripResponse>> = async (
-    req,
-    reply
-  ) => {
+  getTripData: RouterHandlerWithParams<GetExpensesForTripParams, PossibleErrorResponse<GetTripDataResponse>> = async (req, reply) => {
     const userId: number = req.requestContext.get('userId');
     const tripId: number = req.params.tripId;
 
@@ -123,9 +69,43 @@ class TripController {
       return reply.code(400).send({ error: 'Trip not found' });
     }
 
-    const countries = await this.countryRepository.getCountriesForTrips([tripId]);
+    const [expenses, cities, countries, currencies, categories] = await Promise.all([
+      this.expenseRepository.findExpensesForTrip(tripId),
+      this.cityRepository.getCityOptionsForTripId(tripId),
+      this.countryRepository.getCountriesForTrips([tripId]),
+      this.currencyRepository.getCurrencies(),
+      this.categoryRepository.getCategories(),
+    ]);
 
-    return reply.send({ countries });
+    const processedExpenses = expenses.map<ProcessedTripExpense>(parseExpenseForResponse);
+
+    return reply
+      .send({
+        trip,
+        expenses: processedExpenses,
+        cities,
+        countries,
+        currencies,
+        categories,
+      })
+      .code(200);
+  };
+
+  getExpensesForTrip: RouterHandlerWithParams<GetExpensesForTripParams, PossibleErrorResponse<GetExpensesForTripReponse>> = async (req, reply) => {
+    const userId: number = req.requestContext.get('userId');
+    const tripId: number = req.params.tripId;
+
+    const trip = await this.tripRepository.findTripById({ userId, tripId });
+
+    if (!trip) {
+      return reply.code(400).send({ error: 'Trip not found' });
+    }
+
+    const expenses = await this.expenseRepository.findExpensesForTrip(tripId);
+
+    const processedExpenses = expenses.map<ProcessedTripExpense>(parseExpenseForResponse);
+
+    return reply.send({ expenses: processedExpenses }).code(200);
   };
 
   addExpenseForTrip: RouteHandlerWithBodyAndParams<AddExpenseForTripParams, AddExpenseForTripBody, PossibleErrorResponse> = async (req, reply) => {

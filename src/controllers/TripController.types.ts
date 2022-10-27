@@ -1,5 +1,9 @@
+import { DBGetCategoriesResult } from '../repository/CategoryRepository.types';
+import { DBGetCityOptionsForTripIdResult } from '../repository/CityRepository.types';
 import { DBGetCountriesByTripIDResult } from '../repository/CountryRepository.types';
+import { DBGetCurrenciesResult } from '../repository/CurrencyRepository.types';
 import { DBTripResult } from '../repository/TripRepository.types';
+import { ProcessedTripExpense } from '../utils/expenseParser.types';
 
 export interface ResponseTrip extends DBTripResult {
   countries: DBGetCountriesByTripIDResult[];
@@ -9,63 +13,12 @@ export interface GetTripReponse {
   trips: ResponseTrip[];
 }
 
-export interface ExpenseCurrency {
-  id: number;
-  code: string;
-  name: string;
-}
-
-export interface ExpenseCategory {
-  id: number;
-  name: string;
-}
-
-export interface ExpenseCity {
-  id: number;
-  name: string;
-  timezone: string;
-}
-
-export interface ExpenseCountry {
-  id: number;
-  name: string;
-}
-
-export interface ExpenseUser {
-  id: number;
-  firstName: string;
-}
-
-export interface ProcessedTripExpense {
-  id: number;
-  amount: string;
-  currency: ExpenseCurrency;
-  euroAmount: string;
-  localDateTime: string;
-  description: string;
-  category: ExpenseCategory;
-  city: ExpenseCity;
-  country: ExpenseCountry;
-  createdAt: string;
-  updatedAt: string;
-  user: ExpenseUser;
-}
-
-export interface GetExpensesForTripReponse {
-  trip: DBTripResult;
-  expenses: ProcessedTripExpense[];
-}
-
 export interface GetExpensesForTripParams {
   tripId: number;
 }
 
-export interface GetCountriesForTripParams {
-  tripId: number;
-}
-
-export interface GetCountriesForTripResponse {
-  countries: DBGetCountriesByTripIDResult[];
+export interface GetExpensesForTripReponse {
+  expenses: ProcessedTripExpense[];
 }
 
 export interface AddExpenseForTripParams {
@@ -79,4 +32,13 @@ export interface AddExpenseForTripBody {
   currencyId: number;
   categoryId: number;
   description: string;
+}
+
+export interface GetTripDataResponse {
+  expenses: ProcessedTripExpense[];
+  trip: DBTripResult;
+  countries: DBGetCountriesByTripIDResult[];
+  cities: DBGetCityOptionsForTripIdResult[];
+  currencies: DBGetCurrenciesResult[];
+  categories: DBGetCategoriesResult[];
 }

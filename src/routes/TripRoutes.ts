@@ -3,8 +3,7 @@ import TripController from '../controllers/TripController';
 import {
   AddExpenseForTripBody,
   AddExpenseForTripParams,
-  GetCountriesForTripParams,
-  GetCountriesForTripResponse,
+  GetTripDataResponse,
   GetExpensesForTripParams,
   GetExpensesForTripReponse,
   GetTripReponse,
@@ -38,12 +37,12 @@ class TripRoutes implements Router {
     });
 
     server.route<{
-      Params: GetCountriesForTripParams;
-      Reply: PossibleErrorResponse<GetCountriesForTripResponse>;
+      Params: GetExpensesForTripParams;
+      Reply: PossibleErrorResponse<GetTripDataResponse>;
     }>({
       method: 'GET',
-      url: '/trips/:tripId/countries',
-      handler: this.controller.getCountriesForTrip,
+      url: '/trips/:tripId/data',
+      handler: this.controller.getTripData,
     });
 
     server.route<{
