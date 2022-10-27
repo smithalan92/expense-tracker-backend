@@ -1,6 +1,6 @@
 import { ContainerCradle } from '../lib/types';
-import { PossibleErrorResponse, RouterHandlerWithParams } from '../types/routes';
-import { GetCitiesForCountryParams, GetCitiesForCountryResponse } from './CountryController.types';
+import { PossibleErrorResponse, RouteHandlerWithQueryString, RouterHandlerWithParams } from '../types/routes';
+import { CitiesByCountryId, GetCitiesForCountriesParams, GetCitiesForCountriesResponse } from './CountryController.types';
 import CityRepository from '../repository/CityRepository';
 
 class CountryController {
@@ -10,14 +10,26 @@ class CountryController {
     this.cityRepository = cityRepository;
   }
 
-  getCitiesForCountry: RouterHandlerWithParams<GetCitiesForCountryParams, PossibleErrorResponse<GetCitiesForCountryResponse>> = async (
+  getCitiesForCountries: RouteHandlerWithQueryString<GetCitiesForCountriesParams, PossibleErrorResponse<GetCitiesForCountriesResponse>> = async (
     req,
     reply
   ) => {
-    const countryId: number = req.params.countryId;
-    const cities = await this.cityRepository.getCitiesForCountry(countryId);
+    const countryIds: number[] = req.query.countryIds;
+    const cities = await this.cityRepository.getCitiesForCountryIds(countryIds);
 
-    return reply.send({ cities }).code(200);
+    const citiesByCountryId = cities.reduce<CitiesByCountryId>((acc, current) => {
+      const { countryId } = current;
+
+      if (acc[countryId]) {
+        acc[countryId].push(current);
+      } else {
+        acc[countryId] = [current];
+      }
+
+      return acc;
+    }, {});
+
+    return reply.send({ countries: citiesByCountryId }).code(200);
   };
 }
 

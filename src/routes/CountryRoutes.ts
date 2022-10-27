@@ -1,6 +1,6 @@
 import { FastifyInstance } from 'fastify';
 import CountryController from '../controllers/CountryController';
-import { GetCitiesForCountryParams, GetCitiesForCountryResponse } from '../controllers/CountryController.types';
+import { GetCitiesForCountriesParams, GetCitiesForCountriesResponse } from '../controllers/CountryController.types';
 import { Router, ContainerCradle } from '../lib/types';
 import { PossibleErrorResponse } from '../types/routes';
 
@@ -13,12 +13,12 @@ class CountryRoutes implements Router {
 
   configure(server: FastifyInstance) {
     server.route<{
-      Params: GetCitiesForCountryParams;
-      Reply: PossibleErrorResponse<GetCitiesForCountryResponse>;
+      Reply: PossibleErrorResponse<GetCitiesForCountriesResponse>;
+      Querystring: GetCitiesForCountriesParams;
     }>({
       method: 'GET',
-      url: '/countries/:countryId/cities',
-      handler: this.controller.getCitiesForCountry,
+      url: '/countries/cities',
+      handler: this.controller.getCitiesForCountries,
     });
   }
 }

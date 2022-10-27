@@ -1,9 +1,13 @@
 import { DBCityResult } from '../repository/CityRepository.types';
 
-export interface GetCitiesForCountryParams {
-  countryId: number;
+export interface GetCitiesForCountriesParams {
+  countryIds: number[];
 }
 
-export interface GetCitiesForCountryResponse {
-  cities: DBCityResult[];
+export interface CitiesByCountryId {
+  [key: number]: DBCityResult[];
+}
+
+export interface GetCitiesForCountriesResponse {
+  countries: CitiesByCountryId;
 }

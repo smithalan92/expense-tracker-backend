@@ -16,9 +16,8 @@ class CountryRepository {
         FROM trip_countries tc
         JOIN countries c on c.id = tc.countryId
         JOIN currencies cur on cur.id = c.currencyId
-        WHERE tc.tripId = ?;
+        WHERE tc.tripId IN (${this.dbAgent.prepareArrayForInValue(tripIds)});
       `,
-      values: [tripIds],
     });
 
     return results;

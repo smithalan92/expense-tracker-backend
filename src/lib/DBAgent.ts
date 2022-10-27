@@ -2,7 +2,7 @@ import mysql from 'mysql2/promise';
 
 interface RunQueryParams {
   query: string;
-  values?: Array<string | number> | Array<Array<string | number>>;
+  values?: Array<string | number>;
 }
 
 class DBAgent {
@@ -13,13 +13,13 @@ class DBAgent {
   }
 
   async runQuery<T extends mysql.RowDataPacket[] | mysql.OkPacket>({ query, values }: RunQueryParams) {
-    // Flatten nested arrays
-    const valuesToUse = values?.map((v) => {
-      return Array.isArray(v) ? v.join(',') : v;
-    });
-
-    const [rows] = await this.pool.execute<T>(query, valuesToUse);
+    const [rows] = await this.pool.execute<T>(query, values);
     return rows;
+  }
+
+  prepareArrayForInValue(items: Array<string | number>) {
+    if (typeof items[0] === 'number') return items.join(',');
+    else return items.map((i) => `'${i}'`).join(',');
   }
 }
 

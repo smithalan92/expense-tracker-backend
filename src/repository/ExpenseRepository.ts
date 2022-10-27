@@ -29,10 +29,9 @@ class ExpenseRepository {
           ci.timezoneName as cityTimeZone,
           co.id as countryId,
           co.name as countryName,
-          te.userId,
           te.createdAt,
           te.updatedAt,
-          us.id,
+          us.id as userId,
           us.firstName
         FROM trip_expenses te
         JOIN expense_categories ec ON te.categoryId = ec.id

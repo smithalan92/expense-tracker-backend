@@ -1,4 +1,5 @@
 import Fastify, { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
+import qs from 'qs';
 import cors from '@fastify/cors';
 import { ContainerCradle, Router } from './types';
 import TokenRepository from '../repository/TokenRepository';
@@ -17,6 +18,7 @@ class Server {
 
   createServer() {
     const server = Fastify({
+      querystringParser: (str) => qs.parse(str, { comma: true }),
       logger: {
         level: 'info',
       },

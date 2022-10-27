@@ -9,15 +9,14 @@ class CityRepository {
     this.dbAgent = dbAgent;
   }
 
-  async getCitiesForCountry(countryId: number) {
+  async getCitiesForCountryIds(countryIds: number[]) {
     const results = await this.dbAgent.runQuery<DBCityResult[]>({
       query: `
-        SELECT id, name
+        SELECT id, name, countryId
         FROM cities
-        WHERE countryId = ?
+        WHERE countryId IN (${this.dbAgent.prepareArrayForInValue(countryIds)})
         ORDER BY name ASC;
       `,
-      values: [countryId],
     });
 
     return results;
