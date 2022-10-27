@@ -33,3 +33,18 @@ export interface NewExpenseRecord {
   cityId: number;
   userId: number;
 }
+
+export interface DBExpenseCategoryBreakdownForTripResult extends mysql.RowDataPacket {
+  categoryName: string;
+  totalEuroAmount: number;
+}
+
+export interface DBExpenseByUserBreakdownForTripResult extends mysql.RowDataPacket {
+  userFirstName: string;
+  totalEuroAmount: number;
+}
+
+export interface DBGetExpensiveTripDayResult extends mysql.RowDataPacket {
+  localDate: string;
+  totalEuroAmount: number;
+}

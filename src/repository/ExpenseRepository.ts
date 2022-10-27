@@ -1,7 +1,13 @@
 import { OkPacket } from 'mysql2';
 import DBAgent from '../lib/DBAgent';
 import { ContainerCradle } from '../lib/types';
-import { DBExpenseResult, NewExpenseRecord } from './ExpenseRepository.types';
+import {
+  DBExpenseByUserBreakdownForTripResult,
+  DBExpenseCategoryBreakdownForTripResult,
+  DBExpenseResult,
+  DBGetExpensiveTripDayResult,
+  NewExpenseRecord,
+} from './ExpenseRepository.types';
 
 class ExpenseRepository {
   dbAgent: DBAgent;
@@ -71,6 +77,70 @@ class ExpenseRepository {
     if (!result.insertId) {
       throw new Error('Failed to insert new expense');
     }
+  }
+
+  async getExpenseCategoryBreakdownForTrip(tripId: number) {
+    const result = await this.dbAgent.runQuery<DBExpenseCategoryBreakdownForTripResult[]>({
+      query: `
+        SELECT ec.name as categoryName, ROUND(SUM(te.euroAmount), 2) as totalEuroAmount
+        FROM trip_expenses te
+        JOIN expense_categories ec ON ec.id = te.categoryId
+        WHERE te.tripId = ?
+        GROUP BY ec.id
+        ORDER BY totalEuroAmount DESC;
+      `,
+      values: [tripId],
+    });
+
+    return result;
+  }
+
+  async getExpenseByUserBreakdownForTrip(tripId: number) {
+    const result = await this.dbAgent.runQuery<DBExpenseByUserBreakdownForTripResult[]>({
+      query: `
+        SELECT u.firstName as userFirstName, ROUND(SUM(te.euroAmount), 2) as totalEuroAmount
+        FROM trip_expenses te
+        JOIN users u ON u.id = te.userId
+        WHERE te.tripId = ?
+        GROUP BY u.id
+        ORDER BY totalEuroAmount DESC;
+      `,
+      values: [tripId],
+    });
+
+    return result;
+  }
+
+  async getMostExpensiveTripDay(tripId: number) {
+    const result = await this.dbAgent.runQuery<DBGetExpensiveTripDayResult[]>({
+      query: `
+        SELECT DATE_FORMAT(localDateTime, '%Y-%m-%d') as localDate, ROUND(SUM(te.euroAmount), 2) as totalEuroAmount
+        FROM trip_expenses te
+        WHERE te.tripId = ?
+        GROUP BY localDate
+        ORDER BY totalEuroAmount DESC
+        LIMIT 1;
+      `,
+      values: [tripId],
+    });
+
+    return result[0];
+  }
+
+  async getLeastExpensiveTripDay(tripId: number) {
+    const result = await this.dbAgent.runQuery<DBGetExpensiveTripDayResult[]>({
+      query: `
+        SELECT DATE_FORMAT(localDateTime, '%Y-%m-%d') as localDate, ROUND(SUM(te.euroAmount), 2) as totalEuroAmount
+        FROM trip_expenses te
+        WHERE te.tripId = ?
+        GROUP BY localDate
+        ORDER BY totalEuroAmount ASC
+        LIMIT 1;
+      `,
+      values: [tripId],
+    });
+
+    return result[0];
   }
 }
 

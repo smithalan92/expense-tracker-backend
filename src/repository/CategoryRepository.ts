@@ -13,7 +13,8 @@ class CategoryRepository {
     const results = await this.dbAgent.runQuery<DBGetCategoriesResult[]>({
       query: `
         SELECT id, name
-        FROM expense_categories;
+        FROM expense_categories
+        ORDER BY orderId ASC;
       `,
     });
 

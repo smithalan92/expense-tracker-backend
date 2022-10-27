@@ -4,11 +4,12 @@ import TripRepository from '../repository/TripRepository';
 import {
   GetTripReponse,
   GetExpensesForTripReponse,
-  GetExpensesForTripParams,
+  RouteWithTripIDParams,
   ResponseTrip,
   AddExpenseForTripBody,
   AddExpenseForTripParams,
   GetTripDataResponse,
+  GetExpenseStatsResponse,
 } from './TripController.types';
 import { format } from 'date-fns';
 import ExpenseRepository from '../repository/ExpenseRepository';
@@ -59,7 +60,7 @@ class TripController {
     return reply.send({ trips: tripsWithFormattedDates }).code(200);
   };
 
-  getTripData: RouterHandlerWithParams<GetExpensesForTripParams, PossibleErrorResponse<GetTripDataResponse>> = async (req, reply) => {
+  getTripData: RouterHandlerWithParams<RouteWithTripIDParams, PossibleErrorResponse<GetTripDataResponse>> = async (req, reply) => {
     const userId: number = req.requestContext.get('userId');
     const tripId: number = req.params.tripId;
 
@@ -91,7 +92,7 @@ class TripController {
       .code(200);
   };
 
-  getExpensesForTrip: RouterHandlerWithParams<GetExpensesForTripParams, PossibleErrorResponse<GetExpensesForTripReponse>> = async (req, reply) => {
+  getExpensesForTrip: RouterHandlerWithParams<RouteWithTripIDParams, PossibleErrorResponse<GetExpensesForTripReponse>> = async (req, reply) => {
     const userId: number = req.requestContext.get('userId');
     const tripId: number = req.params.tripId;
 
@@ -140,6 +141,31 @@ class TripController {
     await this.expenseRepository.addExpenseForTrip(expense);
 
     return reply.status(201).send();
+  };
+
+  getExpenseStats: RouterHandlerWithParams<RouteWithTripIDParams, PossibleErrorResponse<GetExpenseStatsResponse>> = async (req, reply) => {
+    const userId: number = req.requestContext.get('userId');
+    const tripId: number = req.params.tripId;
+
+    const trip = await this.tripRepository.findTripById({ userId, tripId });
+
+    if (!trip) {
+      return reply.code(400).send({ error: 'Trip not found' });
+    }
+
+    const [categoryBreakdown, userBreakdown, mostExpenseDay, leastExpensiveDay] = await Promise.all([
+      this.expenseRepository.getExpenseCategoryBreakdownForTrip(tripId),
+      this.expenseRepository.getExpenseByUserBreakdownForTrip(tripId),
+      this.expenseRepository.getMostExpensiveTripDay(tripId),
+      this.expenseRepository.getLeastExpensiveTripDay(tripId),
+    ]);
+
+    return {
+      categoryBreakdown,
+      userBreakdown,
+      mostExpenseDay,
+      leastExpensiveDay,
+    };
   };
 }
 

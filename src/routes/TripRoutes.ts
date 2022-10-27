@@ -4,9 +4,10 @@ import {
   AddExpenseForTripBody,
   AddExpenseForTripParams,
   GetTripDataResponse,
-  GetExpensesForTripParams,
+  RouteWithTripIDParams,
   GetExpensesForTripReponse,
   GetTripReponse,
+  GetExpenseStatsResponse,
 } from '../controllers/TripController.types';
 import { Router, ContainerCradle } from '../lib/types';
 import { PossibleErrorResponse } from '../types/routes';
@@ -28,7 +29,7 @@ class TripRoutes implements Router {
     });
 
     server.route<{
-      Params: GetExpensesForTripParams;
+      Params: RouteWithTripIDParams;
       Reply: PossibleErrorResponse<GetExpensesForTripReponse>;
     }>({
       method: 'GET',
@@ -37,12 +38,21 @@ class TripRoutes implements Router {
     });
 
     server.route<{
-      Params: GetExpensesForTripParams;
+      Params: RouteWithTripIDParams;
       Reply: PossibleErrorResponse<GetTripDataResponse>;
     }>({
       method: 'GET',
       url: '/trips/:tripId/data',
       handler: this.controller.getTripData,
+    });
+
+    server.route<{
+      Params: RouteWithTripIDParams;
+      Reply: PossibleErrorResponse<GetExpenseStatsResponse>;
+    }>({
+      method: 'GET',
+      url: '/trips/:tripId/stats',
+      handler: this.controller.getExpenseStats,
     });
 
     server.route<{
