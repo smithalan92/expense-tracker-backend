@@ -54,3 +54,8 @@ export interface GetExpenseStatsResponse {
   mostExpenseDay: DBGetExpensiveTripDayResult;
   leastExpensiveDay: DBGetExpensiveTripDayResult;
 }
+
+export interface DeleteExpenseParams {
+  tripId: number;
+  expenseId: number;
+}

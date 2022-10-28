@@ -79,6 +79,17 @@ class ExpenseRepository {
     }
   }
 
+  async deleteExpenseForTrip(tripId: number, expenseId: number) {
+    return this.dbAgent.runQuery<OkPacket>({
+      query: `
+        DELETE FROM trip_expenses
+        WHERE tripId = ?
+        AND id = ?
+      `,
+      values: [tripId, expenseId],
+    });
+  }
+
   async getExpenseCategoryBreakdownForTrip(tripId: number) {
     const result = await this.dbAgent.runQuery<DBExpenseCategoryBreakdownForTripResult[]>({
       query: `

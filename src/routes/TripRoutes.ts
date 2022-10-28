@@ -8,6 +8,7 @@ import {
   GetExpensesForTripReponse,
   GetTripReponse,
   GetExpenseStatsResponse,
+  DeleteExpenseParams,
 } from '../controllers/TripController.types';
 import { Router, ContainerCradle } from '../lib/types';
 import { PossibleErrorResponse } from '../types/routes';
@@ -63,6 +64,15 @@ class TripRoutes implements Router {
       method: 'POST',
       url: '/trips/:tripId/expense',
       handler: this.controller.addExpenseForTrip,
+    });
+
+    server.route<{
+      Params: DeleteExpenseParams;
+      Reply: PossibleErrorResponse<any>;
+    }>({
+      method: 'DELETE',
+      url: '/trips/:tripId/expense/:expenseId',
+      handler: this.controller.deleteExpense,
     });
   }
 }

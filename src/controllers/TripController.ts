@@ -10,6 +10,7 @@ import {
   AddExpenseForTripParams,
   GetTripDataResponse,
   GetExpenseStatsResponse,
+  DeleteExpenseParams,
 } from './TripController.types';
 import { format } from 'date-fns';
 import ExpenseRepository from '../repository/ExpenseRepository';
@@ -160,12 +161,28 @@ class TripController {
       this.expenseRepository.getLeastExpensiveTripDay(tripId),
     ]);
 
-    return {
+    return reply.status(200).send({
       categoryBreakdown,
       userBreakdown,
       mostExpenseDay,
       leastExpensiveDay,
-    };
+    });
+  };
+
+  deleteExpense: RouterHandlerWithParams<DeleteExpenseParams, PossibleErrorResponse<GetExpenseStatsResponse>> = async (req, reply) => {
+    const userId: number = req.requestContext.get('userId');
+    const tripId: number = req.params.tripId;
+    const expenseId: number = req.params.expenseId;
+
+    const trip = await this.tripRepository.findTripById({ userId, tripId });
+
+    if (!trip) {
+      return reply.code(400).send({ error: 'Trip not found' });
+    }
+
+    await this.expenseRepository.deleteExpenseForTrip(tripId, expenseId);
+
+    return reply.status(204).send();
   };
 }
 
