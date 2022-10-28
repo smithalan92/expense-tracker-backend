@@ -11,10 +11,7 @@ import DBAgent from './DBAgent';
 import CurrencyRepository from '../repository/CurrencyRepository';
 import CountryRepository from '../repository/CountryRepository';
 import CityRepository from '../repository/CityRepository';
-import CountryController from '../controllers/CountryController';
-import CurrencyController from '../controllers/CurrencyController';
 import CategoryRepository from '../repository/CategoryRepository';
-import CategoryController from '../controllers/CategoryController';
 
 export interface Env {
   serviceName: string;
@@ -30,9 +27,6 @@ export interface ContainerCradle {
   authRoutes: AuthRouter;
   tripRoutes: TripRoutes;
   tripController: TripController;
-  countryController: CountryController;
-  currencyController: CurrencyController;
-  categoryController: CategoryController;
   dbAgent: DBAgent;
   userRepository: UserRepository;
   tokenRepository: TokenRepository;
