@@ -35,7 +35,7 @@ export interface ProcessedTripExpense {
   category: ExpenseCategory;
   city: ExpenseCity;
   country: ExpenseCountry;
-  createdAt: string;
-  updatedAt: string;
+  createdAt: Date;
+  updatedAt: Date;
   user: ExpenseUser;
 }

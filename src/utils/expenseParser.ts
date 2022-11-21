@@ -11,7 +11,7 @@ export function parseExpenseForResponse(expense: DBExpenseResult): ProcessedTrip
       name: expense.currencyName,
     },
     euroAmount: expense.euroAmount.toFixed(2),
-    localDateTime: expense.localDateTime,
+    localDateTime: expense.localDateTime.toISOString().replace('.000Z', ''),
     description: expense.description,
     category: {
       id: expense.categoryId,

@@ -7,7 +7,7 @@ export interface DBExpenseResult extends mysql.RowDataPacket {
   currencyCode: string;
   currencyName: string;
   euroAmount: number;
-  localDateTime: string;
+  localDateTime: Date;
   description: string;
   categoryId: number;
   categoryName: string;
@@ -16,8 +16,8 @@ export interface DBExpenseResult extends mysql.RowDataPacket {
   cityTimeZone: string;
   countryId: number;
   countryName: string;
-  createdAt: string;
-  updatedAt: string;
+  createdAt: Date;
+  updatedAt: Date;
   userId: number;
   firstName: string;
 }
