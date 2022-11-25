@@ -48,3 +48,17 @@ export interface DBGetExpensiveTripDayResult extends mysql.RowDataPacket {
   localDate: string;
   totalEuroAmount: number;
 }
+
+export interface DBGetCountryBreakdownResult extends mysql.RowDataPacket {
+  name: string;
+  euroTotal: number;
+  localTotal: number;
+  localCurrency: string;
+}
+
+export interface DBGetCityBreakdownResult extends DBGetCountryBreakdownResult {}
+
+export interface DBGetDailyCostBreakdownResult extends mysql.RowDataPacket {
+  localDate: string;
+  euroTotal: number;
+}

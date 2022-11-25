@@ -5,6 +5,9 @@ import {
   DBExpenseByUserBreakdownForTripResult,
   DBExpenseCategoryBreakdownForTripResult,
   DBExpenseResult,
+  DBGetCityBreakdownResult,
+  DBGetCountryBreakdownResult,
+  DBGetDailyCostBreakdownResult,
   DBGetExpensiveTripDayResult,
   NewExpenseRecord,
 } from './ExpenseRepository.types';
@@ -152,6 +155,57 @@ class ExpenseRepository {
     });
 
     return result[0];
+  }
+
+  async getExpenseByCountryBreakdownForTrip(tripId: number) {
+    const results = await this.dbAgent.runQuery<DBGetCountryBreakdownResult[]>({
+      query: `
+        SELECT co.name, TRUNCATE(SUM(te.euroAmount), 2) as euroTotal, TRUNCATE(SUM(te.amount), 2) as localTotal, cu.code as localCurrency
+        FROM trip_expenses te
+        LEFT JOIN cities c ON c.id = te.cityId
+        LEFT JOIN countries co ON co.id = c.countryId
+        LEFT JOIN currencies cu ON cu.id = te.currencyId
+        WHERE te.tripId = ?
+        GROUP BY co.id
+        ORDER BY te.localDateTime;
+      `,
+      values: [tripId],
+    });
+
+    return results;
+  }
+
+  async getExpenseByCityBreakdownForTrip(tripId: number) {
+    const results = await this.dbAgent.runQuery<DBGetCityBreakdownResult[]>({
+      query: `
+        SELECT c.name, TRUNCATE(SUM(te.euroAmount), 2) as euroTotal, TRUNCATE(SUM(te.amount), 2) as localAmount, cu.code as localCurrency
+        FROM trip_expenses te
+        LEFT JOIN cities c ON c.id = te.cityId
+        LEFT JOIN countries co ON co.id = c.countryId
+        LEFT JOIN currencies cu ON cu.id = te.currencyId
+        WHERE te.tripId = ?
+        GROUP BY c.id
+        ORDER BY te.localDateTime
+      `,
+      values: [tripId],
+    });
+
+    return results;
+  }
+
+  async getDailyCostBreakdownForTrip(tripId: number) {
+    const results = await this.dbAgent.runQuery<DBGetDailyCostBreakdownResult[]>({
+      query: `
+        SELECT  DATE_FORMAT(localDateTime, '%Y-%m-%d') as localDate, TRUNCATE(SUM(te.euroAmount), 2) as euroTotal
+        FROM trip_expenses te
+        WHERE te.tripId = ?
+        GROUP BY YEAR(te.localDateTime), MONTH(te.localDateTime), DAY(te.localDateTime)
+        ORDER BY localDate ASC;
+      `,
+      values: [tripId],
+    });
+
+    return results;
   }
 }
 

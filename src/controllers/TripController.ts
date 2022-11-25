@@ -154,18 +154,25 @@ class TripController {
       return reply.code(400).send({ error: 'Trip not found' });
     }
 
-    const [categoryBreakdown, userBreakdown, mostExpenseDay, leastExpensiveDay] = await Promise.all([
-      this.expenseRepository.getExpenseCategoryBreakdownForTrip(tripId),
-      this.expenseRepository.getExpenseByUserBreakdownForTrip(tripId),
-      this.expenseRepository.getMostExpensiveTripDay(tripId),
-      this.expenseRepository.getLeastExpensiveTripDay(tripId),
-    ]);
+    const [categoryBreakdown, userBreakdown, mostExpenseDay, leastExpensiveDay, countryBreakdown, cityBreakdown, dailyCostBreakdown] =
+      await Promise.all([
+        this.expenseRepository.getExpenseCategoryBreakdownForTrip(tripId),
+        this.expenseRepository.getExpenseByUserBreakdownForTrip(tripId),
+        this.expenseRepository.getMostExpensiveTripDay(tripId),
+        this.expenseRepository.getLeastExpensiveTripDay(tripId),
+        this.expenseRepository.getExpenseByCountryBreakdownForTrip(tripId),
+        this.expenseRepository.getExpenseByCityBreakdownForTrip(tripId),
+        this.expenseRepository.getDailyCostBreakdownForTrip(tripId),
+      ]);
 
     return reply.status(200).send({
       categoryBreakdown,
       userBreakdown,
       mostExpenseDay,
       leastExpensiveDay,
+      countryBreakdown,
+      cityBreakdown,
+      dailyCostBreakdown,
     });
   };
 

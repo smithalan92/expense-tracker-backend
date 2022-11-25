@@ -5,6 +5,9 @@ import { DBGetCurrenciesResult } from '../repository/CurrencyRepository.types';
 import {
   DBExpenseByUserBreakdownForTripResult,
   DBExpenseCategoryBreakdownForTripResult,
+  DBGetCityBreakdownResult,
+  DBGetCountryBreakdownResult,
+  DBGetDailyCostBreakdownResult,
   DBGetExpensiveTripDayResult,
 } from '../repository/ExpenseRepository.types';
 import { DBTripResult } from '../repository/TripRepository.types';
@@ -53,6 +56,9 @@ export interface GetExpenseStatsResponse {
   userBreakdown: DBExpenseByUserBreakdownForTripResult[];
   mostExpenseDay: DBGetExpensiveTripDayResult;
   leastExpensiveDay: DBGetExpensiveTripDayResult;
+  countryBreakdown: DBGetCountryBreakdownResult[];
+  cityBreakdown: DBGetCityBreakdownResult[];
+  dailyCostBreakdown: DBGetDailyCostBreakdownResult[];
 }
 
 export interface DeleteExpenseParams {
