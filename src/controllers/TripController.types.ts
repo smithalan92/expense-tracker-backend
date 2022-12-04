@@ -9,8 +9,9 @@ import {
   DBGetCountryBreakdownResult,
   DBGetDailyCostBreakdownResult,
   DBGetExpensiveTripDayResult,
+  ExpenseCategoryBreakdownForTripByUser,
 } from '../repository/ExpenseRepository.types';
-import { DBTripResult } from '../repository/TripRepository.types';
+import { DBTripResult, UsersForTrip } from '../repository/TripRepository.types';
 import { ProcessedTripExpense } from '../utils/expenseParser.types';
 
 export interface ResponseTrip extends DBTripResult {
@@ -49,10 +50,12 @@ export interface GetTripDataResponse {
   cities: DBGetCityOptionsForTripIdResult[];
   currencies: DBGetCurrenciesResult[];
   categories: DBGetCategoriesResult[];
+  users: UsersForTrip;
 }
 
 export interface GetExpenseStatsResponse {
   categoryBreakdown: DBExpenseCategoryBreakdownForTripResult[];
+  categoryByUserBreakdown: ExpenseCategoryBreakdownForTripByUser;
   userBreakdown: DBExpenseByUserBreakdownForTripResult[];
   mostExpenseDay: DBGetExpensiveTripDayResult;
   leastExpensiveDay: DBGetExpensiveTripDayResult;

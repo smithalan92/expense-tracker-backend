@@ -1,6 +1,6 @@
 import DBAgent from '../lib/DBAgent';
 import { ContainerCradle } from '../lib/types';
-import { DBTripResult } from './TripRepository.types';
+import { DBFindUsersForTripResult, DBTripResult, UsersForTrip } from './TripRepository.types';
 
 class TripRepository {
   dbAgent: DBAgent;
@@ -40,6 +40,27 @@ class TripRepository {
     });
 
     return result ?? null;
+  }
+
+  async findUsersForTrip(tripId: number) {
+    const results = await this.dbAgent.runQuery<DBFindUsersForTripResult[]>({
+      query: `
+        SELECT u.id, u.firstName, u.lastName
+        FROM users u
+        LEFT JOIN user_trips ut ON ut.userId = u.id
+        WHERE ut.tripId = ?
+      `,
+      values: [tripId],
+    });
+
+    return results.reduce<UsersForTrip>((acc, current) => {
+      acc[current.id] = {
+        firstName: current.firstName,
+        lastName: current.lastName,
+      };
+
+      return acc;
+    }, {});
   }
 }
 

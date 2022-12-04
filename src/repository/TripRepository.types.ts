@@ -10,3 +10,13 @@ export interface DBTripResult extends mysql.RowDataPacket {
   totalLocalAmount: number;
   totalExpenseAmount: number;
 }
+
+export interface DBFindUsersForTripResult extends mysql.RowDataPacket {
+  id: number;
+  firstName: string;
+  lastName: string;
+}
+
+export interface UsersForTrip {
+  [key: number]: Omit<DBFindUsersForTripResult, 'constructor' | 'id'>;
+}

@@ -3,12 +3,14 @@ import DBAgent from '../lib/DBAgent';
 import { ContainerCradle } from '../lib/types';
 import {
   DBExpenseByUserBreakdownForTripResult,
+  DBExpenseCategoryBreakdownForTripByUserResult,
   DBExpenseCategoryBreakdownForTripResult,
   DBExpenseResult,
   DBGetCityBreakdownResult,
   DBGetCountryBreakdownResult,
   DBGetDailyCostBreakdownResult,
   DBGetExpensiveTripDayResult,
+  ExpenseCategoryBreakdownForTripByUser,
   NewExpenseRecord,
 } from './ExpenseRepository.types';
 
@@ -207,6 +209,36 @@ class ExpenseRepository {
 
     return results;
   }
-}
 
+  async getExpenseCategoryBreakdownByUser(tripId: number) {
+    const results = await this.dbAgent.runQuery<DBExpenseCategoryBreakdownForTripByUserResult[]>({
+      query: `
+      SELECT ec.name as categoryName, ROUND(SUM(te.euroAmount), 2) as totalEuroAmount, te.userId
+      FROM trip_expenses te
+      JOIN expense_categories ec ON ec.id = te.categoryId
+      WHERE te.tripId = ?
+      GROUP BY ec.id, te.userId
+      ORDER BY userId, totalEuroAmount DESC
+    `,
+      values: [tripId],
+    });
+
+    return results.reduce<ExpenseCategoryBreakdownForTripByUser>((acc, current) => {
+      if (acc[current.userId]) {
+        acc[current.userId].push({
+          categoryName: current.categoryName,
+          totalEuroAmount: current.totalEuroAmount,
+        });
+      } else {
+        acc[current.userId] = [
+          {
+            categoryName: current.categoryName,
+            totalEuroAmount: current.totalEuroAmount,
+          },
+        ];
+      }
+      return acc;
+    }, {});
+  }
+}
 export default ExpenseRepository;

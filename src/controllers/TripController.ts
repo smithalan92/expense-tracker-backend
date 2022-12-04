@@ -71,12 +71,13 @@ class TripController {
       return reply.code(400).send({ error: 'Trip not found' });
     }
 
-    const [expenses, cities, countries, currencies, categories] = await Promise.all([
+    const [expenses, cities, countries, currencies, categories, users] = await Promise.all([
       this.expenseRepository.findExpensesForTrip(tripId),
       this.cityRepository.getCityOptionsForTripId(tripId),
       this.countryRepository.getCountriesForTrips([tripId]),
       this.currencyRepository.getCurrencies(),
       this.categoryRepository.getCategories(),
+      this.tripRepository.findUsersForTrip(tripId),
     ]);
 
     const processedExpenses = expenses.map<ProcessedTripExpense>(parseExpenseForResponse);
@@ -89,6 +90,7 @@ class TripController {
         countries,
         currencies,
         categories,
+        users,
       })
       .code(200);
   };
@@ -154,19 +156,29 @@ class TripController {
       return reply.code(400).send({ error: 'Trip not found' });
     }
 
-    const [categoryBreakdown, userBreakdown, mostExpenseDay, leastExpensiveDay, countryBreakdown, cityBreakdown, dailyCostBreakdown] =
-      await Promise.all([
-        this.expenseRepository.getExpenseCategoryBreakdownForTrip(tripId),
-        this.expenseRepository.getExpenseByUserBreakdownForTrip(tripId),
-        this.expenseRepository.getMostExpensiveTripDay(tripId),
-        this.expenseRepository.getLeastExpensiveTripDay(tripId),
-        this.expenseRepository.getExpenseByCountryBreakdownForTrip(tripId),
-        this.expenseRepository.getExpenseByCityBreakdownForTrip(tripId),
-        this.expenseRepository.getDailyCostBreakdownForTrip(tripId),
-      ]);
+    const [
+      categoryBreakdown,
+      categoryByUserBreakdown,
+      userBreakdown,
+      mostExpenseDay,
+      leastExpensiveDay,
+      countryBreakdown,
+      cityBreakdown,
+      dailyCostBreakdown,
+    ] = await Promise.all([
+      this.expenseRepository.getExpenseCategoryBreakdownForTrip(tripId),
+      this.expenseRepository.getExpenseCategoryBreakdownByUser(tripId),
+      this.expenseRepository.getExpenseByUserBreakdownForTrip(tripId),
+      this.expenseRepository.getMostExpensiveTripDay(tripId),
+      this.expenseRepository.getLeastExpensiveTripDay(tripId),
+      this.expenseRepository.getExpenseByCountryBreakdownForTrip(tripId),
+      this.expenseRepository.getExpenseByCityBreakdownForTrip(tripId),
+      this.expenseRepository.getDailyCostBreakdownForTrip(tripId),
+    ]);
 
     return reply.status(200).send({
       categoryBreakdown,
+      categoryByUserBreakdown,
       userBreakdown,
       mostExpenseDay,
       leastExpensiveDay,

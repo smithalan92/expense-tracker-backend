@@ -62,3 +62,11 @@ export interface DBGetDailyCostBreakdownResult extends mysql.RowDataPacket {
   localDate: string;
   euroTotal: number;
 }
+
+export interface DBExpenseCategoryBreakdownForTripByUserResult extends DBExpenseCategoryBreakdownForTripResult {
+  userId: number;
+}
+
+export interface ExpenseCategoryBreakdownForTripByUser {
+  [key: string]: Array<Omit<DBExpenseCategoryBreakdownForTripResult, 'constructor'>>;
+}
