@@ -70,3 +70,29 @@ export interface DBExpenseCategoryBreakdownForTripByUserResult extends DBExpense
 export interface ExpenseCategoryBreakdownForTripByUser {
   [key: string]: Array<Omit<DBExpenseCategoryBreakdownForTripResult, 'constructor'>>;
 }
+
+export interface UpdateExpenseParmas {
+  amount?: number;
+  currencyId?: number;
+  euroAmount?: number;
+  localDateTime?: string;
+  description?: string;
+  categoryId?: number;
+  cityId?: number;
+}
+
+export interface DBGetSingleExpenseResult extends mysql.RowDataPacket {
+  id: number;
+  amount: number;
+  currencyId: number;
+  euroAmount: number;
+  localDateTime: Date;
+  description: string;
+  categoryId: number;
+  cityId: number;
+  countryId: number;
+  createdAt: Date;
+  updatedAt: Date;
+  userId: number;
+  updatedByUserId: number | null;
+}

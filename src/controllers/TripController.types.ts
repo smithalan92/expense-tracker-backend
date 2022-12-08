@@ -10,6 +10,7 @@ import {
   DBGetDailyCostBreakdownResult,
   DBGetExpensiveTripDayResult,
   ExpenseCategoryBreakdownForTripByUser,
+  UpdateExpenseParmas,
 } from '../repository/ExpenseRepository.types';
 import { DBTripResult, UsersForTrip } from '../repository/TripRepository.types';
 import { ProcessedTripExpense } from '../utils/expenseParser.types';
@@ -68,3 +69,10 @@ export interface DeleteExpenseParams {
   tripId: number;
   expenseId: number;
 }
+
+export interface EditExpenseForTripParams {
+  tripId: number;
+  expenseId: number;
+}
+
+export type UpdateExpenseForTripBody = UpdateExpenseParmas;

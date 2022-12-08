@@ -11,6 +11,8 @@ import {
   GetTripDataResponse,
   GetExpenseStatsResponse,
   DeleteExpenseParams,
+  EditExpenseForTripParams,
+  UpdateExpenseForTripBody,
 } from './TripController.types';
 import { format } from 'date-fns';
 import ExpenseRepository from '../repository/ExpenseRepository';
@@ -139,8 +141,6 @@ class TripController {
       userId,
     };
 
-    console.log(expense);
-
     await this.expenseRepository.addExpenseForTrip(expense);
 
     return reply.status(201).send();
@@ -202,6 +202,37 @@ class TripController {
     await this.expenseRepository.deleteExpenseForTrip(tripId, expenseId);
 
     return reply.status(204).send();
+  };
+
+  updateExpenseForTrip: RouteHandlerWithBodyAndParams<EditExpenseForTripParams, UpdateExpenseForTripBody, PossibleErrorResponse> = async (
+    req,
+    reply
+  ) => {
+    const { tripId, expenseId } = req.params;
+    const userId: number = req.requestContext.get('userId');
+    const updateData = req.body;
+
+    const expense = await this.expenseRepository.getExpense(expenseId, userId);
+
+    if (!expense) {
+      return reply.code(404).send({ error: 'Trip or expense not found' });
+    }
+
+    const hasValidUpdateData = !!Object.values(updateData).find((v) => v !== null && v !== undefined);
+
+    if (!hasValidUpdateData) {
+      return reply.code(400).send({ error: 'Not valid update data provided' });
+    }
+
+    if (updateData.amount) {
+      const currencyId = updateData.currencyId ?? expense.currencyId;
+      const currencyToEurFXRate = await this.currencyRepository.getCurrencyFXRate(currencyId);
+      updateData.euroAmount = parseFloat((updateData.amount / currencyToEurFXRate).toFixed(2));
+    }
+
+    await this.expenseRepository.updateExpenseForTrip(tripId, expenseId, userId, updateData);
+
+    return reply.status(200).send();
   };
 }
 

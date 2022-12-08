@@ -1,5 +1,6 @@
 import { OkPacket } from 'mysql2';
 import DBAgent from '../lib/DBAgent';
+import knex from '../lib/knex';
 import { ContainerCradle } from '../lib/types';
 import {
   DBExpenseByUserBreakdownForTripResult,
@@ -10,8 +11,10 @@ import {
   DBGetCountryBreakdownResult,
   DBGetDailyCostBreakdownResult,
   DBGetExpensiveTripDayResult,
+  DBGetSingleExpenseResult,
   ExpenseCategoryBreakdownForTripByUser,
   NewExpenseRecord,
+  UpdateExpenseParmas,
 } from './ExpenseRepository.types';
 
 class ExpenseRepository {
@@ -60,6 +63,23 @@ class ExpenseRepository {
     return results;
   }
 
+  async getExpense(expenseId: number, userId: number) {
+    const [result] = await this.dbAgent.runQuery<DBGetSingleExpenseResult[]>({
+      query: `
+        SELECT te.*
+        FROM trip_expenses te
+        JOIN user_trips ut ON ut.tripId = te.tripId
+        JOIN trips t ON t.id = te.tripId
+        WHERE te.id = ?
+        AND ut.userId = ?
+        AND t.status = 'active';
+      `,
+      values: [expenseId, userId],
+    });
+
+    return result;
+  }
+
   async addExpenseForTrip(expense: NewExpenseRecord) {
     const result = await this.dbAgent.runQuery<OkPacket>({
       query: `
@@ -81,6 +101,34 @@ class ExpenseRepository {
 
     if (!result.insertId) {
       throw new Error('Failed to insert new expense');
+    }
+  }
+
+  async updateExpenseForTrip(tripId: number, expenseId: number, userId: number, params: UpdateExpenseParmas) {
+    let query = knex('trip_expenses')
+      .where('id', expenseId)
+      .where('tripId', tripId)
+      .update('updatedByUserId', userId)
+      .update('updatedAt', knex.raw('NOW()'));
+
+    if (params.amount && params.euroAmount) {
+      query = query.update('amount', params.amount).update('euroAmount', params.euroAmount);
+    }
+    if (params.currencyId) query = query.update('currencyId', params.currencyId);
+    if (params.localDateTime) query = query.update('localDateTime', params.localDateTime);
+    if (params.description) query = query.update('description', params.description);
+    if (params.categoryId) query = query.update('categoryId', params.categoryId);
+    if (params.cityId) query = query.update('cityId', params.cityId);
+
+    const sql = query.toQuery();
+
+    const result = await this.dbAgent.runQuery<OkPacket>({
+      query: sql,
+    });
+
+    if (result.changedRows !== 1) {
+      console.log(params);
+      throw new Error('Failed to update expense');
     }
   }
 
