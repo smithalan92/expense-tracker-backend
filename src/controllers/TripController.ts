@@ -165,6 +165,7 @@ class TripController {
       countryBreakdown,
       cityBreakdown,
       dailyCostBreakdown,
+      hourlySpendingBreakdown,
     ] = await Promise.all([
       this.expenseRepository.getExpenseCategoryBreakdownForTrip(tripId),
       this.expenseRepository.getExpenseCategoryBreakdownByUser(tripId),
@@ -174,6 +175,7 @@ class TripController {
       this.expenseRepository.getExpenseByCountryBreakdownForTrip(tripId),
       this.expenseRepository.getExpenseByCityBreakdownForTrip(tripId),
       this.expenseRepository.getDailyCostBreakdownForTrip(tripId),
+      this.expenseRepository.getHourlySpendingBreakdown(tripId),
     ]);
 
     return reply.status(200).send({
@@ -185,6 +187,7 @@ class TripController {
       countryBreakdown,
       cityBreakdown,
       dailyCostBreakdown,
+      hourlySpendingBreakdown,
     });
   };
 

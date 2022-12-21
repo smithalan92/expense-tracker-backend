@@ -10,6 +10,7 @@ import {
   DBGetDailyCostBreakdownResult,
   DBGetExpensiveTripDayResult,
   ExpenseCategoryBreakdownForTripByUser,
+  ParsedHourlyExpenseResult,
   UpdateExpenseParmas,
 } from '../repository/ExpenseRepository.types';
 import { DBTripResult, UsersForTrip } from '../repository/TripRepository.types';
@@ -63,6 +64,7 @@ export interface GetExpenseStatsResponse {
   countryBreakdown: DBGetCountryBreakdownResult[];
   cityBreakdown: DBGetCityBreakdownResult[];
   dailyCostBreakdown: DBGetDailyCostBreakdownResult[];
+  hourlySpendingBreakdown: ParsedHourlyExpenseResult[];
 }
 
 export interface DeleteExpenseParams {

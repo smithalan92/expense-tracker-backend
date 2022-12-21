@@ -82,7 +82,7 @@ class TripRoutes implements Router {
       Body: UpdateExpenseForTripBody;
       Reply: PossibleErrorResponse;
     }>({
-      method: 'PUT',
+      method: 'PATCH',
       url: '/trips/:tripId/expense/:expenseId',
       handler: this.controller.updateExpenseForTrip,
     });

@@ -2,6 +2,7 @@ import { OkPacket } from 'mysql2';
 import DBAgent from '../lib/DBAgent';
 import knex from '../lib/knex';
 import { ContainerCradle } from '../lib/types';
+import { get12HourTimeFromHour } from '../utils/time';
 import {
   DBExpenseByUserBreakdownForTripResult,
   DBExpenseCategoryBreakdownForTripByUserResult,
@@ -12,8 +13,10 @@ import {
   DBGetDailyCostBreakdownResult,
   DBGetExpensiveTripDayResult,
   DBGetSingleExpenseResult,
+  DBHourlyExpenseBreakdownResult,
   ExpenseCategoryBreakdownForTripByUser,
   NewExpenseRecord,
+  ParsedHourlyExpenseResult,
   UpdateExpenseParmas,
 } from './ExpenseRepository.types';
 
@@ -287,6 +290,31 @@ class ExpenseRepository {
       }
       return acc;
     }, {});
+  }
+
+  async getHourlySpendingBreakdown(tripId: number) {
+    const results = await this.dbAgent.runQuery<DBHourlyExpenseBreakdownResult[]>({
+      query: `
+        SELECT HOUR(localDateTime) as hour, ROUND(SUM(euroAmount), 2) as total
+        from trip_expenses
+        WHERE tripId = ?
+        GROUP BY HOUR(localDateTime)
+        ORDER BY hour ASC
+      `,
+      values: [tripId],
+    });
+
+    const parsedResults: ParsedHourlyExpenseResult[] = [];
+
+    for (let i = 0; i < 24; i++) {
+      const { total } = results.find(({ hour }) => hour === i) ?? {};
+      const hour = get12HourTimeFromHour(i);
+
+      if (total) parsedResults[i] = { hour, total };
+      else parsedResults[i] = { hour, total: 0 };
+    }
+
+    return parsedResults;
   }
 }
 export default ExpenseRepository;

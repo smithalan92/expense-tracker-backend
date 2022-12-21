@@ -96,3 +96,13 @@ export interface DBGetSingleExpenseResult extends mysql.RowDataPacket {
   userId: number;
   updatedByUserId: number | null;
 }
+
+export interface DBHourlyExpenseBreakdownResult extends mysql.RowDataPacket {
+  hour: number;
+  total: number;
+}
+
+export interface ParsedHourlyExpenseResult {
+  hour: string;
+  total: number;
+}
