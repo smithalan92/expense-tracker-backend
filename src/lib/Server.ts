@@ -1,4 +1,5 @@
 import Fastify, { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
+import multipart from '@fastify/multipart';
 import qs from 'qs';
 import cors from '@fastify/cors';
 import { ContainerCradle, Router } from './types';
@@ -30,6 +31,7 @@ class Server {
         userId: 0,
       },
     });
+    void server.register(multipart);
 
     server.addHook('onRequest', async (request: FastifyRequest, reply: FastifyReply) => {
       if (request.routerPath === '/login') {

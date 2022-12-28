@@ -12,6 +12,7 @@ import CurrencyRepository from '../repository/CurrencyRepository';
 import CountryRepository from '../repository/CountryRepository';
 import CityRepository from '../repository/CityRepository';
 import CategoryRepository from '../repository/CategoryRepository';
+import FileController from '../controllers/FileController';
 
 export interface Env {
   serviceName: string;
@@ -19,6 +20,8 @@ export interface Env {
   MYSQL_EXPENSE_HOST: string;
   MYSQL_EXPENSE_USER: string;
   MYSQL_EXPENSE_PASSWORD: string;
+  EXPENSR_TMP_DIR: string;
+  EXPENSR_FILE_DIR: string;
 }
 
 export interface ContainerCradle {
@@ -36,6 +39,7 @@ export interface ContainerCradle {
   countryRepository: CountryRepository;
   cityRepository: CityRepository;
   categoryRepository: CategoryRepository;
+  fileController: FileController;
 }
 
 export interface Router {
