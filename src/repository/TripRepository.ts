@@ -3,6 +3,7 @@ import { ContainerCradle } from '../lib/types';
 import { CreateTripParams, DBFindUsersForTripResult, DBTripResult, UsersForTrip } from './TripRepository.types';
 import knex from '../lib/knex';
 import mysql from 'mysql2';
+import DBTransaction from '../lib/DBTransaction';
 
 class TripRepository {
   dbAgent: DBAgent;
@@ -14,10 +15,11 @@ class TripRepository {
   async findTripsForUserId(userId: number) {
     const results = await this.dbAgent.runQuery<DBTripResult[]>({
       query: `
-        SELECT t.id, t.name, t.startDate, t.endDate, t.status, t.image, COALESCE(ROUND(SUM(te.euroAmount), 2), 0) as totalExpenseAmount
+        SELECT t.id, t.name, t.startDate, t.endDate, t.status, f.path as filePath, COALESCE(ROUND(SUM(te.euroAmount), 2), 0) as totalExpenseAmount
         FROM user_trips ut
         LEFT JOIN trips t ON t.id = ut.tripId
         LEFT JOIN trip_expenses te ON te.tripId = t.id
+        LEFT JOIN files f on f.id = t.fileId
         WHERE ut.userId = ?
         GROUP BY t.id;
       `,
@@ -30,10 +32,11 @@ class TripRepository {
   async findTripById({ userId, tripId }: { userId: number; tripId: number }): Promise<DBTripResult | null> {
     const [result] = await this.dbAgent.runQuery<DBTripResult[]>({
       query: `
-        SELECT t.id, t.name, t.startDate, t.endDate, t.status, t.image, COALESCE(ROUND(SUM(te.amount), 2), 0) as totalLocalAmount, COALESCE(ROUND(SUM(te.euroAmount), 2), 0) as totalExpenseAmount
+        SELECT t.id, t.name, t.startDate, t.endDate, t.status, f.path as filePath, COALESCE(ROUND(SUM(te.amount), 2), 0) as totalLocalAmount, COALESCE(ROUND(SUM(te.euroAmount), 2), 0) as totalExpenseAmount
         FROM user_trips ut
         LEFT JOIN trips t ON t.id = ut.tripId
         LEFT JOIN trip_expenses te ON te.tripId = t.id
+        LEFT JOIN files f on f.id = t.fileId
         WHERE ut.userId = ?
         AND t.id = ?
         GROUP BY t.id;
@@ -65,13 +68,17 @@ class TripRepository {
     }, {});
   }
 
-  async createTrip({ name, startDate, endDate, file, countryIds, userIds }: CreateTripParams) {
-    const transaction = await this.dbAgent.createTransaction();
+  async createTrip({ name, startDate, endDate, countryIds, userIds }: CreateTripParams, transaction?: DBTransaction) {
+    let transactionToUse = transaction;
 
-    await transaction.begin();
+    if (!transactionToUse) {
+      transactionToUse = await this.dbAgent.createTransaction();
+    }
+
+    await transactionToUse.begin();
 
     try {
-      const { insertId: tripId } = await transaction.runQuery<mysql.OkPacket>({
+      const { insertId: tripId } = await transactionToUse.runQuery<mysql.OkPacket>({
         query: knex('trips')
           .insert({
             name,
@@ -81,6 +88,8 @@ class TripRepository {
           })
           .toQuery(),
       });
+
+      console.log('here, tripId is ', tripId);
 
       const countryInserts = countryIds.reduce<Array<{ tripId: Number; countryId: number }>>((acc, current) => {
         acc.push({ tripId, countryId: current });
@@ -93,21 +102,31 @@ class TripRepository {
       }, []);
 
       await Promise.all([
-        transaction.runQuery({
+        transactionToUse.runQuery({
           query: knex('trip_countries').insert(countryInserts).toQuery(),
         }),
-        transaction.runQuery({
+        transactionToUse.runQuery({
           query: knex('user_trips').insert(userInserts).toQuery(),
         }),
       ]);
 
-      await transaction.end();
+      if (!transaction) {
+        await transactionToUse.commit();
+      }
 
       return tripId;
     } catch (err) {
-      await transaction.rollback();
+      if (!transaction) {
+        await transactionToUse.rollback();
+      }
       throw err;
     }
+  }
+
+  async updateTrip({ fileId, tripId }: { fileId: number; tripId: number }, transaction?: DBTransaction) {
+    return (transaction ?? this.dbAgent).runQuery({
+      query: knex('trips').where('id', tripId).update('fileId', fileId).toQuery(),
+    });
   }
 }
 

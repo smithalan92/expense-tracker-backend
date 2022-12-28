@@ -13,6 +13,7 @@ import CountryRepository from '../repository/CountryRepository';
 import CityRepository from '../repository/CityRepository';
 import CategoryRepository from '../repository/CategoryRepository';
 import FileController from '../controllers/FileController';
+import FileRepository from '../repository/FileRepository';
 
 export interface Env {
   serviceName: string;
@@ -40,6 +41,7 @@ export interface ContainerCradle {
   cityRepository: CityRepository;
   categoryRepository: CategoryRepository;
   fileController: FileController;
+  fileRepository: FileRepository;
 }
 
 export interface Router {

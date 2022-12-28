@@ -1,4 +1,4 @@
-import { ContainerCradle } from '../lib/types';
+import { ContainerCradle, Env } from '../lib/types';
 import { PossibleErrorResponse, RouteHandler, RouteHandlerWithBody, RouteHandlerWithBodyAndParams, RouterHandlerWithParams } from '../types/routes';
 import TripRepository from '../repository/TripRepository';
 import {
@@ -25,6 +25,10 @@ import CityRepository from '../repository/CityRepository';
 import CategoryRepository from '../repository/CategoryRepository';
 import { parseExpenseForResponse } from '../utils/expenseParser';
 import { ProcessedTripExpense } from '../utils/expenseParser.types';
+import FileRepository from '../repository/FileRepository';
+import path from 'path';
+import { parseTrip } from '../utils/trip';
+import DBAgent from '../lib/DBAgent';
 
 class TripController {
   tripRepository: TripRepository;
@@ -33,14 +37,30 @@ class TripController {
   currencyRepository: CurrencyRepository;
   cityRepository: CityRepository;
   categoryRepository: CategoryRepository;
+  fileRepository: FileRepository;
+  env: Env;
+  dbAgent: DBAgent;
 
-  constructor({ tripRepository, expenseRepository, countryRepository, currencyRepository, cityRepository, categoryRepository }: ContainerCradle) {
+  constructor({
+    fileRepository,
+    env,
+    tripRepository,
+    expenseRepository,
+    countryRepository,
+    currencyRepository,
+    cityRepository,
+    categoryRepository,
+    dbAgent,
+  }: ContainerCradle) {
     this.tripRepository = tripRepository;
     this.expenseRepository = expenseRepository;
     this.countryRepository = countryRepository;
     this.currencyRepository = currencyRepository;
     this.cityRepository = cityRepository;
     this.categoryRepository = categoryRepository;
+    this.fileRepository = fileRepository;
+    this.env = env;
+    this.dbAgent = dbAgent;
   }
 
   getTrips: RouteHandler<PossibleErrorResponse<GetTripReponse>> = async (req, reply) => {
@@ -54,7 +74,7 @@ class TripController {
 
     const tripsWithFormattedDates = trips.map<ResponseTrip>((t) => {
       const trip: ResponseTrip = {
-        ...t,
+        ...parseTrip(t),
         countries: countries.filter((c) => c.tripId === t.id),
       };
       trip.startDate = format(new Date(t.startDate), 'dd MMM yyyy');
@@ -75,9 +95,34 @@ class TripController {
       userIds.push(userId);
     }
 
-    const tripId = await this.tripRepository.createTrip({ name, startDate, endDate, file, countryIds, userIds });
+    const transaction = await this.dbAgent.createTransaction();
 
-    return reply.code(201).send({ tripId });
+    try {
+      const tripId = await this.tripRepository.createTrip({ name, startDate, endDate, countryIds, userIds }, transaction);
+
+      if (!file) {
+        await transaction.commit();
+        return reply.code(201).send({ tripId });
+      }
+
+      const fileId = await this.fileRepository.saveTempFile(
+        {
+          userId,
+          fileName: file,
+          destPath: path.join(this.env.EXPENSR_FILE_DIR, `trips/${tripId}`),
+        },
+        transaction
+      );
+
+      await this.tripRepository.updateTrip({ fileId, tripId }, transaction);
+
+      await transaction.commit();
+
+      return reply.code(201).send({ tripId });
+    } catch (err) {
+      await transaction.rollback();
+      throw err;
+    }
   };
 
   getTripData: RouterHandlerWithParams<RouteWithTripIDParams, PossibleErrorResponse<GetTripDataResponse>> = async (req, reply) => {
@@ -103,7 +148,7 @@ class TripController {
 
     return reply
       .send({
-        trip,
+        trip: parseTrip(trip),
         expenses: processedExpenses,
         cities,
         countries,

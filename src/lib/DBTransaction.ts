@@ -21,7 +21,7 @@ class DBTransaction {
     await this.connection.release();
   }
 
-  async end() {
+  async commit() {
     await this.connection.commit();
     await this.connection.release();
   }

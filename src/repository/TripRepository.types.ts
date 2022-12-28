@@ -7,7 +7,7 @@ export interface DBTripResult extends mysql.RowDataPacket {
   startDate: string;
   endDate: string;
   status: 'active' | 'deleted';
-  image: string;
+  filePath: string | null;
   totalLocalAmount: number;
   totalExpenseAmount: number;
 }
@@ -22,4 +22,4 @@ export interface UsersForTrip {
   [key: number]: Omit<DBFindUsersForTripResult, 'constructor' | 'id'>;
 }
 
-export type CreateTripParams = CreateTripBody;
+export type CreateTripParams = Omit<CreateTripBody, 'file'>;

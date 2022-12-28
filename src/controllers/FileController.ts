@@ -23,13 +23,11 @@ class FileController {
 
     const [extension] = filename.match(/\.\w+$/)!;
 
-    const folderName = randomUUID();
-    const newFilePath = path.join(folderName, `${randomUUID()}${extension}`);
+    const fileName = `${randomUUID()}${extension}`;
 
-    await fs.mkdir(path.join(this.env.EXPENSR_TMP_DIR, folderName));
-    await fs.writeFile(path.join(this.env.EXPENSR_TMP_DIR, newFilePath), file);
+    await fs.writeFile(path.join(this.env.EXPENSR_TMP_DIR, fileName), file);
 
-    return reply.code(201).send({ filePath: newFilePath });
+    return reply.code(201).send({ file: fileName });
   };
 }
 

@@ -13,10 +13,21 @@ import {
   ParsedHourlyExpenseResult,
   UpdateExpenseParmas,
 } from '../repository/ExpenseRepository.types';
-import { DBTripResult, UsersForTrip } from '../repository/TripRepository.types';
+import { UsersForTrip } from '../repository/TripRepository.types';
 import { ProcessedTripExpense } from '../utils/expenseParser.types';
 
-export interface ResponseTrip extends DBTripResult {
+export interface ParsedTrip {
+  id: number;
+  name: string;
+  startDate: string;
+  endDate: string;
+  status: 'active' | 'deleted';
+  image: string;
+  totalLocalAmount: number;
+  totalExpenseAmount: number;
+}
+
+export interface ResponseTrip extends ParsedTrip {
   countries: DBGetCountriesByTripIDResult[];
 }
 
@@ -47,7 +58,7 @@ export interface AddExpenseForTripBody {
 
 export interface GetTripDataResponse {
   expenses: ProcessedTripExpense[];
-  trip: DBTripResult;
+  trip: ParsedTrip;
   countries: DBGetCountriesByTripIDResult[];
   cities: DBGetCityOptionsForTripIdResult[];
   currencies: DBGetCurrenciesResult[];
