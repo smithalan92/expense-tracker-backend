@@ -1,5 +1,5 @@
 import { ContainerCradle } from '../lib/types';
-import { PossibleErrorResponse, RouteHandler, RouteHandlerWithBodyAndParams, RouterHandlerWithParams } from '../types/routes';
+import { PossibleErrorResponse, RouteHandler, RouteHandlerWithBody, RouteHandlerWithBodyAndParams, RouterHandlerWithParams } from '../types/routes';
 import TripRepository from '../repository/TripRepository';
 import {
   GetTripReponse,
@@ -13,6 +13,8 @@ import {
   DeleteExpenseParams,
   EditExpenseForTripParams,
   UpdateExpenseForTripBody,
+  CreateTripBody,
+  CreateTripResponse,
 } from './TripController.types';
 import { format } from 'date-fns';
 import ExpenseRepository from '../repository/ExpenseRepository';
@@ -61,6 +63,21 @@ class TripController {
     });
 
     return reply.send({ trips: tripsWithFormattedDates }).code(200);
+  };
+
+  createTrip: RouteHandlerWithBody<CreateTripBody, PossibleErrorResponse<CreateTripResponse>> = async (req, reply) => {
+    const userId = parseInt(req.requestContext.get('userId'), 10);
+
+    const { name, startDate, endDate, file, countryIds, userIds } = req.body;
+
+    if (!userIds.includes(userId)) {
+      // Always make sure the current user is a member of the trip
+      userIds.push(userId);
+    }
+
+    const tripId = await this.tripRepository.createTrip({ name, startDate, endDate, file, countryIds, userIds });
+
+    return reply.code(201).send({ tripId });
   };
 
   getTripData: RouterHandlerWithParams<RouteWithTripIDParams, PossibleErrorResponse<GetTripDataResponse>> = async (req, reply) => {

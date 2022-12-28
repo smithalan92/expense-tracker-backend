@@ -1,4 +1,5 @@
 import mysql from 'mysql2/promise';
+import DBTransaction from './DBTransaction';
 
 interface RunQueryParams {
   query: string;
@@ -20,6 +21,11 @@ class DBAgent {
   prepareArrayForInValue(items: Array<string | number>) {
     if (typeof items[0] === 'number') return items.join(',');
     else return items.map((i) => `'${i}'`).join(',');
+  }
+
+  async createTransaction() {
+    const connection = await this.pool.getConnection();
+    return new DBTransaction(connection);
   }
 }
 

@@ -78,3 +78,16 @@ export interface EditExpenseForTripParams {
 }
 
 export type UpdateExpenseForTripBody = UpdateExpenseParmas;
+
+export interface CreateTripBody {
+  name: string;
+  startDate: string;
+  endDate: string;
+  file?: string;
+  countryIds: number[];
+  userIds: number[];
+}
+
+export interface CreateTripResponse {
+  tripId: number;
+}

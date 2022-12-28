@@ -11,6 +11,8 @@ import {
   DeleteExpenseParams,
   EditExpenseForTripParams,
   UpdateExpenseForTripBody,
+  CreateTripBody,
+  CreateTripResponse,
 } from '../controllers/TripController.types';
 import { Router, ContainerCradle } from '../lib/types';
 import { PossibleErrorResponse } from '../types/routes';
@@ -85,6 +87,15 @@ class TripRoutes implements Router {
       method: 'PATCH',
       url: '/trips/:tripId/expense/:expenseId',
       handler: this.controller.updateExpenseForTrip,
+    });
+
+    server.route<{
+      Body: CreateTripBody;
+      Reply: PossibleErrorResponse<CreateTripResponse>;
+    }>({
+      method: 'POST',
+      url: '/trips',
+      handler: this.controller.createTrip,
     });
   }
 }

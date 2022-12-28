@@ -1,6 +1,8 @@
 import DBAgent from '../lib/DBAgent';
 import { ContainerCradle } from '../lib/types';
-import { DBFindUsersForTripResult, DBTripResult, UsersForTrip } from './TripRepository.types';
+import { CreateTripParams, DBFindUsersForTripResult, DBTripResult, UsersForTrip } from './TripRepository.types';
+import knex from '../lib/knex';
+import mysql from 'mysql2';
 
 class TripRepository {
   dbAgent: DBAgent;
@@ -61,6 +63,51 @@ class TripRepository {
 
       return acc;
     }, {});
+  }
+
+  async createTrip({ name, startDate, endDate, file, countryIds, userIds }: CreateTripParams) {
+    const transaction = await this.dbAgent.createTransaction();
+
+    await transaction.begin();
+
+    try {
+      const { insertId: tripId } = await transaction.runQuery<mysql.OkPacket>({
+        query: knex('trips')
+          .insert({
+            name,
+            startDate,
+            endDate,
+            status: 'active',
+          })
+          .toQuery(),
+      });
+
+      const countryInserts = countryIds.reduce<Array<{ tripId: Number; countryId: number }>>((acc, current) => {
+        acc.push({ tripId, countryId: current });
+        return acc;
+      }, []);
+
+      const userInserts = userIds.reduce<Array<{ tripId: Number; userId: number }>>((acc, current) => {
+        acc.push({ tripId, userId: current });
+        return acc;
+      }, []);
+
+      await Promise.all([
+        transaction.runQuery({
+          query: knex('trip_countries').insert(countryInserts).toQuery(),
+        }),
+        transaction.runQuery({
+          query: knex('user_trips').insert(userInserts).toQuery(),
+        }),
+      ]);
+
+      await transaction.end();
+
+      return tripId;
+    } catch (err) {
+      await transaction.rollback();
+      throw err;
+    }
   }
 }
 
