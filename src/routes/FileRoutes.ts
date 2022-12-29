@@ -4,7 +4,7 @@ import { Router, ContainerCradle } from '../lib/types';
 import { PossibleErrorResponse } from '../types/routes';
 import { FileUploadResponse } from '../controllers/FileController.types';
 
-class AuthRoutes implements Router {
+class FileRoutes implements Router {
   controller: FileController;
 
   constructor({ fileController }: ContainerCradle) {
@@ -22,4 +22,4 @@ class AuthRoutes implements Router {
   }
 }
 
-export default AuthRoutes;
+export default FileRoutes;
