@@ -17,13 +17,14 @@ class FileRepository {
   }
 
   async saveTempFile({ userId, fileName, destPath }: { userId: number; fileName: string; destPath: string }, transaction?: DBTransaction) {
-    const doesDestPathExist = await doesFileOrFolderExist(destPath);
+    const fullDestPath = path.join(this.env.EXPENSR_FILE_DIR, destPath);
+    const doesDestPathExist = await doesFileOrFolderExist(fullDestPath);
 
     if (!doesDestPathExist) {
-      await fs.mkdir(destPath);
+      await fs.mkdir(fullDestPath);
     }
 
-    await fs.copyFile(path.join(this.env.EXPENSR_TMP_DIR, fileName), path.join(destPath, fileName));
+    await fs.copyFile(path.join(this.env.EXPENSR_TMP_DIR, fileName), path.join(fullDestPath, fileName));
 
     const { insertId } = await (transaction ?? this.dbAgent).runQuery<mysql.OkPacket>({
       query: knex('files')

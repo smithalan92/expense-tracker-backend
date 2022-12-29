@@ -26,7 +26,6 @@ import CategoryRepository from '../repository/CategoryRepository';
 import { parseExpenseForResponse } from '../utils/expenseParser';
 import { ProcessedTripExpense } from '../utils/expenseParser.types';
 import FileRepository from '../repository/FileRepository';
-import path from 'path';
 import { parseTrip } from '../utils/trip';
 import DBAgent from '../lib/DBAgent';
 
@@ -109,7 +108,7 @@ class TripController {
         {
           userId,
           fileName: file,
-          destPath: path.join(this.env.EXPENSR_FILE_DIR, `trips/${tripId}`),
+          destPath: `/trips/${tripId}`,
         },
         transaction
       );
