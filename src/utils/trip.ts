@@ -1,3 +1,4 @@
+import format from 'date-fns/format';
 import { ParsedTrip } from '../controllers/TripController.types';
 import { DBTripResult } from '../repository/TripRepository.types';
 import { getTripFileUrl } from './file';
@@ -8,8 +9,8 @@ export function parseTrip(trip: DBTripResult): ParsedTrip {
   return {
     id: trip.id,
     name: trip.name,
-    startDate: trip.startDate,
-    endDate: trip.endDate,
+    startDate: format(new Date(trip.startDate), 'dd MMM yyyy'),
+    endDate: format(new Date(trip.endDate), 'dd MMM yyyy'),
     status: trip.status,
     image,
     totalLocalAmount: trip.totalLocalAmount,

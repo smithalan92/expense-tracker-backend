@@ -16,7 +16,6 @@ import {
   CreateTripBody,
   CreateTripResponse,
 } from './TripController.types';
-import { format } from 'date-fns';
 import ExpenseRepository from '../repository/ExpenseRepository';
 import CountryRepository from '../repository/CountryRepository';
 import { NewExpenseRecord } from '../repository/ExpenseRepository.types';
@@ -72,13 +71,10 @@ class TripController {
     const countries = await this.countryRepository.getCountriesForTrips(countriesIdsForTrips);
 
     const tripsWithFormattedDates = trips.map<ResponseTrip>((t) => {
-      const trip: ResponseTrip = {
+      return {
         ...parseTrip(t),
         countries: countries.filter((c) => c.tripId === t.id),
       };
-      trip.startDate = format(new Date(t.startDate), 'dd MMM yyyy');
-      trip.endDate = format(new Date(t.endDate), 'dd MMM yyyy');
-      return trip;
     });
 
     return reply.send({ trips: tripsWithFormattedDates }).code(200);
