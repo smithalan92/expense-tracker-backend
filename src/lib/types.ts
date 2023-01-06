@@ -15,6 +15,7 @@ import CategoryRepository from '../repository/CategoryRepository';
 import FileController from '../controllers/FileController';
 import FileRepository from '../repository/FileRepository';
 import CountryController from '../controllers/CountryController';
+import UserController from '../controllers/UserController';
 
 export interface Env {
   serviceName: string;
@@ -33,6 +34,7 @@ export interface ContainerCradle {
   tripRoutes: TripRoutes;
   tripController: TripController;
   dbAgent: DBAgent;
+  userController: UserController;
   userRepository: UserRepository;
   tokenRepository: TokenRepository;
   tripRepository: TripRepository;
