@@ -14,6 +14,7 @@ import CityRepository from '../repository/CityRepository';
 import CategoryRepository from '../repository/CategoryRepository';
 import FileController from '../controllers/FileController';
 import FileRepository from '../repository/FileRepository';
+import CountryController from '../controllers/CountryController';
 
 export interface Env {
   serviceName: string;
@@ -37,6 +38,7 @@ export interface ContainerCradle {
   tripRepository: TripRepository;
   expenseRepository: ExpenseRepository;
   currencyRepository: CurrencyRepository;
+  countryController: CountryController;
   countryRepository: CountryRepository;
   cityRepository: CityRepository;
   categoryRepository: CategoryRepository;

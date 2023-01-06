@@ -1,12 +1,24 @@
 import DBAgent from '../lib/DBAgent';
 import { ContainerCradle } from '../lib/types';
-import { DBGetCountriesByTripIDResult } from './CountryRepository.types';
+import { DBCountriesResult, DBGetCountriesByTripIDResult } from './CountryRepository.types';
 
 class CountryRepository {
   dbAgent: DBAgent;
 
   constructor({ dbAgent }: ContainerCradle) {
     this.dbAgent = dbAgent;
+  }
+
+  async getCountries() {
+    const results = await this.dbAgent.runQuery<DBCountriesResult[]>({
+      query: `
+        SELECT id, name
+        FROM countries
+        ORDER BY name ASC;
+      `,
+    });
+
+    return results;
   }
 
   async getCountriesForTrips(tripIds: number[]) {
