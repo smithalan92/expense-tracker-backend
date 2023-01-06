@@ -100,5 +100,5 @@ export interface CreateTripBody {
 }
 
 export interface CreateTripResponse {
-  tripId: number;
+  trip: ParsedTrip;
 }

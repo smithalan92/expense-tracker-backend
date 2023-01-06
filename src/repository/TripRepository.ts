@@ -12,18 +12,26 @@ class TripRepository {
     this.dbAgent = dbAgent;
   }
 
-  async findTripsForUserId(userId: number) {
+  async findTripsForUserId(userId: number, tripId?: number) {
+    let query = knex
+      .select(
+        knex.raw(
+          `t.id, t.name, t.startDate, t.endDate, t.status, f.path as filePath, COALESCE(ROUND(SUM(te.euroAmount), 2), 0) as totalExpenseAmount`
+        )
+      )
+      .from('user_trips AS ut')
+      .leftJoin('trips AS t', 't.id', 'ut.tripId')
+      .leftJoin('trip_expenses AS te', 'te.tripId', 't.id')
+      .leftJoin('files AS f', 'f.id', 't.fileId')
+      .where('ut.userId', userId)
+      .groupBy('t.id');
+
+    if (tripId) {
+      query = query.where('t.id', tripId);
+    }
+
     const results = await this.dbAgent.runQuery<DBTripResult[]>({
-      query: `
-        SELECT t.id, t.name, t.startDate, t.endDate, t.status, f.path as filePath, COALESCE(ROUND(SUM(te.euroAmount), 2), 0) as totalExpenseAmount
-        FROM user_trips ut
-        LEFT JOIN trips t ON t.id = ut.tripId
-        LEFT JOIN trip_expenses te ON te.tripId = t.id
-        LEFT JOIN files f on f.id = t.fileId
-        WHERE ut.userId = ?
-        GROUP BY t.id;
-      `,
-      values: [userId],
+      query: query.toQuery(),
     });
 
     return results;

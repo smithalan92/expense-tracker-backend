@@ -99,25 +99,24 @@ class TripController {
     try {
       const tripId = await this.tripRepository.createTrip({ name, startDate, endDate, countryIds, userIds }, transaction);
 
-      if (!file) {
-        await transaction.commit();
-        return reply.code(201).send({ tripId });
+      if (file) {
+        const fileId = await this.fileRepository.saveTempFile(
+          {
+            userId,
+            fileName: file,
+            destPath: `/trips/${tripId}`,
+          },
+          transaction
+        );
+
+        await this.tripRepository.updateTrip({ fileId, tripId }, transaction);
       }
-
-      const fileId = await this.fileRepository.saveTempFile(
-        {
-          userId,
-          fileName: file,
-          destPath: `/trips/${tripId}`,
-        },
-        transaction
-      );
-
-      await this.tripRepository.updateTrip({ fileId, tripId }, transaction);
 
       await transaction.commit();
 
-      return reply.code(201).send({ tripId });
+      const [trip] = await this.tripRepository.findTripsForUserId(userId, tripId);
+
+      return reply.code(201).send({ trip: parseTrip(trip) });
     } catch (err) {
       await transaction.rollback();
       throw err;
