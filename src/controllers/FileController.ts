@@ -2,8 +2,9 @@ import { PossibleErrorResponse, RouteHandler } from '../types/routes';
 import { FileUploadResponse } from './FileController.types';
 import { randomUUID } from 'crypto';
 import path from 'path';
-import fs from 'fs/promises';
+import fs from 'fs';
 import { ContainerCradle, Env } from '../lib/types';
+import pump from 'pump';
 
 class FileController {
   env: Env;
@@ -25,7 +26,8 @@ class FileController {
 
     const fileName = `${randomUUID()}${extension}`;
 
-    await fs.writeFile(path.join(this.env.EXPENSR_TMP_DIR, fileName), file);
+    const writeStream = fs.createWriteStream(path.join(this.env.EXPENSR_TMP_DIR, fileName));
+    await pump(file, writeStream);
 
     return reply.code(201).send({ file: fileName });
   };
