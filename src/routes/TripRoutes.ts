@@ -13,6 +13,7 @@ import {
   UpdateExpenseForTripBody,
   CreateTripBody,
   CreateTripResponse,
+  DeleteTripParams,
 } from '../controllers/TripController.types';
 import { Router, ContainerCradle } from '../lib/types';
 import { PossibleErrorResponse } from '../types/routes';
@@ -96,6 +97,15 @@ class TripRoutes implements Router {
       method: 'POST',
       url: '/trips',
       handler: this.controller.createTrip,
+    });
+
+    server.route<{
+      Params: DeleteTripParams;
+      Reply: PossibleErrorResponse;
+    }>({
+      method: 'DELETE',
+      url: '/trips/:tripId',
+      handler: this.controller.deleteTrip,
     });
   }
 }

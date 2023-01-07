@@ -2,7 +2,6 @@ import { PossibleErrorResponse, RouteHandler } from '../types/routes';
 import { FileUploadResponse } from './FileController.types';
 import { randomUUID } from 'crypto';
 import path from 'path';
-import fs from 'fs';
 import { ContainerCradle, Env } from '../lib/types';
 import { saveTempFile } from '../utils/file';
 

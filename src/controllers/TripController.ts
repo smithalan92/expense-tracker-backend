@@ -15,6 +15,7 @@ import {
   UpdateExpenseForTripBody,
   CreateTripBody,
   CreateTripResponse,
+  DeleteTripParams,
 } from './TripController.types';
 import ExpenseRepository from '../repository/ExpenseRepository';
 import CountryRepository from '../repository/CountryRepository';
@@ -292,6 +293,23 @@ class TripController {
     await this.expenseRepository.updateExpenseForTrip(tripId, expenseId, userId, updateData);
 
     return reply.status(200).send();
+  };
+
+  deleteTrip: RouterHandlerWithParams<DeleteTripParams, PossibleErrorResponse> = async (req, reply) => {
+    const { tripId } = req.params;
+    const userId: number = req.requestContext.get('userId');
+    const trip = await this.tripRepository.findTripById({ userId, tripId });
+
+    if (!trip) {
+      return reply.code(404).send({ error: 'Trip not found' });
+    }
+
+    await this.tripRepository.updateTrip({
+      tripId,
+      status: 'deleted',
+    });
+
+    return reply.code(204).send();
   };
 }
 

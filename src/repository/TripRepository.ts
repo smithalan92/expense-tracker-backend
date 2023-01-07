@@ -24,6 +24,7 @@ class TripRepository {
       .leftJoin('trip_expenses AS te', 'te.tripId', 't.id')
       .leftJoin('files AS f', 'f.id', 't.fileId')
       .where('ut.userId', userId)
+      .where('t.status', 'active')
       .groupBy('t.id');
 
     if (tripId) {
@@ -47,6 +48,7 @@ class TripRepository {
         LEFT JOIN files f on f.id = t.fileId
         WHERE ut.userId = ?
         AND t.id = ?
+        AND t.status = 'active'
         GROUP BY t.id;
       `,
       values: [userId, tripId],
@@ -97,8 +99,6 @@ class TripRepository {
           .toQuery(),
       });
 
-      console.log('here, tripId is ', tripId);
-
       const countryInserts = countryIds.reduce<Array<{ tripId: Number; countryId: number }>>((acc, current) => {
         acc.push({ tripId, countryId: current });
         return acc;
@@ -131,9 +131,19 @@ class TripRepository {
     }
   }
 
-  async updateTrip({ fileId, tripId }: { fileId: number; tripId: number }, transaction?: DBTransaction) {
+  async updateTrip({ fileId, tripId, status }: { fileId?: number; status?: string; tripId: number }, transaction?: DBTransaction) {
+    let query = knex('trips').where('id', tripId);
+
+    if (fileId !== undefined) {
+      query = query.update('fileId', fileId);
+    }
+
+    if (status) {
+      query = query.update('status', status);
+    }
+
     return (transaction ?? this.dbAgent).runQuery({
-      query: knex('trips').where('id', tripId).update('fileId', fileId).toQuery(),
+      query: query.toQuery(),
     });
   }
 }

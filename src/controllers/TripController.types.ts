@@ -102,3 +102,7 @@ export interface CreateTripBody {
 export interface CreateTripResponse {
   trip: ParsedTrip;
 }
+
+export interface DeleteTripParams {
+  tripId: number;
+}
