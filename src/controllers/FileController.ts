@@ -4,7 +4,7 @@ import { randomUUID } from 'crypto';
 import path from 'path';
 import fs from 'fs';
 import { ContainerCradle, Env } from '../lib/types';
-import pump from 'pump';
+import { saveTempFile } from '../utils/file';
 
 class FileController {
   env: Env;
@@ -14,20 +14,17 @@ class FileController {
   }
 
   upload: RouteHandler<PossibleErrorResponse<FileUploadResponse>> = async (req, reply) => {
-    const data = await req.file();
+    const fileData = await req.file();
 
-    if (!data) {
+    if (!fileData) {
       return reply.code(400).send({ error: 'No file included in request' });
     }
 
-    const { filename, file } = data;
-
-    const [extension] = filename.match(/\.\w+$/)!;
+    const [extension] = fileData.filename.match(/\.\w+$/)!;
 
     const fileName = `${randomUUID()}${extension}`;
 
-    const writeStream = fs.createWriteStream(path.join(this.env.EXPENSR_TMP_DIR, fileName));
-    await pump(file, writeStream);
+    await saveTempFile(fileData, path.join(this.env.EXPENSR_TMP_DIR, fileName));
 
     return reply.code(201).send({ file: fileName });
   };

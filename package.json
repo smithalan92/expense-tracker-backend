@@ -22,7 +22,6 @@
     "knex": "^2.3.0",
     "mysql2": "^2.3.3",
     "node-cron": "^3.0.2",
-    "pump": "^3.0.0",
     "qs": "^6.11.0"
   },
   "devDependencies": {
