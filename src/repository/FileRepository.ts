@@ -6,6 +6,7 @@ import { doesFileOrFolderExist } from '../utils/file';
 import knex from '../lib/knex';
 import path from 'path';
 import DBTransaction from '../lib/DBTransaction';
+import { DBUnprocessedFileResult } from './FileRepository.types';
 
 class FileRepository {
   dbAgent: DBAgent;
@@ -14,6 +15,38 @@ class FileRepository {
   constructor({ dbAgent, env }: ContainerCradle) {
     this.dbAgent = dbAgent;
     this.env = env;
+  }
+
+  async getUnprocssedFiles() {
+    const results = await this.dbAgent.runQuery<DBUnprocessedFileResult[]>({
+      query: `
+        SELECT id, path
+        FROM files
+        WHERE processed = 0;
+      `,
+    });
+
+    return results;
+  }
+
+  async updateFile({ id, processed, path }: { id: number; processed?: 0 | 1; path?: string }) {
+    let query = knex('files').where('id', id);
+
+    if (processed !== undefined) {
+      query = query.update('processed', processed);
+    }
+
+    if (path) {
+      query = query.update('path', path);
+    }
+
+    const result = await this.dbAgent.runQuery<mysql.OkPacket>({
+      query: query.toQuery(),
+    });
+
+    if (result.changedRows !== 1) {
+      throw new Error('Could not update file');
+    }
   }
 
   async saveTempFile({ userId, fileName, destPath }: { userId: number; fileName: string; destPath: string }, transaction?: DBTransaction) {
