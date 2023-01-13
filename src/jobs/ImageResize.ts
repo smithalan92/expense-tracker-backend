@@ -47,7 +47,10 @@ class ImageResize implements Job {
 
         // Max image size range before we resize is 400kb (+ a little tolerance)
         if (fileSizeInKB / 400 <= 1.01) {
-          console.log(`File ${file.id} doesnt need resizing`);
+          await this.fileRepository.updateFile({
+            id: file.id,
+            processed: 1,
+          });
           continue;
         }
 
@@ -71,7 +74,6 @@ class ImageResize implements Job {
         const newWidth = Math.floor(width * reductionMultiplier);
         const newHeight = Math.floor(height * reductionMultiplier);
 
-        console.log(`Resizing file ${file.id}`);
         const fileExt = path.extname(file.path);
         const fileDir = path.dirname(file.path);
         const newFilePath = path.join(fileDir, `${randomUUID()}${fileExt}`);
