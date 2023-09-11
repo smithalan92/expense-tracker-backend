@@ -1,10 +1,10 @@
 import { FastifyInstance } from 'fastify';
 import CountryController from '../controllers/CountryController';
-import { GetCountriesResponse } from '../controllers/CountryController.types';
-import { Router, ContainerCradle } from '../lib/types';
+import { GetCitiesForCountryParams, GetCitiesForCountryResponse, GetCountriesResponse } from '../controllers/CountryController.types';
+import { ContainerCradle, Router } from '../lib/types';
 import { PossibleErrorResponse } from '../types/routes';
 
-class TripRoutes implements Router {
+class CountryRoutes implements Router {
   controller: CountryController;
 
   constructor({ countryController }: ContainerCradle) {
@@ -19,7 +19,16 @@ class TripRoutes implements Router {
       url: '/countries',
       handler: this.controller.getCountries,
     });
+
+    server.route<{
+      Params: GetCitiesForCountryParams;
+      Reply: PossibleErrorResponse<GetCitiesForCountryResponse>;
+    }>({
+      method: 'GET',
+      url: '/countries/:countryId/cities',
+      handler: this.controller.getCitiesForCountry,
+    });
   }
 }
 
-export default TripRoutes;
+export default CountryRoutes;

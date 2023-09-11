@@ -1,10 +1,10 @@
-import Fastify, { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
-import multipart from '@fastify/multipart';
-import qs from 'qs';
 import cors from '@fastify/cors';
-import { ContainerCradle, Router } from './types';
-import TokenRepository from '../repository/TokenRepository';
+import multipart from '@fastify/multipart';
 import { fastifyRequestContextPlugin } from '@fastify/request-context';
+import Fastify, { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
+import qs from 'qs';
+import TokenRepository from '../repository/TokenRepository';
+import { ContainerCradle, Router } from './types';
 
 class Server {
   server: FastifyInstance;
