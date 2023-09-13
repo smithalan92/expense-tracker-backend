@@ -19,6 +19,7 @@ class DBAgent {
   }
 
   prepareArrayForInValue(items: Array<string | number>) {
+    if (!items.length) return `''`;
     if (typeof items[0] === 'number') return items.join(',');
     else return items.map((i) => `'${i}'`).join(',');
   }

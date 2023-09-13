@@ -11,3 +11,8 @@ export interface DBCityResult extends mysql.RowDataPacket {
   name: string;
   countryId: number;
 }
+
+export interface DBGetCityOptionsForTripIdCountry extends mysql.RowDataPacket {
+  countryId: number;
+  cityIds: string | null;
+}

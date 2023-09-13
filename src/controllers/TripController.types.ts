@@ -90,12 +90,17 @@ export interface EditExpenseForTripParams {
 
 export type UpdateExpenseForTripBody = UpdateExpenseParmas;
 
+export interface CreateTripCountry {
+  countryId: number;
+  cityIds?: number[];
+}
+
 export interface CreateTripBody {
   name: string;
   startDate: string;
   endDate: string;
   file?: string;
-  countryIds: number[];
+  countries: CreateTripCountry[];
   userIds: number[];
 }
 

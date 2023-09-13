@@ -1,33 +1,33 @@
+import DBAgent from '../lib/DBAgent';
 import { ContainerCradle, Env } from '../lib/types';
-import { PossibleErrorResponse, RouteHandler, RouteHandlerWithBody, RouteHandlerWithBodyAndParams, RouterHandlerWithParams } from '../types/routes';
-import TripRepository from '../repository/TripRepository';
-import {
-  GetTripReponse,
-  GetExpensesForTripReponse,
-  RouteWithTripIDParams,
-  ResponseTrip,
-  AddExpenseForTripBody,
-  AddExpenseForTripParams,
-  GetTripDataResponse,
-  GetExpenseStatsResponse,
-  DeleteExpenseParams,
-  EditExpenseForTripParams,
-  UpdateExpenseForTripBody,
-  CreateTripBody,
-  CreateTripResponse,
-  DeleteTripParams,
-} from './TripController.types';
-import ExpenseRepository from '../repository/ExpenseRepository';
-import CountryRepository from '../repository/CountryRepository';
-import { NewExpenseRecord } from '../repository/ExpenseRepository.types';
-import CurrencyRepository from '../repository/CurrencyRepository';
-import CityRepository from '../repository/CityRepository';
 import CategoryRepository from '../repository/CategoryRepository';
+import CityRepository from '../repository/CityRepository';
+import CountryRepository from '../repository/CountryRepository';
+import CurrencyRepository from '../repository/CurrencyRepository';
+import ExpenseRepository from '../repository/ExpenseRepository';
+import { NewExpenseRecord } from '../repository/ExpenseRepository.types';
+import FileRepository from '../repository/FileRepository';
+import TripRepository from '../repository/TripRepository';
+import { PossibleErrorResponse, RouteHandler, RouteHandlerWithBody, RouteHandlerWithBodyAndParams, RouterHandlerWithParams } from '../types/routes';
 import { parseExpenseForResponse } from '../utils/expenseParser';
 import { ProcessedTripExpense } from '../utils/expenseParser.types';
-import FileRepository from '../repository/FileRepository';
 import { parseTrip } from '../utils/trip';
-import DBAgent from '../lib/DBAgent';
+import {
+  AddExpenseForTripBody,
+  AddExpenseForTripParams,
+  CreateTripBody,
+  CreateTripResponse,
+  DeleteExpenseParams,
+  DeleteTripParams,
+  EditExpenseForTripParams,
+  GetExpenseStatsResponse,
+  GetExpensesForTripReponse,
+  GetTripDataResponse,
+  GetTripReponse,
+  ResponseTrip,
+  RouteWithTripIDParams,
+  UpdateExpenseForTripBody,
+} from './TripController.types';
 
 class TripController {
   tripRepository: TripRepository;
@@ -84,7 +84,7 @@ class TripController {
   createTrip: RouteHandlerWithBody<CreateTripBody, PossibleErrorResponse<CreateTripResponse>> = async (req, reply) => {
     const userId = parseInt(req.requestContext.get('userId'), 10);
 
-    const { name, startDate, endDate, file, countryIds, userIds } = req.body;
+    const { name, startDate, endDate, file, countries, userIds } = req.body;
 
     if (!userIds.includes(userId)) {
       // Always make sure the current user is a member of the trip
@@ -94,7 +94,7 @@ class TripController {
     const transaction = await this.dbAgent.createTransaction();
 
     try {
-      const tripId = await this.tripRepository.createTrip({ name, startDate, endDate, countryIds, userIds }, transaction);
+      const tripId = await this.tripRepository.createTrip({ name, startDate, endDate, countries, userIds }, transaction);
 
       if (file) {
         const fileId = await this.fileRepository.saveTempFile(

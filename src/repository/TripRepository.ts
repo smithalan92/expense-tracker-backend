@@ -1,9 +1,9 @@
+import mysql from 'mysql2';
 import DBAgent from '../lib/DBAgent';
+import DBTransaction from '../lib/DBTransaction';
+import knex from '../lib/knex';
 import { ContainerCradle } from '../lib/types';
 import { CreateTripParams, DBFindUsersForTripResult, DBTripResult, UsersForTrip } from './TripRepository.types';
-import knex from '../lib/knex';
-import mysql from 'mysql2';
-import DBTransaction from '../lib/DBTransaction';
 
 class TripRepository {
   dbAgent: DBAgent;
@@ -78,7 +78,7 @@ class TripRepository {
     }, {});
   }
 
-  async createTrip({ name, startDate, endDate, countryIds, userIds }: CreateTripParams, transaction?: DBTransaction) {
+  async createTrip({ name, startDate, endDate, countries, userIds }: CreateTripParams, transaction?: DBTransaction) {
     let transactionToUse = transaction;
 
     if (!transactionToUse) {
@@ -99,8 +99,10 @@ class TripRepository {
           .toQuery(),
       });
 
-      const countryInserts = countryIds.reduce<Array<{ tripId: Number; countryId: number }>>((acc, current) => {
-        acc.push({ tripId, countryId: current });
+      const countryInserts = countries.reduce<Array<{ tripId: Number; countryId: number; cityIds: string | null }>>((acc, current) => {
+        const cityIds = current.cityIds?.join(',') ?? null;
+
+        acc.push({ tripId, countryId: current.countryId, cityIds });
         return acc;
       }, []);
 

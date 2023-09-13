@@ -1,6 +1,6 @@
 import DBAgent from '../lib/DBAgent';
 import { ContainerCradle } from '../lib/types';
-import { DBCityResult, DBGetCityOptionsForTripIdResult } from './CityRepository.types';
+import { DBCityResult, DBGetCityOptionsForTripIdCountry, DBGetCityOptionsForTripIdResult } from './CityRepository.types';
 
 class CityRepository {
   dbAgent: DBAgent;
@@ -10,15 +10,31 @@ class CityRepository {
   }
 
   async getCityOptionsForTripId(tripId: number) {
+    const tripCountries = await this.dbAgent.runQuery<DBGetCityOptionsForTripIdCountry[]>({
+      query: `
+        SELECT countryId, cityIds
+        FROM trip_countries tc
+        WHERE tc.tripId = ?
+      `,
+      values: [tripId],
+    });
+
+    const allCitiesForCountryIds = tripCountries.filter((c) => !c.cityIds).map((c) => c.countryId);
+    const cityIds = tripCountries.reduce<number[]>((acc, current) => {
+      if (current.cityIds) {
+        return [...acc, ...current.cityIds.split(',').map((s) => parseInt(s, 10))];
+      }
+      return acc;
+    }, []);
+
     const results = await this.dbAgent.runQuery<DBGetCityOptionsForTripIdResult[]>({
       query: `
         SELECT c.id, c.name, c.timezoneName, c.countryId
-        FROM trip_countries tc
-        JOIN cities c ON tc.countryId = c.countryId
-        WHERE tc.tripId = ?
+        FROM cities c
+        WHERE c.id IN (${this.dbAgent.prepareArrayForInValue(cityIds)})
+        OR c.countryId IN (${this.dbAgent.prepareArrayForInValue(allCitiesForCountryIds)})
         ORDER BY c.name ASC;
       `,
-      values: [tripId],
     });
 
     return results;
