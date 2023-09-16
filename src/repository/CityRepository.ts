@@ -40,6 +40,17 @@ class CityRepository {
     return results;
   }
 
+  async getCitiesById(cityIds: number[]) {
+    return this.dbAgent.runQuery<DBCityResult[]>({
+      query: `
+        SELECT id, name, countryId
+        FROM cities
+        WHERE id IN (${this.dbAgent.prepareArrayForInValue(cityIds)})
+        ORDER BY name ASC;
+      `,
+    });
+  }
+
   async getCitiesForCountryIds(countryIds: number[]) {
     const results = await this.dbAgent.runQuery<DBCityResult[]>({
       query: `

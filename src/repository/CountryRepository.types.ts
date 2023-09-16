@@ -11,4 +11,5 @@ export interface DBGetCountriesByTripIDResult extends mysql.RowDataPacket {
   tripId: number;
   currencyCode: string;
   currencyId: number;
+  cityIds: string | null;
 }

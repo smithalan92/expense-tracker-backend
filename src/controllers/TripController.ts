@@ -2,6 +2,7 @@ import DBAgent from '../lib/DBAgent';
 import { ContainerCradle, Env } from '../lib/types';
 import CategoryRepository from '../repository/CategoryRepository';
 import CityRepository from '../repository/CityRepository';
+import { DBCityResult } from '../repository/CityRepository.types';
 import CountryRepository from '../repository/CountryRepository';
 import CurrencyRepository from '../repository/CurrencyRepository';
 import ExpenseRepository from '../repository/ExpenseRepository';
@@ -11,10 +12,12 @@ import TripRepository from '../repository/TripRepository';
 import { PossibleErrorResponse, RouteHandler, RouteHandlerWithBody, RouteHandlerWithBodyAndParams, RouterHandlerWithParams } from '../types/routes';
 import { parseExpenseForResponse } from '../utils/expenseParser';
 import { ProcessedTripExpense } from '../utils/expenseParser.types';
+import { getTripFileUrl } from '../utils/file';
 import { parseTrip } from '../utils/trip';
 import {
   AddExpenseForTripBody,
   AddExpenseForTripParams,
+  CountryWithCities,
   CreateTripBody,
   CreateTripResponse,
   DeleteExpenseParams,
@@ -22,11 +25,14 @@ import {
   EditExpenseForTripParams,
   GetExpenseStatsResponse,
   GetExpensesForTripReponse,
+  GetTripDataForEditingResponse,
   GetTripDataResponse,
   GetTripReponse,
   ResponseTrip,
   RouteWithTripIDParams,
   UpdateExpenseForTripBody,
+  UpdateTripBody,
+  UpdateTripResponse,
 } from './TripController.types';
 
 class TripController {
@@ -106,7 +112,7 @@ class TripController {
           transaction
         );
 
-        await this.tripRepository.updateTrip({ fileId, tripId }, transaction);
+        await this.tripRepository.updateTrip({ fileId, tripId, currentUserId: userId }, transaction);
       }
 
       await transaction.commit();
@@ -141,17 +147,124 @@ class TripController {
 
     const processedExpenses = expenses.map<ProcessedTripExpense>(parseExpenseForResponse);
 
+    return reply.code(200).send({
+      trip: parseTrip(trip),
+      expenses: processedExpenses,
+      cities,
+      countries,
+      currencies,
+      categories,
+      users,
+    });
+  };
+
+  getTripDataForEditing: RouterHandlerWithParams<RouteWithTripIDParams, PossibleErrorResponse<GetTripDataForEditingResponse>> = async (
+    req,
+    reply
+  ) => {
+    const userId: number = req.requestContext.get('userId');
+    const tripId: number = req.params.tripId;
+
+    const trip = await this.tripRepository.findTripById({ userId, tripId });
+
+    if (!trip) {
+      return reply.code(400).send({ error: 'Trip not found' });
+    }
+
+    const [countries, users] = await Promise.all([
+      this.countryRepository.getCountriesForTrips([trip.id]),
+      this.tripRepository.findUsersForTrip(tripId),
+    ]);
+
+    const userIds = Object.keys(users).map(Number);
+
+    const cityIds = countries.reduce<number[]>((acc, current) => {
+      if (current.cityIds) {
+        return [...acc, ...current.cityIds.split(',').map(Number)];
+      }
+      return acc;
+    }, []);
+
+    let cities: DBCityResult[] = [];
+
+    if (cityIds.length) {
+      cities = await this.cityRepository.getCitiesById(cityIds);
+    }
+
+    const countriesWithCities = countries.reduce<CountryWithCities[]>((acc, current) => {
+      const data: CountryWithCities = { countryId: current.id, name: current.name };
+
+      const countryCityIds = cities.filter((c) => c.countryId === data.countryId).map((c) => c.id);
+
+      if (countryCityIds) {
+        data.cityIds = countryCityIds;
+      }
+
+      return [...acc, data];
+    }, []);
+
     return reply
       .send({
-        trip: parseTrip(trip),
-        expenses: processedExpenses,
-        cities,
-        countries,
-        currencies,
-        categories,
-        users,
+        name: trip.name,
+        image: trip.filePath ? getTripFileUrl(trip.filePath) : null,
+        startDate: trip.startDate,
+        endDate: trip.endDate,
+        countries: countriesWithCities,
+        userIds,
       })
       .code(200);
+  };
+
+  updateTrip: RouteHandlerWithBodyAndParams<RouteWithTripIDParams, UpdateTripBody, PossibleErrorResponse<UpdateTripResponse>> = async (
+    req,
+    reply
+  ) => {
+    const userId: number = req.requestContext.get('userId');
+    const tripId: number = req.params.tripId;
+
+    const existingTrip = await this.tripRepository.findTripById({ userId, tripId });
+
+    if (!existingTrip) {
+      return reply.code(400).send({ error: 'Trip not found' });
+    }
+
+    const transaction = await this.dbAgent.createTransaction();
+
+    let fileId: null | number = null;
+
+    try {
+      if (req.body.file) {
+        fileId = await this.fileRepository.saveTempFile(
+          {
+            userId,
+            fileName: req.body.file,
+            destPath: `/trips/${tripId}`,
+          },
+          transaction
+        );
+
+        await this.tripRepository.updateTrip({ fileId, tripId, currentUserId: userId }, transaction);
+      }
+
+      await this.tripRepository.updateTrip({
+        tripId,
+        name: req.body.name,
+        startDate: req.body.startDate,
+        endDate: req.body.endDate,
+        countries: req.body.countries,
+        userIds: req.body.userIds,
+        currentUserId: userId,
+      });
+
+      await transaction.commit();
+
+      const [trip] = await this.tripRepository.findTripsForUserId(userId, tripId);
+
+      return reply.code(201).send({ trip: parseTrip(trip) });
+    } catch (err) {
+      await transaction.rollback();
+      throw err;
+    }
   };
 
   getExpensesForTrip: RouterHandlerWithParams<RouteWithTripIDParams, PossibleErrorResponse<GetExpensesForTripReponse>> = async (req, reply) => {
@@ -307,6 +420,7 @@ class TripController {
     await this.tripRepository.updateTrip({
       tripId,
       status: 'deleted',
+      currentUserId: userId,
     });
 
     return reply.code(204).send();

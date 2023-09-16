@@ -3,19 +3,22 @@ import TripController from '../controllers/TripController';
 import {
   AddExpenseForTripBody,
   AddExpenseForTripParams,
-  GetTripDataResponse,
-  RouteWithTripIDParams,
-  GetExpensesForTripReponse,
-  GetTripReponse,
-  GetExpenseStatsResponse,
-  DeleteExpenseParams,
-  EditExpenseForTripParams,
-  UpdateExpenseForTripBody,
   CreateTripBody,
   CreateTripResponse,
+  DeleteExpenseParams,
   DeleteTripParams,
+  EditExpenseForTripParams,
+  GetExpenseStatsResponse,
+  GetExpensesForTripReponse,
+  GetTripDataForEditingResponse,
+  GetTripDataResponse,
+  GetTripReponse,
+  RouteWithTripIDParams,
+  UpdateExpenseForTripBody,
+  UpdateTripBody,
+  UpdateTripResponse,
 } from '../controllers/TripController.types';
-import { Router, ContainerCradle } from '../lib/types';
+import { ContainerCradle, Router } from '../lib/types';
 import { PossibleErrorResponse } from '../types/routes';
 
 class TripRoutes implements Router {
@@ -50,6 +53,15 @@ class TripRoutes implements Router {
       method: 'GET',
       url: '/trips/:tripId/data',
       handler: this.controller.getTripData,
+    });
+
+    server.route<{
+      Params: RouteWithTripIDParams;
+      Reply: PossibleErrorResponse<GetTripDataForEditingResponse>;
+    }>({
+      method: 'GET',
+      url: '/trips/:tripId/edit-data',
+      handler: this.controller.getTripDataForEditing,
     });
 
     server.route<{
@@ -97,6 +109,16 @@ class TripRoutes implements Router {
       method: 'POST',
       url: '/trips',
       handler: this.controller.createTrip,
+    });
+
+    server.route<{
+      Params: RouteWithTripIDParams;
+      Body: UpdateTripBody;
+      Reply: PossibleErrorResponse<UpdateTripResponse>;
+    }>({
+      method: 'PATCH',
+      url: '/trips/:tripId',
+      handler: this.controller.updateTrip,
     });
 
     server.route<{

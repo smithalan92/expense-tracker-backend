@@ -1,4 +1,5 @@
 import mysql from 'mysql2';
+import { CreateTripCountry } from '../controllers/TripController.types';
 import DBAgent from '../lib/DBAgent';
 import DBTransaction from '../lib/DBTransaction';
 import knex from '../lib/knex';
@@ -133,8 +134,43 @@ class TripRepository {
     }
   }
 
-  async updateTrip({ fileId, tripId, status }: { fileId?: number; status?: string; tripId: number }, transaction?: DBTransaction) {
+  async updateTrip(
+    {
+      name,
+      startDate,
+      endDate,
+      countries,
+      userIds,
+      fileId,
+      tripId,
+      status,
+      currentUserId,
+    }: {
+      name?: string;
+      startDate?: string;
+      endDate?: string;
+      countries?: CreateTripCountry[];
+      userIds?: number[];
+      fileId?: number;
+      status?: string;
+      tripId: number;
+      currentUserId: number;
+    },
+    transaction?: DBTransaction
+  ) {
     let query = knex('trips').where('id', tripId);
+
+    if (name) {
+      query = query.update('name', name);
+    }
+
+    if (startDate) {
+      query = query.update('startDate', startDate);
+    }
+
+    if (endDate) {
+      query = query.update('endDate', endDate);
+    }
 
     if (fileId !== undefined) {
       query = query.update('fileId', fileId);
@@ -144,9 +180,47 @@ class TripRepository {
       query = query.update('status', status);
     }
 
-    return (transaction ?? this.dbAgent).runQuery({
+    await (transaction ?? this.dbAgent).runQuery({
       query: query.toQuery(),
     });
+
+    if (userIds) {
+      await (transaction ?? this.dbAgent).runQuery({
+        query: 'DELETE FROM user_trips WHERE tripId = ? AND userId != ?;',
+        values: [tripId, currentUserId],
+      });
+
+      if (userIds.length) {
+        const usersToAdd = userIds.map((id) => ({ tripId, userId: id }));
+        await (transaction ?? this.dbAgent).runQuery({
+          query: knex('user_trips').insert(usersToAdd).toQuery(),
+        });
+      }
+    }
+
+    if (countries) {
+      if (!countries.length) {
+        throw new Error('You need to have at least one country on a trip');
+      }
+
+      await (transaction ?? this.dbAgent).runQuery({
+        query: 'DELETE FROM trip_countries WHERE tripId = ?;',
+        values: [tripId],
+      });
+
+      const countryRows = countries.map((country) => {
+        const cityIds = country.cityIds?.join(',') ?? null;
+        return {
+          tripId,
+          countryId: country.countryId,
+          cityIds,
+        };
+      });
+
+      await (transaction ?? this.dbAgent).runQuery({
+        query: knex('trip_countries').insert(countryRows).toQuery(),
+      });
+    }
   }
 }
 

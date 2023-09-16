@@ -108,6 +108,25 @@ export interface CreateTripResponse {
   trip: ParsedTrip;
 }
 
+export type UpdateTripBody = Partial<CreateTripBody>;
+
+export type UpdateTripResponse = CreateTripResponse;
+
 export interface DeleteTripParams {
   tripId: number;
+}
+
+export interface CountryWithCities {
+  name: string;
+  countryId: number;
+  cityIds?: number[];
+}
+
+export interface GetTripDataForEditingResponse {
+  image: string | null;
+  name: string;
+  startDate: string;
+  endDate: string;
+  countries: CountryWithCities[];
+  userIds: number[];
 }
