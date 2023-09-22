@@ -114,9 +114,8 @@ class ExpenseRepository {
       .update('updatedByUserId', userId)
       .update('updatedAt', knex.raw('NOW()'));
 
-    if (params.amount && params.euroAmount) {
-      query = query.update('amount', params.amount).update('euroAmount', params.euroAmount);
-    }
+    if (params.amount) query = query.update('amount', params.amount);
+    if (params.euroAmount) query = query.update('euroAmount', params.euroAmount);
     if (params.currencyId) query = query.update('currencyId', params.currencyId);
     if (params.localDateTime) query = query.update('localDateTime', params.localDateTime);
     if (params.description) query = query.update('description', params.description);

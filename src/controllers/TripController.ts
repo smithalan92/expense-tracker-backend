@@ -397,10 +397,11 @@ class TripController {
       return reply.code(400).send({ error: 'Not valid update data provided' });
     }
 
-    if (updateData.amount) {
+    if ((updateData.amount && updateData.amount !== expense.amount) ?? (updateData.currencyId && updateData.currencyId !== expense.currencyId)) {
+      const amount = updateData.amount ?? expense.amount;
       const currencyId = updateData.currencyId ?? expense.currencyId;
       const currencyToEurFXRate = await this.currencyRepository.getCurrencyFXRate(currencyId);
-      updateData.euroAmount = parseFloat((updateData.amount / currencyToEurFXRate).toFixed(2));
+      updateData.euroAmount = parseFloat((amount / currencyToEurFXRate).toFixed(2));
     }
 
     await this.expenseRepository.updateExpenseForTrip(tripId, expenseId, userId, updateData);
