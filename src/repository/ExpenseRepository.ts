@@ -49,7 +49,8 @@ class ExpenseRepository {
           te.createdAt,
           te.updatedAt,
           us.id as userId,
-          us.firstName
+          us.firstName,
+          us.lastName
         FROM trip_expenses te
         JOIN expense_categories ec ON te.categoryId = ec.id
         JOIN currencies cu ON cu.id=te.currencyId

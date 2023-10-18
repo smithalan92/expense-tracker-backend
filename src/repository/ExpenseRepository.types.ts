@@ -20,6 +20,7 @@ export interface DBExpenseResult extends mysql.RowDataPacket {
   updatedAt: Date;
   userId: number;
   firstName: string;
+  lastName: string;
 }
 
 export interface NewExpenseRecord {

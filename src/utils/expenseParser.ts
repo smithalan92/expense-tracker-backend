@@ -1,5 +1,5 @@
-import { ProcessedTripExpense } from './expenseParser.types';
 import { DBExpenseResult } from '../repository/ExpenseRepository.types';
+import { ProcessedTripExpense } from './expenseParser.types';
 
 export function parseExpenseForResponse(expense: DBExpenseResult): ProcessedTripExpense {
   return {
@@ -29,6 +29,7 @@ export function parseExpenseForResponse(expense: DBExpenseResult): ProcessedTrip
     user: {
       id: expense.userId,
       firstName: expense.firstName,
+      lastName: expense.lastName,
     },
     createdAt: expense.createdAt,
     updatedAt: expense.updatedAt,
