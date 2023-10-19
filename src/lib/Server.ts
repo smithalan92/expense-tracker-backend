@@ -1,10 +1,16 @@
 import cors from '@fastify/cors';
 import multipart from '@fastify/multipart';
-import { fastifyRequestContextPlugin } from '@fastify/request-context';
+import { fastifyRequestContext } from '@fastify/request-context';
 import Fastify, { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import qs from 'qs';
 import TokenRepository from '../repository/TokenRepository';
 import { ContainerCradle, Router } from './types';
+
+declare module '@fastify/request-context' {
+  interface RequestContextData {
+    userId: number;
+  }
+}
 
 class Server {
   server: FastifyInstance;
@@ -26,7 +32,7 @@ class Server {
     });
 
     void server.register(cors);
-    void server.register(fastifyRequestContextPlugin, {
+    void server.register(fastifyRequestContext, {
       defaultStoreValues: {
         userId: 0,
       },

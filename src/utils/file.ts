@@ -20,10 +20,10 @@ export function getTripFileUrl(filePath: string | null) {
   return `${FILES_URL}${finalPath}`;
 }
 
-export async function saveTempFile({ file }: MultipartFile, filePath: string): Promise<void> {
+export async function saveTempFile(fileData: MultipartFile, filePath: string): Promise<void> {
   const writeStream = fs.createWriteStream(filePath);
 
-  await pipeline(file, writeStream);
+  await pipeline(fileData.file, writeStream);
 
   writeStream.close();
 }
