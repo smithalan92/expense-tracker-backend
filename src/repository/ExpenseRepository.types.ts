@@ -33,6 +33,7 @@ export interface NewExpenseRecord {
   categoryId: number;
   cityId: number;
   userId: number;
+  createdByUserId: number;
 }
 
 export interface DBExpenseCategoryBreakdownForTripResult extends mysql.RowDataPacket {
@@ -72,7 +73,7 @@ export interface ExpenseCategoryBreakdownForTripByUser {
   [key: string]: Array<Omit<DBExpenseCategoryBreakdownForTripResult, 'constructor'>>;
 }
 
-export interface UpdateExpenseParmas {
+export interface UpdateExpenseParams {
   amount?: number;
   currencyId?: number;
   euroAmount?: number;
@@ -80,6 +81,7 @@ export interface UpdateExpenseParmas {
   description?: string;
   categoryId?: number;
   cityId?: number;
+  userId?: number;
 }
 
 export interface DBGetSingleExpenseResult extends mysql.RowDataPacket {

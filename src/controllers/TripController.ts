@@ -293,7 +293,7 @@ class TripController {
       return reply.code(400).send({ error: 'Trip not found' });
     }
 
-    const { localDateTime, cityId, amount, currencyId, categoryId, description } = req.body;
+    const { localDateTime, cityId, amount, currencyId, categoryId, description, userId: expenseUserId } = req.body;
 
     const currencyToEurFXRate = await this.currencyRepository.getCurrencyFXRate(currencyId);
 
@@ -308,7 +308,8 @@ class TripController {
       description,
       categoryId,
       cityId,
-      userId,
+      userId: expenseUserId,
+      createdByUserId: userId,
     };
 
     await this.expenseRepository.addExpenseForTrip(expense);

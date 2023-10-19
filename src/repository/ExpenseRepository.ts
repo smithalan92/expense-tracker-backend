@@ -17,7 +17,7 @@ import {
   ExpenseCategoryBreakdownForTripByUser,
   NewExpenseRecord,
   ParsedHourlyExpenseResult,
-  UpdateExpenseParmas,
+  UpdateExpenseParams,
 } from './ExpenseRepository.types';
 
 class ExpenseRepository {
@@ -85,22 +85,23 @@ class ExpenseRepository {
   }
 
   async addExpenseForTrip(expense: NewExpenseRecord) {
+    const query = knex('trip_expenses')
+      .insert({
+        tripId: expense.tripId,
+        amount: expense.amount,
+        currencyId: expense.currencyId,
+        euroAmount: expense.euroAmount,
+        localDateTime: expense.localDateTime,
+        description: expense.description,
+        categoryId: expense.categoryId,
+        cityId: expense.cityId,
+        userId: expense.userId,
+        createdByUserId: expense.createdByUserId,
+      })
+      .toQuery();
+
     const result = await this.dbAgent.runQuery<OkPacket>({
-      query: `
-        INSERT INTO trip_expenses (tripId, amount, currencyId, euroAmount, localDateTime, description, categoryId, cityId, userId)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-      `,
-      values: [
-        expense.tripId,
-        expense.amount,
-        expense.currencyId,
-        expense.euroAmount,
-        expense.localDateTime,
-        expense.description,
-        expense.categoryId,
-        expense.cityId,
-        expense.userId,
-      ],
+      query,
     });
 
     if (!result.insertId) {
@@ -108,7 +109,7 @@ class ExpenseRepository {
     }
   }
 
-  async updateExpenseForTrip(tripId: number, expenseId: number, userId: number, params: UpdateExpenseParmas) {
+  async updateExpenseForTrip(tripId: number, expenseId: number, userId: number, params: UpdateExpenseParams) {
     let query = knex('trip_expenses')
       .where('id', expenseId)
       .where('tripId', tripId)
@@ -122,6 +123,7 @@ class ExpenseRepository {
     if (params.description) query = query.update('description', params.description);
     if (params.categoryId) query = query.update('categoryId', params.categoryId);
     if (params.cityId) query = query.update('cityId', params.cityId);
+    if (params.userId) query = query.update('userId', params.userId);
 
     const sql = query.toQuery();
 

@@ -11,7 +11,7 @@ import {
   DBGetExpensiveTripDayResult,
   ExpenseCategoryBreakdownForTripByUser,
   ParsedHourlyExpenseResult,
-  UpdateExpenseParmas,
+  UpdateExpenseParams,
 } from '../repository/ExpenseRepository.types';
 import { UsersForTrip } from '../repository/TripRepository.types';
 import { ProcessedTripExpense } from '../utils/expenseParser.types';
@@ -54,6 +54,7 @@ export interface AddExpenseForTripBody {
   currencyId: number;
   categoryId: number;
   description: string;
+  userId: number;
 }
 
 export interface GetTripDataResponse {
@@ -88,7 +89,7 @@ export interface EditExpenseForTripParams {
   expenseId: number;
 }
 
-export type UpdateExpenseForTripBody = UpdateExpenseParmas;
+export type UpdateExpenseForTripBody = UpdateExpenseParams;
 
 export interface CreateTripCountry {
   countryId: number;
