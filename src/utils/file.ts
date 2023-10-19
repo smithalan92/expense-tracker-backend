@@ -1,6 +1,7 @@
 import { MultipartFile } from '@fastify/multipart';
-import fsPromise from 'fs/promises';
 import fs from 'fs';
+import fsPromise from 'fs/promises';
+import { pipeline } from 'stream/promises';
 
 const DEFAULT_TRIP_IMAGE_PATH = '/default/default_trip_image.png';
 const FILES_URL = 'https://media.smithy.dev/expensr';
@@ -22,14 +23,7 @@ export function getTripFileUrl(filePath: string | null) {
 export async function saveTempFile({ file }: MultipartFile, filePath: string): Promise<void> {
   const writeStream = fs.createWriteStream(filePath);
 
-  return new Promise((resolve) => {
-    file.on('data', (data) => {
-      writeStream.write(data);
-    });
+  await pipeline(file, writeStream);
 
-    file.on('end', () => {
-      writeStream.close();
-      resolve();
-    });
-  });
+  writeStream.close();
 }
