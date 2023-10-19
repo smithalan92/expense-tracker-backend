@@ -69,7 +69,7 @@ class TripController {
   }
 
   getTrips: RouteHandler<PossibleErrorResponse<GetTripReponse>> = async (req, reply) => {
-    const userId: number = req.requestContext.get('userId');
+    const userId: number = req.requestContext.get('userId')!;
 
     const trips = await this.tripRepository.findTripsForUserId(userId);
 
@@ -88,7 +88,7 @@ class TripController {
   };
 
   createTrip: RouteHandlerWithBody<CreateTripBody, PossibleErrorResponse<CreateTripResponse>> = async (req, reply) => {
-    const userId = parseInt(req.requestContext.get('userId'), 10);
+    const userId = req.requestContext.get('userId')!;
 
     const { name, startDate, endDate, file, countries, userIds } = req.body;
 
@@ -127,7 +127,7 @@ class TripController {
   };
 
   getTripData: RouterHandlerWithParams<RouteWithTripIDParams, PossibleErrorResponse<GetTripDataResponse>> = async (req, reply) => {
-    const userId: number = req.requestContext.get('userId');
+    const userId = req.requestContext.get('userId')!;
     const tripId: number = req.params.tripId;
 
     const trip = await this.tripRepository.findTripById({ userId, tripId });
@@ -162,7 +162,7 @@ class TripController {
     req,
     reply
   ) => {
-    const userId: number = req.requestContext.get('userId');
+    const userId: number = req.requestContext.get('userId')!;
     const tripId: number = req.params.tripId;
 
     const trip = await this.tripRepository.findTripById({ userId, tripId });
@@ -219,8 +219,8 @@ class TripController {
     req,
     reply
   ) => {
-    const userId: number = req.requestContext.get('userId');
-    const tripId: number = req.params.tripId;
+    const userId = req.requestContext.get('userId')!;
+    const tripId = req.params.tripId;
 
     const existingTrip = await this.tripRepository.findTripById({ userId, tripId });
 
@@ -268,8 +268,8 @@ class TripController {
   };
 
   getExpensesForTrip: RouterHandlerWithParams<RouteWithTripIDParams, PossibleErrorResponse<GetExpensesForTripReponse>> = async (req, reply) => {
-    const userId: number = req.requestContext.get('userId');
-    const tripId: number = req.params.tripId;
+    const userId = req.requestContext.get('userId')!;
+    const tripId = req.params.tripId;
 
     const trip = await this.tripRepository.findTripById({ userId, tripId });
 
@@ -286,7 +286,7 @@ class TripController {
 
   addExpenseForTrip: RouteHandlerWithBodyAndParams<AddExpenseForTripParams, AddExpenseForTripBody, PossibleErrorResponse> = async (req, reply) => {
     const { tripId } = req.params;
-    const userId: number = req.requestContext.get('userId');
+    const userId = req.requestContext.get('userId')!;
     const trip = await this.tripRepository.findTripById({ userId, tripId });
 
     if (!trip) {
@@ -317,8 +317,8 @@ class TripController {
   };
 
   getExpenseStats: RouterHandlerWithParams<RouteWithTripIDParams, PossibleErrorResponse<GetExpenseStatsResponse>> = async (req, reply) => {
-    const userId: number = req.requestContext.get('userId');
-    const tripId: number = req.params.tripId;
+    const userId = req.requestContext.get('userId')!;
+    const tripId = req.params.tripId;
 
     const trip = await this.tripRepository.findTripById({ userId, tripId });
 
@@ -362,9 +362,9 @@ class TripController {
   };
 
   deleteExpense: RouterHandlerWithParams<DeleteExpenseParams, PossibleErrorResponse<GetExpenseStatsResponse>> = async (req, reply) => {
-    const userId: number = req.requestContext.get('userId');
-    const tripId: number = req.params.tripId;
-    const expenseId: number = req.params.expenseId;
+    const userId = req.requestContext.get('userId')!;
+    const tripId = req.params.tripId;
+    const expenseId = req.params.expenseId;
 
     const trip = await this.tripRepository.findTripById({ userId, tripId });
 
@@ -382,7 +382,7 @@ class TripController {
     reply
   ) => {
     const { tripId, expenseId } = req.params;
-    const userId: number = req.requestContext.get('userId');
+    const userId = req.requestContext.get('userId')!;
     const updateData = req.body;
 
     const expense = await this.expenseRepository.getExpense(expenseId, userId);
@@ -411,7 +411,7 @@ class TripController {
 
   deleteTrip: RouterHandlerWithParams<DeleteTripParams, PossibleErrorResponse> = async (req, reply) => {
     const { tripId } = req.params;
-    const userId: number = req.requestContext.get('userId');
+    const userId = req.requestContext.get('userId')!;
     const trip = await this.tripRepository.findTripById({ userId, tripId });
 
     if (!trip) {
