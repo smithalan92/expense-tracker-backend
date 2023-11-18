@@ -1,10 +1,10 @@
 import cors from '@fastify/cors';
 import multipart from '@fastify/multipart';
 import { fastifyRequestContext } from '@fastify/request-context';
-import Fastify, { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
+import Fastify, { type FastifyInstance, type FastifyReply, type FastifyRequest } from 'fastify';
 import qs from 'qs';
-import TokenRepository from '../repository/TokenRepository';
-import { ContainerCradle, Router } from './types';
+import type TokenRepository from '../repository/TokenRepository';
+import { type ContainerCradle, type Router } from './types';
 
 declare module '@fastify/request-context' {
   interface RequestContextData {
@@ -40,7 +40,7 @@ class Server {
     void server.register(multipart);
 
     server.addHook('onRequest', async (request: FastifyRequest, reply: FastifyReply) => {
-      if (request.routerPath === '/login') {
+      if (request.routeOptions.url === '/login') {
         return;
       }
 
@@ -60,7 +60,7 @@ class Server {
     });
 
     server.addHook('onResponse', (request: FastifyRequest, reply: FastifyReply, done) => {
-      console.log(`${request.method.toUpperCase()} ${request.routerPath} ${reply.statusCode}`);
+      console.log(`\n${request.method.toUpperCase()} ${request.routeOptions.url} ${reply.statusCode}`);
       done();
     });
 

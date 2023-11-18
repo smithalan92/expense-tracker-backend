@@ -1,38 +1,38 @@
-import DBAgent from '../lib/DBAgent';
-import { ContainerCradle, Env } from '../lib/types';
-import CategoryRepository from '../repository/CategoryRepository';
-import CityRepository from '../repository/CityRepository';
-import { DBCityResult } from '../repository/CityRepository.types';
-import CountryRepository from '../repository/CountryRepository';
-import CurrencyRepository from '../repository/CurrencyRepository';
-import ExpenseRepository from '../repository/ExpenseRepository';
-import { NewExpenseRecord } from '../repository/ExpenseRepository.types';
-import FileRepository from '../repository/FileRepository';
-import TripRepository from '../repository/TripRepository';
-import { PossibleErrorResponse, RouteHandler, RouteHandlerWithBody, RouteHandlerWithBodyAndParams, RouterHandlerWithParams } from '../types/routes';
+import type DBAgent from '../lib/DBAgent';
+import { type ContainerCradle, type Env } from '../lib/types';
+import type CategoryRepository from '../repository/CategoryRepository';
+import type CityRepository from '../repository/CityRepository';
+import { type DBCityResult } from '../repository/CityRepository.types';
+import type CountryRepository from '../repository/CountryRepository';
+import type CurrencyRepository from '../repository/CurrencyRepository';
+import type ExpenseRepository from '../repository/ExpenseRepository';
+import { type NewExpenseRecord } from '../repository/ExpenseRepository.types';
+import type FileRepository from '../repository/FileRepository';
+import type TripRepository from '../repository/TripRepository';
+import { type PossibleErrorResponse, type RouteHandler, type RouteHandlerWithBody, type RouteHandlerWithBodyAndParams, type RouterHandlerWithParams } from '../types/routes';
 import { parseExpenseForResponse } from '../utils/expenseParser';
-import { ProcessedTripExpense } from '../utils/expenseParser.types';
+import { type ProcessedTripExpense } from '../utils/expenseParser.types';
 import { getTripFileUrl } from '../utils/file';
 import { parseTrip } from '../utils/trip';
 import {
-  AddExpenseForTripBody,
-  AddExpenseForTripParams,
-  CountryWithCities,
-  CreateTripBody,
-  CreateTripResponse,
-  DeleteExpenseParams,
-  DeleteTripParams,
-  EditExpenseForTripParams,
-  GetExpenseStatsResponse,
-  GetExpensesForTripReponse,
-  GetTripDataForEditingResponse,
-  GetTripDataResponse,
-  GetTripReponse,
-  ResponseTrip,
-  RouteWithTripIDParams,
-  UpdateExpenseForTripBody,
-  UpdateTripBody,
-  UpdateTripResponse,
+  type AddExpenseForTripBody,
+  type AddExpenseForTripParams,
+  type CountryWithCities,
+  type CreateTripBody,
+  type CreateTripResponse,
+  type DeleteExpenseParams,
+  type DeleteTripParams,
+  type EditExpenseForTripParams,
+  type GetExpenseStatsResponse,
+  type GetExpensesForTripReponse,
+  type GetTripDataForEditingResponse,
+  type GetTripDataResponse,
+  type GetTripReponse,
+  type ResponseTrip,
+  type RouteWithTripIDParams,
+  type UpdateExpenseForTripBody,
+  type UpdateTripBody,
+  type UpdateTripResponse,
 } from './TripController.types';
 
 class TripController {

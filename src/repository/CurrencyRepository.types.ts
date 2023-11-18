@@ -1,4 +1,4 @@
-import mysql from 'mysql2';
+import type mysql from 'mysql2';
 
 export interface DBGetCurrenciesForSyncJobResult extends mysql.RowDataPacket {
   id: number;

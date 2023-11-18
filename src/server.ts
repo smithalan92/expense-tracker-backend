@@ -1,6 +1,6 @@
 import * as awilix from 'awilix';
 import Server from './lib/Server';
-import { Job } from './types/job.types';
+import { type Job } from './types/job.types';
 
 async function makeServer(container: awilix.AwilixContainer) {
   // Load all repositories to the container

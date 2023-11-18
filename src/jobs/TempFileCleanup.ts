@@ -1,5 +1,5 @@
-import { ContainerCradle, Env } from '../lib/types';
-import { Job } from '../types/job.types';
+import { type ContainerCradle, type Env } from '../lib/types';
+import { type Job } from '../types/job.types';
 import cron from 'node-cron';
 import path from 'path';
 import fs from 'fs/promises';

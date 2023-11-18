@@ -1,4 +1,4 @@
-import mysql from 'mysql2';
+import type mysql from 'mysql2';
 
 export interface DBExpenseResult extends mysql.RowDataPacket {
   id: number;
@@ -69,9 +69,7 @@ export interface DBExpenseCategoryBreakdownForTripByUserResult extends DBExpense
   userId: number;
 }
 
-export interface ExpenseCategoryBreakdownForTripByUser {
-  [key: string]: Array<Omit<DBExpenseCategoryBreakdownForTripResult, 'constructor'>>;
-}
+export type ExpenseCategoryBreakdownForTripByUser = Record<string, Array<Omit<DBExpenseCategoryBreakdownForTripResult, 'constructor'>>>;
 
 export interface UpdateExpenseParams {
   amount?: number;

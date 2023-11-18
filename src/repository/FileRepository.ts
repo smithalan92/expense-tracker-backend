@@ -1,12 +1,12 @@
 import fs from 'fs/promises';
-import mysql from 'mysql2';
-import DBAgent from '../lib/DBAgent';
-import { ContainerCradle, Env } from '../lib/types';
+import type mysql from 'mysql2';
+import type DBAgent from '../lib/DBAgent';
+import { type ContainerCradle, type Env } from '../lib/types';
 import { doesFileOrFolderExist } from '../utils/file';
 import knex from '../lib/knex';
 import path from 'path';
-import DBTransaction from '../lib/DBTransaction';
-import { DBUnprocessedFileResult } from './FileRepository.types';
+import type DBTransaction from '../lib/DBTransaction';
+import { type DBUnprocessedFileResult } from './FileRepository.types';
 
 class FileRepository {
   dbAgent: DBAgent;

@@ -1,8 +1,8 @@
-import { FastifyInstance } from 'fastify';
-import AuthController from '../controllers/AuthController';
-import { Router, ContainerCradle } from '../lib/types';
-import { LoginRequest, LoginResponse } from '../controllers/AuthController.types';
-import { PossibleErrorResponse } from '../types/routes';
+import { type FastifyInstance } from 'fastify';
+import type AuthController from '../controllers/AuthController';
+import { type Router, type ContainerCradle } from '../lib/types';
+import { type LoginRequest, type LoginResponse } from '../controllers/AuthController.types';
+import { type PossibleErrorResponse } from '../types/routes';
 
 class AuthRoutes implements Router {
   controller: AuthController;

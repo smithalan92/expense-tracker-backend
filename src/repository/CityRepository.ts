@@ -1,6 +1,6 @@
-import DBAgent from '../lib/DBAgent';
-import { ContainerCradle } from '../lib/types';
-import { DBCityResult, DBGetCityOptionsForTripIdCountry, DBGetCityOptionsForTripIdResult } from './CityRepository.types';
+import type DBAgent from '../lib/DBAgent';
+import { type ContainerCradle } from '../lib/types';
+import { type DBCityResult, type DBGetCityOptionsForTripIdCountry, type DBGetCityOptionsForTripIdResult } from './CityRepository.types';
 
 class CityRepository {
   dbAgent: DBAgent;

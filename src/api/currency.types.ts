@@ -1,6 +1,4 @@
 export interface GetCurrencyResponse {
   date: string;
-  eur: {
-    [key: string]: number;
-  };
+  eur: Record<string, number>;
 }

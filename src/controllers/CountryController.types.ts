@@ -1,5 +1,5 @@
-import { DBCityResult } from '../repository/CityRepository.types';
-import { DBCountriesResult } from '../repository/CountryRepository.types';
+import { type DBCityResult } from '../repository/CityRepository.types';
+import { type DBCountriesResult } from '../repository/CountryRepository.types';
 
 export interface GetCountriesResponse {
   countries: DBCountriesResult[];

@@ -1,25 +1,25 @@
-import { FastifyInstance } from 'fastify';
-import TripController from '../controllers/TripController';
+import { type FastifyInstance } from 'fastify';
+import type TripController from '../controllers/TripController';
 import {
-  AddExpenseForTripBody,
-  AddExpenseForTripParams,
-  CreateTripBody,
-  CreateTripResponse,
-  DeleteExpenseParams,
-  DeleteTripParams,
-  EditExpenseForTripParams,
-  GetExpenseStatsResponse,
-  GetExpensesForTripReponse,
-  GetTripDataForEditingResponse,
-  GetTripDataResponse,
-  GetTripReponse,
-  RouteWithTripIDParams,
-  UpdateExpenseForTripBody,
-  UpdateTripBody,
-  UpdateTripResponse,
+  type AddExpenseForTripBody,
+  type AddExpenseForTripParams,
+  type CreateTripBody,
+  type CreateTripResponse,
+  type DeleteExpenseParams,
+  type DeleteTripParams,
+  type EditExpenseForTripParams,
+  type GetExpenseStatsResponse,
+  type GetExpensesForTripReponse,
+  type GetTripDataForEditingResponse,
+  type GetTripDataResponse,
+  type GetTripReponse,
+  type RouteWithTripIDParams,
+  type UpdateExpenseForTripBody,
+  type UpdateTripBody,
+  type UpdateTripResponse,
 } from '../controllers/TripController.types';
-import { ContainerCradle, Router } from '../lib/types';
-import { PossibleErrorResponse } from '../types/routes';
+import { type ContainerCradle, type Router } from '../lib/types';
+import { type PossibleErrorResponse } from '../types/routes';
 
 class TripRoutes implements Router {
   controller: TripController;

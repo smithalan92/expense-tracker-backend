@@ -1,5 +1,5 @@
-import mysql from 'mysql2';
-import { CreateTripBody } from '../controllers/TripController.types';
+import type mysql from 'mysql2';
+import { type CreateTripBody } from '../controllers/TripController.types';
 
 export interface DBTripResult extends mysql.RowDataPacket {
   id: number;
@@ -18,8 +18,6 @@ export interface DBFindUsersForTripResult extends mysql.RowDataPacket {
   lastName: string;
 }
 
-export interface UsersForTrip {
-  [key: number]: Omit<DBFindUsersForTripResult, 'constructor' | 'id'>;
-}
+export type UsersForTrip = Record<number, Omit<DBFindUsersForTripResult, 'constructor' | 'id'>>;
 
 export type CreateTripParams = Omit<CreateTripBody, 'file'>;

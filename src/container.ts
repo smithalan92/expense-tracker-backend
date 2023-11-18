@@ -2,7 +2,7 @@ import * as awilix from 'awilix';
 import makeEnv from './services/env';
 import makePool from './services/db';
 import DBAgent from './lib/DBAgent';
-import { ContainerCradle } from './lib/types';
+import { type ContainerCradle } from './lib/types';
 
 export default async function configureContainer() {
   const container = awilix.createContainer<ContainerCradle>();

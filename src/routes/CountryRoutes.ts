@@ -1,8 +1,8 @@
-import { FastifyInstance } from 'fastify';
-import CountryController from '../controllers/CountryController';
-import { GetCitiesForCountryParams, GetCitiesForCountryResponse, GetCountriesResponse } from '../controllers/CountryController.types';
-import { ContainerCradle, Router } from '../lib/types';
-import { PossibleErrorResponse } from '../types/routes';
+import { type FastifyInstance } from 'fastify';
+import type CountryController from '../controllers/CountryController';
+import { type GetCitiesForCountryParams, type GetCitiesForCountryResponse, type GetCountriesResponse } from '../controllers/CountryController.types';
+import { type ContainerCradle, type Router } from '../lib/types';
+import { type PossibleErrorResponse } from '../types/routes';
 
 class CountryRoutes implements Router {
   controller: CountryController;

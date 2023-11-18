@@ -1,20 +1,20 @@
-import { DBGetCategoriesResult } from '../repository/CategoryRepository.types';
-import { DBGetCityOptionsForTripIdResult } from '../repository/CityRepository.types';
-import { DBGetCountriesByTripIDResult } from '../repository/CountryRepository.types';
-import { DBGetCurrenciesResult } from '../repository/CurrencyRepository.types';
+import { type DBGetCategoriesResult } from '../repository/CategoryRepository.types';
+import { type DBGetCityOptionsForTripIdResult } from '../repository/CityRepository.types';
+import { type DBGetCountriesByTripIDResult } from '../repository/CountryRepository.types';
+import { type DBGetCurrenciesResult } from '../repository/CurrencyRepository.types';
 import {
-  DBExpenseByUserBreakdownForTripResult,
-  DBExpenseCategoryBreakdownForTripResult,
-  DBGetCityBreakdownResult,
-  DBGetCountryBreakdownResult,
-  DBGetDailyCostBreakdownResult,
-  DBGetExpensiveTripDayResult,
-  ExpenseCategoryBreakdownForTripByUser,
-  ParsedHourlyExpenseResult,
-  UpdateExpenseParams,
+  type DBExpenseByUserBreakdownForTripResult,
+  type DBExpenseCategoryBreakdownForTripResult,
+  type DBGetCityBreakdownResult,
+  type DBGetCountryBreakdownResult,
+  type DBGetDailyCostBreakdownResult,
+  type DBGetExpensiveTripDayResult,
+  type ExpenseCategoryBreakdownForTripByUser,
+  type ParsedHourlyExpenseResult,
+  type UpdateExpenseParams,
 } from '../repository/ExpenseRepository.types';
-import { UsersForTrip } from '../repository/TripRepository.types';
-import { ProcessedTripExpense } from '../utils/expenseParser.types';
+import { type UsersForTrip } from '../repository/TripRepository.types';
+import { type ProcessedTripExpense } from '../utils/expenseParser.types';
 
 export interface ParsedTrip {
   id: number;

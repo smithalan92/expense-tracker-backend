@@ -1,8 +1,8 @@
-import { FastifyInstance } from 'fastify';
-import FileController from '../controllers/FileController';
-import { Router, ContainerCradle } from '../lib/types';
-import { PossibleErrorResponse } from '../types/routes';
-import { FileUploadResponse } from '../controllers/FileController.types';
+import { type FastifyInstance } from 'fastify';
+import type FileController from '../controllers/FileController';
+import { type Router, type ContainerCradle } from '../lib/types';
+import { type PossibleErrorResponse } from '../types/routes';
+import { type FileUploadResponse } from '../controllers/FileController.types';
 
 class FileRoutes implements Router {
   controller: FileController;

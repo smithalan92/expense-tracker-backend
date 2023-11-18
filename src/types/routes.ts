@@ -1,4 +1,4 @@
-import { RawReplyDefaultExpression, RawRequestDefaultExpression, RawServerDefault, RouteHandlerMethod } from 'fastify';
+import { type RawReplyDefaultExpression, type RawRequestDefaultExpression, type RawServerDefault, type RouteHandlerMethod } from 'fastify';
 
 export type RouteHandlerWithBody<Body, Reply> = RouteHandlerMethod<
   RawServerDefault,
@@ -34,4 +34,4 @@ export interface ErrorResponse {
   error: string;
 }
 
-export type PossibleErrorResponse<T = {}> = T | ErrorResponse;
+export type PossibleErrorResponse<T = unknown> = T | ErrorResponse;

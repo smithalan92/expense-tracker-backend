@@ -1,7 +1,7 @@
-import { OkPacket } from 'mysql2';
-import DBAgent from '../lib/DBAgent';
-import { ContainerCradle } from '../lib/types';
-import { DBGetCurrenciesForSyncJobResult, DBGetCurrenciesResult, DBGetCurrencyFXRateResult } from './CurrencyRepository.types';
+import { type OkPacket } from 'mysql2';
+import type DBAgent from '../lib/DBAgent';
+import { type ContainerCradle } from '../lib/types';
+import { type DBGetCurrenciesForSyncJobResult, type DBGetCurrenciesResult, type DBGetCurrencyFXRateResult } from './CurrencyRepository.types';
 
 class CurrencyRepository {
   dbAgent: DBAgent;

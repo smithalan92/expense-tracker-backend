@@ -1,7 +1,7 @@
-import { PossibleErrorResponse, RouteHandler } from '../types/routes';
-import { ContainerCradle } from '../lib/types';
-import UserRepository from '../repository/UserRepository';
-import { GetUsersResponse } from './UserController.types';
+import { type PossibleErrorResponse, type RouteHandler } from '../types/routes';
+import { type ContainerCradle } from '../lib/types';
+import type UserRepository from '../repository/UserRepository';
+import { type GetUsersResponse } from './UserController.types';
 
 class UserController {
   userRepository: UserRepository;

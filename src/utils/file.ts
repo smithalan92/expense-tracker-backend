@@ -1,4 +1,4 @@
-import { MultipartFile } from '@fastify/multipart';
+import { type MultipartFile } from '@fastify/multipart';
 import fs from 'fs';
 import fsPromise from 'fs/promises';
 import { pipeline } from 'stream/promises';

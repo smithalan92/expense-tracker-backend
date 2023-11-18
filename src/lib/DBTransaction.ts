@@ -1,4 +1,4 @@
-import mysql from 'mysql2/promise';
+import type mysql from 'mysql2/promise';
 
 class DBTransaction {
   connection: mysql.PoolConnection;
@@ -18,12 +18,12 @@ class DBTransaction {
 
   async rollback() {
     await this.connection.rollback();
-    await this.connection.release();
+    this.connection.release();
   }
 
   async commit() {
     await this.connection.commit();
-    await this.connection.release();
+    this.connection.release();
   }
 }
 

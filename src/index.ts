@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-floating-promises */
 import configureContainer from './container';
-import { Env } from './lib/types';
+import { type Env } from './lib/types';
 import makeServer from './server';
 
 (async () => {

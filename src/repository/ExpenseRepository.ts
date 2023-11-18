@@ -1,23 +1,23 @@
-import { OkPacket } from 'mysql2';
-import DBAgent from '../lib/DBAgent';
+import { type OkPacket } from 'mysql2';
+import type DBAgent from '../lib/DBAgent';
 import knex from '../lib/knex';
-import { ContainerCradle } from '../lib/types';
+import { type ContainerCradle } from '../lib/types';
 import { get12HourTimeFromHour } from '../utils/time';
 import {
-  DBExpenseByUserBreakdownForTripResult,
-  DBExpenseCategoryBreakdownForTripByUserResult,
-  DBExpenseCategoryBreakdownForTripResult,
-  DBExpenseResult,
-  DBGetCityBreakdownResult,
-  DBGetCountryBreakdownResult,
-  DBGetDailyCostBreakdownResult,
-  DBGetExpensiveTripDayResult,
-  DBGetSingleExpenseResult,
-  DBHourlyExpenseBreakdownResult,
-  ExpenseCategoryBreakdownForTripByUser,
-  NewExpenseRecord,
-  ParsedHourlyExpenseResult,
-  UpdateExpenseParams,
+  type DBExpenseByUserBreakdownForTripResult,
+  type DBExpenseCategoryBreakdownForTripByUserResult,
+  type DBExpenseCategoryBreakdownForTripResult,
+  type DBExpenseResult,
+  type DBGetCityBreakdownResult,
+  type DBGetCountryBreakdownResult,
+  type DBGetDailyCostBreakdownResult,
+  type DBGetExpensiveTripDayResult,
+  type DBGetSingleExpenseResult,
+  type DBHourlyExpenseBreakdownResult,
+  type ExpenseCategoryBreakdownForTripByUser,
+  type NewExpenseRecord,
+  type ParsedHourlyExpenseResult,
+  type UpdateExpenseParams,
 } from './ExpenseRepository.types';
 
 class ExpenseRepository {

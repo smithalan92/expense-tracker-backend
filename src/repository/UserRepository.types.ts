@@ -1,4 +1,4 @@
-import mysql from 'mysql2/promise';
+import type mysql from 'mysql2/promise';
 
 export interface DBUserByEmailResult extends mysql.RowDataPacket {
   id: number;

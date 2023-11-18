@@ -1,6 +1,6 @@
-import DBAgent from '../lib/DBAgent';
-import { ContainerCradle } from '../lib/types';
-import { DBGetCategoriesResult } from './CategoryRepository.types';
+import type DBAgent from '../lib/DBAgent';
+import { type ContainerCradle } from '../lib/types';
+import { type DBGetCategoriesResult } from './CategoryRepository.types';
 
 class CategoryRepository {
   dbAgent: DBAgent;

@@ -1,9 +1,9 @@
 import { randomUUID } from 'crypto';
 import path from 'path';
-import { ContainerCradle, Env } from '../lib/types';
-import { PossibleErrorResponse, RouteHandler } from '../types/routes';
+import { type ContainerCradle, type Env } from '../lib/types';
+import { type PossibleErrorResponse, type RouteHandler } from '../types/routes';
 import { saveTempFile } from '../utils/file';
-import { FileUploadResponse } from './FileController.types';
+import { type FileUploadResponse } from './FileController.types';
 
 class FileController {
   env: Env;

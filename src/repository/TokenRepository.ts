@@ -1,8 +1,8 @@
 import { randomUUID } from 'crypto';
-import mysql from 'mysql2';
-import DBAgent from '../lib/DBAgent';
-import { ContainerCradle } from '../lib/types';
-import { CreateUserTokenResult, DBFindValidTokenResult, DBUserIDForTokenResult } from './TokenRepository.types';
+import type mysql from 'mysql2';
+import type DBAgent from '../lib/DBAgent';
+import { type ContainerCradle } from '../lib/types';
+import { type CreateUserTokenResult, type DBFindValidTokenResult, type DBUserIDForTokenResult } from './TokenRepository.types';
 import { addWeeks, format } from 'date-fns';
 
 class TokenRepository {

@@ -1,10 +1,10 @@
-import mysql from 'mysql2';
-import { CreateTripCountry } from '../controllers/TripController.types';
-import DBAgent from '../lib/DBAgent';
-import DBTransaction from '../lib/DBTransaction';
+import type mysql from 'mysql2';
+import { type CreateTripCountry } from '../controllers/TripController.types';
+import type DBAgent from '../lib/DBAgent';
+import type DBTransaction from '../lib/DBTransaction';
 import knex from '../lib/knex';
-import { ContainerCradle } from '../lib/types';
-import { CreateTripParams, DBFindUsersForTripResult, DBTripResult, UsersForTrip } from './TripRepository.types';
+import { type ContainerCradle } from '../lib/types';
+import { type CreateTripParams, type DBFindUsersForTripResult, type DBTripResult, type UsersForTrip } from './TripRepository.types';
 
 class TripRepository {
   dbAgent: DBAgent;
@@ -100,14 +100,14 @@ class TripRepository {
           .toQuery(),
       });
 
-      const countryInserts = countries.reduce<Array<{ tripId: Number; countryId: number; cityIds: string | null }>>((acc, current) => {
+      const countryInserts = countries.reduce<Array<{ tripId: number; countryId: number; cityIds: string | null }>>((acc, current) => {
         const cityIds = current.cityIds?.join(',') ?? null;
 
         acc.push({ tripId, countryId: current.countryId, cityIds });
         return acc;
       }, []);
 
-      const userInserts = userIds.reduce<Array<{ tripId: Number; userId: number }>>((acc, current) => {
+      const userInserts = userIds.reduce<Array<{ tripId: number; userId: number }>>((acc, current) => {
         acc.push({ tripId, userId: current });
         return acc;
       }, []);

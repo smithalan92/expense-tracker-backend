@@ -1,8 +1,8 @@
-import { ContainerCradle } from '../lib/types';
-import CityRepository from '../repository/CityRepository';
-import CountryRepository from '../repository/CountryRepository';
-import { PossibleErrorResponse, RouteHandler, RouterHandlerWithParams } from '../types/routes';
-import { GetCitiesForCountryParams, GetCitiesForCountryResponse, GetCountriesResponse } from './CountryController.types';
+import { type ContainerCradle } from '../lib/types';
+import type CityRepository from '../repository/CityRepository';
+import type CountryRepository from '../repository/CountryRepository';
+import { type PossibleErrorResponse, type RouteHandler, type RouterHandlerWithParams } from '../types/routes';
+import { type GetCitiesForCountryParams, type GetCitiesForCountryResponse, type GetCountriesResponse } from './CountryController.types';
 
 class CountryController {
   countryRepository: CountryRepository;

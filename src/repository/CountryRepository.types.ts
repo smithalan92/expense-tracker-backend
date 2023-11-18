@@ -1,4 +1,4 @@
-import mysql from 'mysql2';
+import type mysql from 'mysql2';
 
 export interface DBCountriesResult extends mysql.RowDataPacket {
   id: number;

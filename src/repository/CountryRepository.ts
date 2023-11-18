@@ -1,6 +1,6 @@
-import DBAgent from '../lib/DBAgent';
-import { ContainerCradle } from '../lib/types';
-import { DBCountriesResult, DBGetCountriesByTripIDResult } from './CountryRepository.types';
+import type DBAgent from '../lib/DBAgent';
+import { type ContainerCradle } from '../lib/types';
+import { type DBCountriesResult, type DBGetCountriesByTripIDResult } from './CountryRepository.types';
 
 class CountryRepository {
   dbAgent: DBAgent;

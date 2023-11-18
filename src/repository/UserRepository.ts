@@ -1,6 +1,6 @@
-import DBAgent from '../lib/DBAgent';
-import { ContainerCradle } from '../lib/types';
-import { DBUserByEmailResult, DBUserResult } from './UserRepository.types';
+import type DBAgent from '../lib/DBAgent';
+import { type ContainerCradle } from '../lib/types';
+import { type DBUserByEmailResult, type DBUserResult } from './UserRepository.types';
 
 class UserRepository {
   dbAgent: DBAgent;

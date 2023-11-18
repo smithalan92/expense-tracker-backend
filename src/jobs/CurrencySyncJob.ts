@@ -1,6 +1,6 @@
-import { ContainerCradle } from '../lib/types';
-import CurrencyRepository from '../repository/CurrencyRepository';
-import { Job } from '../types/job.types';
+import { type ContainerCradle } from '../lib/types';
+import type CurrencyRepository from '../repository/CurrencyRepository';
+import { type Job } from '../types/job.types';
 import cron from 'node-cron';
 import { getExchangeRatesForEUR } from '../api/currency';
 

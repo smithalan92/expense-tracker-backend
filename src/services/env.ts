@@ -1,4 +1,4 @@
-import { Env } from '../lib/types';
+import { type Env } from '../lib/types';
 
 export default function makeEnv(): Env {
   return {

@@ -1,8 +1,8 @@
-import { FastifyInstance } from 'fastify';
-import UserController from '../controllers/UserController';
-import { GetUsersResponse } from '../controllers/UserController.types';
-import { Router, ContainerCradle } from '../lib/types';
-import { PossibleErrorResponse } from '../types/routes';
+import { type FastifyInstance } from 'fastify';
+import type UserController from '../controllers/UserController';
+import { type GetUsersResponse } from '../controllers/UserController.types';
+import { type Router, type ContainerCradle } from '../lib/types';
+import { type PossibleErrorResponse } from '../types/routes';
 
 class UserRoutes implements Router {
   controller: UserController;
