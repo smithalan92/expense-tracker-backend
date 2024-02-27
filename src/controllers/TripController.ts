@@ -9,7 +9,13 @@ import type ExpenseRepository from '../repository/ExpenseRepository';
 import { type NewExpenseRecord } from '../repository/ExpenseRepository.types';
 import type FileRepository from '../repository/FileRepository';
 import type TripRepository from '../repository/TripRepository';
-import { type PossibleErrorResponse, type RouteHandler, type RouteHandlerWithBody, type RouteHandlerWithBodyAndParams, type RouterHandlerWithParams } from '../types/routes';
+import {
+  type PossibleErrorResponse,
+  type RouteHandler,
+  type RouteHandlerWithBody,
+  type RouteHandlerWithBodyAndParams,
+  type RouterHandlerWithParams,
+} from '../types/routes';
 import { parseExpenseForResponse } from '../utils/expenseParser';
 import { type ProcessedTripExpense } from '../utils/expenseParser.types';
 import { getTripFileUrl } from '../utils/file';
@@ -77,12 +83,14 @@ class TripController {
 
     const countries = await this.countryRepository.getCountriesForTrips(countriesIdsForTrips);
 
-    const tripsWithFormattedDates = trips.map<ResponseTrip>((t) => {
-      return {
-        ...parseTrip(t),
-        countries: countries.filter((c) => c.tripId === t.id),
-      };
-    });
+    const tripsWithFormattedDates = trips
+      .map<ResponseTrip>((t) => {
+        return {
+          ...parseTrip(t),
+          countries: countries.filter((c) => c.tripId === t.id),
+        };
+      })
+      .sort((a, b) => new Date(b.endDate).getTime() - new Date(a.endDate).getTime());
 
     return reply.send({ trips: tripsWithFormattedDates }).code(200);
   };
@@ -109,7 +117,7 @@ class TripController {
             fileName: file,
             destPath: `/trips/${tripId}`,
           },
-          transaction
+          transaction,
         );
 
         await this.tripRepository.updateTrip({ fileId, tripId, currentUserId: userId }, transaction);
@@ -160,7 +168,7 @@ class TripController {
 
   getTripDataForEditing: RouterHandlerWithParams<RouteWithTripIDParams, PossibleErrorResponse<GetTripDataForEditingResponse>> = async (
     req,
-    reply
+    reply,
   ) => {
     const userId: number = req.requestContext.get('userId')!;
     const tripId: number = req.params.tripId;
@@ -217,7 +225,7 @@ class TripController {
 
   updateTrip: RouteHandlerWithBodyAndParams<RouteWithTripIDParams, UpdateTripBody, PossibleErrorResponse<UpdateTripResponse>> = async (
     req,
-    reply
+    reply,
   ) => {
     const userId = req.requestContext.get('userId')!;
     const tripId = req.params.tripId;
@@ -240,7 +248,7 @@ class TripController {
             fileName: req.body.file,
             destPath: `/trips/${tripId}`,
           },
-          transaction
+          transaction,
         );
 
         await this.tripRepository.updateTrip({ fileId, tripId, currentUserId: userId }, transaction);
@@ -380,7 +388,7 @@ class TripController {
 
   updateExpenseForTrip: RouteHandlerWithBodyAndParams<EditExpenseForTripParams, UpdateExpenseForTripBody, PossibleErrorResponse> = async (
     req,
-    reply
+    reply,
   ) => {
     const { tripId, expenseId } = req.params;
     const userId = req.requestContext.get('userId')!;
