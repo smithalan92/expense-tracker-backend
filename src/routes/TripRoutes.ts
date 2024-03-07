@@ -8,6 +8,7 @@ import {
   type DeleteExpenseParams,
   type DeleteTripParams,
   type EditExpenseForTripParams,
+  type GetExpenseStatsQuery,
   type GetExpenseStatsResponse,
   type GetExpensesForTripReponse,
   type GetTripDataForEditingResponse,
@@ -66,11 +67,12 @@ class TripRoutes implements Router {
 
     server.route<{
       Params: RouteWithTripIDParams;
+      QueryString: GetExpenseStatsQuery;
       Reply: PossibleErrorResponse<GetExpenseStatsResponse>;
     }>({
       method: 'GET',
       url: '/trips/:tripId/stats',
-      handler: this.controller.getExpenseStats,
+      handler: this.controller.getExpenseStats as any, // Dunno why this isnt typing correctly. Figure out later
     });
 
     server.route<{

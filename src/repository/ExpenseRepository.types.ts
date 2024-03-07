@@ -107,3 +107,8 @@ export interface ParsedHourlyExpenseResult {
   hour: string;
   total: number;
 }
+
+export interface GetTripExpenseStatsOptions {
+  includeFlights?: boolean;
+  includeHotels?: boolean;
+}

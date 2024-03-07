@@ -131,3 +131,8 @@ export interface GetTripDataForEditingResponse {
   countries: CountryWithCities[];
   userIds: number[];
 }
+
+export interface GetExpenseStatsQuery {
+  includeFlights: string;
+  includeHotels: string;
+}

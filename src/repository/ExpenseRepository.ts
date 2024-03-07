@@ -1,4 +1,6 @@
+/* eslint-disable @typescript-eslint/no-floating-promises */
 import { type OkPacket } from 'mysql2';
+import { CATEGORY_IDS } from '../constants';
 import type DBAgent from '../lib/DBAgent';
 import knex from '../lib/knex';
 import { type ContainerCradle } from '../lib/types';
@@ -15,6 +17,7 @@ import {
   type DBGetSingleExpenseResult,
   type DBHourlyExpenseBreakdownResult,
   type ExpenseCategoryBreakdownForTripByUser,
+  type GetTripExpenseStatsOptions,
   type NewExpenseRecord,
   type ParsedHourlyExpenseResult,
   type UpdateExpenseParams,
@@ -148,132 +151,242 @@ class ExpenseRepository {
     });
   }
 
-  async getExpenseCategoryBreakdownForTrip(tripId: number) {
+  async getTripExpenseStats({ tripId }: { tripId: number }, options: GetTripExpenseStatsOptions) {
+    const [
+      categoryBreakdown,
+      categoryByUserBreakdown,
+      userBreakdown,
+      mostExpenseDay,
+      leastExpensiveDay,
+      countryBreakdown,
+      cityBreakdown,
+      dailyCostBreakdown,
+      hourlySpendingBreakdown,
+    ] = await Promise.all([
+      this.getExpenseCategoryBreakdownForTrip(tripId, options),
+      this.getExpenseCategoryBreakdownByUser(tripId, options),
+      this.getExpenseByUserBreakdownForTrip(tripId, options),
+      this.getMostExpensiveTripDay(tripId, options),
+      this.getLeastExpensiveTripDay(tripId, options),
+      this.getExpenseByCountryBreakdownForTrip(tripId, options),
+      this.getExpenseByCityBreakdownForTrip(tripId, options),
+      this.getDailyCostBreakdownForTrip(tripId, options),
+      this.getHourlySpendingBreakdown(tripId, options),
+    ]);
+
+    return {
+      categoryBreakdown,
+      categoryByUserBreakdown,
+      userBreakdown,
+      mostExpenseDay,
+      leastExpensiveDay,
+      countryBreakdown,
+      cityBreakdown,
+      dailyCostBreakdown,
+      hourlySpendingBreakdown,
+    };
+  }
+
+  private async getExpenseCategoryBreakdownForTrip(tripId: number, options: GetTripExpenseStatsOptions) {
+    const query = knex('trip_expenses')
+      .select('ec.name as categoryName', knex.raw('ROUND(SUM(te.euroAmount), 2) as totalEuroAmount'))
+      .from('trip_expenses AS te')
+      .join('expense_categories AS ec', 'ec.id', '=', 'te.categoryId')
+      .where('te.tripId', tripId)
+      .groupBy('ec.id')
+      .orderBy('totalEuroAmount', 'desc');
+
+    if (!options.includeFlights) {
+      query.where('te.categoryId', '!=', CATEGORY_IDS.FLIGHTS);
+    }
+
+    if (!options.includeHotels) {
+      query.where('te.categoryId', '!=', CATEGORY_IDS.ACCOMMODATION);
+    }
+
     const result = await this.dbAgent.runQuery<DBExpenseCategoryBreakdownForTripResult[]>({
-      query: `
-        SELECT ec.name as categoryName, ROUND(SUM(te.euroAmount), 2) as totalEuroAmount
-        FROM trip_expenses te
-        JOIN expense_categories ec ON ec.id = te.categoryId
-        WHERE te.tripId = ?
-        GROUP BY ec.id
-        ORDER BY totalEuroAmount DESC;
-      `,
-      values: [tripId],
+      query: query.toQuery(),
     });
 
     return result;
   }
 
-  async getExpenseByUserBreakdownForTrip(tripId: number) {
+  private async getExpenseByUserBreakdownForTrip(tripId: number, options: GetTripExpenseStatsOptions) {
+    const query = knex('trip_expenses')
+      .select('u.firstName as userFirstName', knex.raw('ROUND(SUM(te.euroAmount), 2) as totalEuroAmount'))
+      .from('trip_expenses AS te')
+      .join('users AS u', 'u.id', '=', 'te.userId')
+      .where('te.tripId', tripId)
+      .groupBy('u.id')
+      .orderBy('totalEuroAmount', 'desc');
+
+    if (!options.includeFlights) {
+      query.where('te.categoryId', '!=', CATEGORY_IDS.FLIGHTS);
+    }
+
+    if (!options.includeHotels) {
+      query.where('te.categoryId', '!=', CATEGORY_IDS.ACCOMMODATION);
+    }
+
     const result = await this.dbAgent.runQuery<DBExpenseByUserBreakdownForTripResult[]>({
-      query: `
-        SELECT u.firstName as userFirstName, ROUND(SUM(te.euroAmount), 2) as totalEuroAmount
-        FROM trip_expenses te
-        JOIN users u ON u.id = te.userId
-        WHERE te.tripId = ?
-        GROUP BY u.id
-        ORDER BY totalEuroAmount DESC;
-      `,
-      values: [tripId],
+      query: query.toQuery(),
     });
 
     return result;
   }
 
-  async getMostExpensiveTripDay(tripId: number) {
+  private async getMostExpensiveTripDay(tripId: number, options: GetTripExpenseStatsOptions) {
+    const query = knex('trip_expenses')
+      .select(knex.raw("DATE_FORMAT(localDateTime, '%Y-%m-%d') as localDate"), knex.raw('ROUND(SUM(te.euroAmount), 2) as totalEuroAmount'))
+      .from('trip_expenses AS te')
+      .where('te.tripId', tripId)
+      .groupBy('localDate')
+      .orderBy('totalEuroAmount', 'desc')
+      .limit(1);
+
+    if (!options.includeFlights) {
+      query.where('te.categoryId', '!=', CATEGORY_IDS.FLIGHTS);
+    }
+
+    if (!options.includeHotels) {
+      query.where('te.categoryId', '!=', CATEGORY_IDS.ACCOMMODATION);
+    }
+
     const result = await this.dbAgent.runQuery<DBGetExpensiveTripDayResult[]>({
-      query: `
-        SELECT DATE_FORMAT(localDateTime, '%Y-%m-%d') as localDate, ROUND(SUM(te.euroAmount), 2) as totalEuroAmount
-        FROM trip_expenses te
-        WHERE te.tripId = ?
-        GROUP BY localDate
-        ORDER BY totalEuroAmount DESC
-        LIMIT 1;
-      `,
-      values: [tripId],
+      query: query.toQuery(),
     });
 
     return result[0];
   }
 
-  async getLeastExpensiveTripDay(tripId: number) {
+  private async getLeastExpensiveTripDay(tripId: number, options: GetTripExpenseStatsOptions) {
+    const query = knex('trip_expenses')
+      .select(knex.raw("DATE_FORMAT(localDateTime, '%Y-%m-%d') as localDate"), knex.raw('ROUND(SUM(te.euroAmount), 2) as totalEuroAmount'))
+      .from('trip_expenses AS te')
+      .where('te.tripId', tripId)
+      .groupBy('localDate')
+      .orderBy('totalEuroAmount', 'asc')
+      .limit(1);
+
+    if (!options.includeFlights) {
+      query.where('te.categoryId', '!=', CATEGORY_IDS.FLIGHTS);
+    }
+
+    if (!options.includeHotels) {
+      query.where('te.categoryId', '!=', CATEGORY_IDS.ACCOMMODATION);
+    }
+
     const result = await this.dbAgent.runQuery<DBGetExpensiveTripDayResult[]>({
-      query: `
-        SELECT DATE_FORMAT(localDateTime, '%Y-%m-%d') as localDate, ROUND(SUM(te.euroAmount), 2) as totalEuroAmount
-        FROM trip_expenses te
-        WHERE te.tripId = ?
-        GROUP BY localDate
-        ORDER BY totalEuroAmount ASC
-        LIMIT 1;
-      `,
-      values: [tripId],
+      query: query.toQuery(),
     });
 
     return result[0];
   }
 
-  async getExpenseByCountryBreakdownForTrip(tripId: number) {
+  private async getExpenseByCountryBreakdownForTrip(tripId: number, options: GetTripExpenseStatsOptions) {
+    const query = knex('trip_expenses')
+      .select(
+        'co.name',
+        knex.raw('TRUNCATE(SUM(te.euroAmount), 2) as euroTotal'),
+        knex.raw('TRUNCATE(SUM(te.amount), 2) as localTotal'),
+        'cu.code as localCurrency',
+      )
+      .from('trip_expenses AS te')
+      .leftJoin('cities AS c', 'c.id', '=', 'te.cityId')
+      .leftJoin('countries AS co', 'co.id', '=', 'c.countryId')
+      .leftJoin('currencies AS cu', 'cu.id', '=', 'te.currencyId')
+      .where('te.tripId', tripId)
+      .groupBy('co.id')
+      .orderBy('te.localDateTime');
+
+    if (!options.includeFlights) {
+      query.where('te.categoryId', '!=', CATEGORY_IDS.FLIGHTS);
+    }
+
+    if (!options.includeHotels) {
+      query.where('te.categoryId', '!=', CATEGORY_IDS.ACCOMMODATION);
+    }
+
     const results = await this.dbAgent.runQuery<DBGetCountryBreakdownResult[]>({
-      query: `
-        SELECT co.name, TRUNCATE(SUM(te.euroAmount), 2) as euroTotal, TRUNCATE(SUM(te.amount), 2) as localTotal, cu.code as localCurrency
-        FROM trip_expenses te
-        LEFT JOIN cities c ON c.id = te.cityId
-        LEFT JOIN countries co ON co.id = c.countryId
-        LEFT JOIN currencies cu ON cu.id = te.currencyId
-        WHERE te.tripId = ?
-        GROUP BY co.id
-        ORDER BY te.localDateTime;
-      `,
-      values: [tripId],
+      query: query.toQuery(),
     });
 
     return results;
   }
 
-  async getExpenseByCityBreakdownForTrip(tripId: number) {
+  private async getExpenseByCityBreakdownForTrip(tripId: number, options: GetTripExpenseStatsOptions) {
+    const query = knex('trip_expenses')
+      .select(
+        'c.name',
+        knex.raw('TRUNCATE(SUM(te.euroAmount), 2) as euroTotal'),
+        knex.raw('TRUNCATE(SUM(te.amount), 2) as localAmount'),
+        'cu.code as localCurrency',
+      )
+      .from('trip_expenses AS te')
+      .leftJoin('cities AS c', 'c.id', '=', 'te.cityId')
+      .leftJoin('countries AS co', 'co.id', '=', 'c.countryId')
+      .leftJoin('currencies AS cu', 'cu.id', '=', 'te.currencyId')
+      .where('te.tripId', tripId)
+      .groupBy('c.id')
+      .orderBy('te.localDateTime');
+
+    if (!options.includeFlights) {
+      query.where('te.categoryId', '!=', CATEGORY_IDS.FLIGHTS);
+    }
+
+    if (!options.includeHotels) {
+      query.where('te.categoryId', '!=', CATEGORY_IDS.ACCOMMODATION);
+    }
+
     const results = await this.dbAgent.runQuery<DBGetCityBreakdownResult[]>({
-      query: `
-        SELECT c.name, TRUNCATE(SUM(te.euroAmount), 2) as euroTotal, TRUNCATE(SUM(te.amount), 2) as localAmount, cu.code as localCurrency
-        FROM trip_expenses te
-        LEFT JOIN cities c ON c.id = te.cityId
-        LEFT JOIN countries co ON co.id = c.countryId
-        LEFT JOIN currencies cu ON cu.id = te.currencyId
-        WHERE te.tripId = ?
-        GROUP BY c.id
-        ORDER BY te.localDateTime
-      `,
-      values: [tripId],
+      query: query.toQuery(),
     });
 
     return results;
   }
 
-  async getDailyCostBreakdownForTrip(tripId: number) {
+  private async getDailyCostBreakdownForTrip(tripId: number, options: GetTripExpenseStatsOptions) {
+    const query = knex('trip_expenses')
+      .select(knex.raw("DATE_FORMAT(localDateTime, '%Y-%m-%d') as localDate"), knex.raw('TRUNCATE(SUM(te.euroAmount), 2) as euroTotal'))
+      .from('trip_expenses AS te')
+      .where('te.tripId', tripId)
+      .groupBy(knex.raw('YEAR(te.localDateTime), MONTH(te.localDateTime), DAY(te.localDateTime)'))
+      .orderBy('localDate', 'asc');
+
+    if (!options.includeFlights) {
+      query.where('te.categoryId', '!=', CATEGORY_IDS.FLIGHTS);
+    }
+
+    if (!options.includeHotels) {
+      query.where('te.categoryId', '!=', CATEGORY_IDS.ACCOMMODATION);
+    }
+
     const results = await this.dbAgent.runQuery<DBGetDailyCostBreakdownResult[]>({
-      query: `
-        SELECT  DATE_FORMAT(localDateTime, '%Y-%m-%d') as localDate, TRUNCATE(SUM(te.euroAmount), 2) as euroTotal
-        FROM trip_expenses te
-        WHERE te.tripId = ?
-        GROUP BY YEAR(te.localDateTime), MONTH(te.localDateTime), DAY(te.localDateTime)
-        ORDER BY localDate ASC;
-      `,
-      values: [tripId],
+      query: query.toQuery(),
     });
 
     return results;
   }
 
-  async getExpenseCategoryBreakdownByUser(tripId: number) {
+  private async getExpenseCategoryBreakdownByUser(tripId: number, options: GetTripExpenseStatsOptions) {
+    const query = knex('trip_expenses')
+      .select('ec.name AS categoryName', knex.raw('ROUND(SUM(te.euroAmount), 2) as totalEuroAmount'), 'te.userId')
+      .from('trip_expenses AS te')
+      .join('expense_categories AS ec', 'ec.id', '=', 'te.categoryId')
+      .where('te.tripId', tripId)
+      .groupBy('ec.id', 'te.userId')
+      .orderBy('userId', 'totalEuroAmount', 'desc');
+
+    if (!options.includeFlights) {
+      query.where('te.categoryId', '!=', CATEGORY_IDS.FLIGHTS);
+    }
+
+    if (!options.includeHotels) {
+      query.where('te.categoryId', '!=', CATEGORY_IDS.ACCOMMODATION);
+    }
+
     const results = await this.dbAgent.runQuery<DBExpenseCategoryBreakdownForTripByUserResult[]>({
-      query: `
-      SELECT ec.name as categoryName, ROUND(SUM(te.euroAmount), 2) as totalEuroAmount, te.userId
-      FROM trip_expenses te
-      JOIN expense_categories ec ON ec.id = te.categoryId
-      WHERE te.tripId = ?
-      GROUP BY ec.id, te.userId
-      ORDER BY userId, totalEuroAmount DESC
-    `,
-      values: [tripId],
+      query: query.toQuery(),
     });
 
     return results.reduce<ExpenseCategoryBreakdownForTripByUser>((acc, current) => {
@@ -294,16 +407,24 @@ class ExpenseRepository {
     }, {});
   }
 
-  async getHourlySpendingBreakdown(tripId: number) {
+  private async getHourlySpendingBreakdown(tripId: number, options: GetTripExpenseStatsOptions) {
+    const query = knex('trip_expenses')
+      .select(knex.raw('HOUR(localDateTime) as hour'), knex.raw(' ROUND(SUM(euroAmount), 2) as total'))
+      .from('trip_expenses')
+      .where('tripId', tripId)
+      .groupBy(knex.raw('HOUR(localDateTime)'))
+      .orderBy('hour', 'asc');
+
+    if (!options.includeFlights) {
+      query.where('categoryId', '!=', CATEGORY_IDS.FLIGHTS);
+    }
+
+    if (!options.includeHotels) {
+      query.where('categoryId', '!=', CATEGORY_IDS.ACCOMMODATION);
+    }
+
     const results = await this.dbAgent.runQuery<DBHourlyExpenseBreakdownResult[]>({
-      query: `
-        SELECT HOUR(localDateTime) as hour, ROUND(SUM(euroAmount), 2) as total
-        from trip_expenses
-        WHERE tripId = ?
-        GROUP BY HOUR(localDateTime)
-        ORDER BY hour ASC
-      `,
-      values: [tripId],
+      query: query.toQuery(),
     });
 
     const parsedResults: ParsedHourlyExpenseResult[] = [];

@@ -30,6 +30,13 @@ export type RouteHandlerWithQueryString<QueryString, Reply> = RouteHandlerMethod
   { Reply: Reply; Querystring: QueryString }
 >;
 
+export type RouteHandlerWithQueryAndParamsString<Params, QueryString, Reply> = RouteHandlerMethod<
+  RawServerDefault,
+  RawRequestDefaultExpression,
+  RawReplyDefaultExpression,
+  { Params: Params; Querystring: QueryString; Reply: Reply }
+>;
+
 export interface ErrorResponse {
   error: string;
 }

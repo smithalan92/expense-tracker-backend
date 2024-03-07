@@ -10,6 +10,7 @@ import { type NewExpenseRecord } from '../repository/ExpenseRepository.types';
 import type FileRepository from '../repository/FileRepository';
 import type TripRepository from '../repository/TripRepository';
 import {
+  RouteHandlerWithQueryAndParamsString,
   type PossibleErrorResponse,
   type RouteHandler,
   type RouteHandlerWithBody,
@@ -29,6 +30,7 @@ import {
   type DeleteExpenseParams,
   type DeleteTripParams,
   type EditExpenseForTripParams,
+  type GetExpenseStatsQuery,
   type GetExpenseStatsResponse,
   type GetExpensesForTripReponse,
   type GetTripDataForEditingResponse,
@@ -325,50 +327,45 @@ class TripController {
     return reply.status(201).send();
   };
 
-  getExpenseStats: RouterHandlerWithParams<RouteWithTripIDParams, PossibleErrorResponse<GetExpenseStatsResponse>> = async (req, reply) => {
-    const userId = req.requestContext.get('userId')!;
-    const tripId = req.params.tripId;
+  getExpenseStats: RouteHandlerWithQueryAndParamsString<RouteWithTripIDParams, GetExpenseStatsQuery, PossibleErrorResponse<GetExpenseStatsResponse>> =
+    async (req, reply) => {
+      const userId = req.requestContext.get('userId')!;
+      const tripId = req.params.tripId;
+      const { includeFlights, includeHotels } = req.query;
 
-    const trip = await this.tripRepository.findTripById({ userId, tripId });
+      const trip = await this.tripRepository.findTripById({ userId, tripId });
 
-    if (!trip) {
-      return reply.code(400).send({ error: 'Trip not found' });
-    }
+      if (!trip) {
+        return reply.code(400).send({ error: 'Trip not found' });
+      }
 
-    const [
-      categoryBreakdown,
-      categoryByUserBreakdown,
-      userBreakdown,
-      mostExpenseDay,
-      leastExpensiveDay,
-      countryBreakdown,
-      cityBreakdown,
-      dailyCostBreakdown,
-      hourlySpendingBreakdown,
-    ] = await Promise.all([
-      this.expenseRepository.getExpenseCategoryBreakdownForTrip(tripId),
-      this.expenseRepository.getExpenseCategoryBreakdownByUser(tripId),
-      this.expenseRepository.getExpenseByUserBreakdownForTrip(tripId),
-      this.expenseRepository.getMostExpensiveTripDay(tripId),
-      this.expenseRepository.getLeastExpensiveTripDay(tripId),
-      this.expenseRepository.getExpenseByCountryBreakdownForTrip(tripId),
-      this.expenseRepository.getExpenseByCityBreakdownForTrip(tripId),
-      this.expenseRepository.getDailyCostBreakdownForTrip(tripId),
-      this.expenseRepository.getHourlySpendingBreakdown(tripId),
-    ]);
+      const {
+        categoryBreakdown,
+        categoryByUserBreakdown,
+        userBreakdown,
+        mostExpenseDay,
+        leastExpensiveDay,
+        countryBreakdown,
+        cityBreakdown,
+        dailyCostBreakdown,
+        hourlySpendingBreakdown,
+      } = await this.expenseRepository.getTripExpenseStats(
+        { tripId },
+        { includeFlights: includeFlights === 'true', includeHotels: includeHotels === 'true' },
+      );
 
-    return reply.status(200).send({
-      categoryBreakdown,
-      categoryByUserBreakdown,
-      userBreakdown,
-      mostExpenseDay,
-      leastExpensiveDay,
-      countryBreakdown,
-      cityBreakdown,
-      dailyCostBreakdown,
-      hourlySpendingBreakdown,
-    });
-  };
+      return reply.status(200).send({
+        categoryBreakdown,
+        categoryByUserBreakdown,
+        userBreakdown,
+        mostExpenseDay,
+        leastExpensiveDay,
+        countryBreakdown,
+        cityBreakdown,
+        dailyCostBreakdown,
+        hourlySpendingBreakdown,
+      });
+    };
 
   deleteExpense: RouterHandlerWithParams<DeleteExpenseParams, PossibleErrorResponse<GetExpenseStatsResponse>> = async (req, reply) => {
     const userId = req.requestContext.get('userId')!;
