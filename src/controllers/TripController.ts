@@ -303,26 +303,38 @@ class TripController {
       return reply.code(400).send({ error: 'Trip not found' });
     }
 
-    const { localDateTime, cityId, amount, currencyId, categoryId, description, userId: expenseUserId } = req.body;
+    const { localDateTime, cityId, amount, currencyId, categoryId, description, userId: expenseUserId, userIds: expenseUserIds } = req.body;
 
     const currencyToEurFXRate = await this.currencyRepository.getCurrencyFXRate(currencyId);
 
-    const euroAmount = parseFloat((amount / currencyToEurFXRate).toFixed(2));
+    let expenseAmount;
 
-    const expense: NewExpenseRecord = {
-      tripId,
-      amount,
-      currencyId,
-      euroAmount,
-      localDateTime,
-      description,
-      categoryId,
-      cityId,
-      userId: expenseUserId,
-      createdByUserId: userId,
-    };
+    if (expenseUserIds?.length) {
+      expenseAmount = Math.round((amount / expenseUserIds.length) * 100) / 100;
+    } else {
+      expenseAmount = amount;
+    }
 
-    await this.expenseRepository.addExpenseForTrip(expense);
+    const euroAmount = parseFloat((expenseAmount / currencyToEurFXRate).toFixed(2));
+
+    const userIdsToAddExpensesFor = expenseUserIds ?? [expenseUserId!];
+
+    for (const userIdToAddExpenseFor of userIdsToAddExpensesFor) {
+      const expense: NewExpenseRecord = {
+        tripId,
+        amount: expenseAmount,
+        currencyId,
+        euroAmount,
+        localDateTime,
+        description,
+        categoryId,
+        cityId,
+        userId: userIdToAddExpenseFor,
+        createdByUserId: userId,
+      };
+
+      await this.expenseRepository.addExpenseForTrip(expense);
+    }
 
     return reply.status(201).send();
   };
