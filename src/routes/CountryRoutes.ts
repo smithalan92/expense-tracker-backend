@@ -1,34 +1,63 @@
 import { type FastifyInstance } from 'fastify';
-import type CountryController from '../controllers/CountryController';
-import { type GetCitiesForCountryParams, type GetCitiesForCountryResponse, type GetCountriesResponse } from '../controllers/CountryController.types';
-import { type ContainerCradle, type Router } from '../lib/types';
-import { type PossibleErrorResponse } from '../types/routes';
+import type CityRepository from '../repository/CityRepository';
+import { type DBCityResult } from '../repository/CityRepository';
+import type CountryRepository from '../repository/CountryRepository';
+import { type DBCountriesResult } from '../repository/CountryRepository';
 
 class CountryRoutes implements Router {
-  controller: CountryController;
+  countryRepository: CountryRepository;
+  cityRepository: CityRepository;
 
-  constructor({ countryController }: ContainerCradle) {
-    this.controller = countryController;
+  constructor({ countryRepository, cityRepository }: ContainerCradle) {
+    this.countryRepository = countryRepository;
+    this.cityRepository = cityRepository;
   }
 
   configure(server: FastifyInstance) {
+    this.makeGetCountriesRoute(server);
+    this.makeGetCitiesForCountriesRoute(server);
+  }
+
+  makeGetCountriesRoute(server: FastifyInstance) {
     server.route<{
       Reply: PossibleErrorResponse<GetCountriesResponse>;
     }>({
       method: 'GET',
       url: '/countries',
-      handler: this.controller.getCountries,
-    });
+      handler: async (req, reply) => {
+        const countries = await this.countryRepository.getCountries();
 
+        return reply.code(200).send({ countries });
+      },
+    });
+  }
+
+  makeGetCitiesForCountriesRoute(server: FastifyInstance) {
     server.route<{
       Params: GetCitiesForCountryParams;
       Reply: PossibleErrorResponse<GetCitiesForCountryResponse>;
     }>({
       method: 'GET',
       url: '/countries/:countryId/cities',
-      handler: this.controller.getCitiesForCountry,
+      handler: async (req, reply) => {
+        const cities = await this.cityRepository.getCitiesForCountryIds([req.params.countryId]);
+
+        return reply.code(200).send({ cities });
+      },
     });
   }
 }
 
 export default CountryRoutes;
+
+export interface GetCountriesResponse {
+  countries: DBCountriesResult[];
+}
+
+export interface GetCitiesForCountryParams {
+  countryId: number;
+}
+
+export interface GetCitiesForCountryResponse {
+  cities: DBCityResult[];
+}

@@ -1,6 +1,6 @@
 import format from 'date-fns/format';
-import { type ParsedTrip } from '../controllers/TripController.types';
-import { type DBTripResult } from '../repository/TripRepository.types';
+import { type DBTripResult } from '../repository/TripRepository';
+import { type ParsedTrip } from '../routes/TripRoutes';
 import { getTripFileUrl } from './file';
 
 export function parseTrip(trip: DBTripResult): ParsedTrip {

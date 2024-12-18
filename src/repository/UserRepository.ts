@@ -1,6 +1,5 @@
+import type mysql from 'mysql2/promise';
 import type DBAgent from '../lib/DBAgent';
-import { type ContainerCradle } from '../lib/types';
-import { type DBUserByEmailResult, type DBUserResult } from './UserRepository.types';
 
 class UserRepository {
   dbAgent: DBAgent;
@@ -28,3 +27,17 @@ class UserRepository {
 }
 
 export default UserRepository;
+
+export interface DBUserByEmailResult extends mysql.RowDataPacket {
+  id: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+}
+
+export interface DBUserResult extends mysql.RowDataPacket {
+  id: number;
+  firstName: string;
+  lastName: string;
+}

@@ -4,7 +4,6 @@ import { fastifyRequestContext } from '@fastify/request-context';
 import Fastify, { type FastifyInstance, type FastifyReply, type FastifyRequest } from 'fastify';
 import qs from 'qs';
 import type TokenRepository from '../repository/TokenRepository';
-import { type ContainerCradle, type Router } from './types';
 
 declare module '@fastify/request-context' {
   interface RequestContextData {

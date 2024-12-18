@@ -1,7 +1,6 @@
+import type mysql from 'mysql2';
 import { type OkPacket } from 'mysql2';
 import type DBAgent from '../lib/DBAgent';
-import { type ContainerCradle } from '../lib/types';
-import { type DBGetCurrenciesForSyncJobResult, type DBGetCurrenciesResult, type DBGetCurrencyFXRateResult } from './CurrencyRepository.types';
 
 class CurrencyRepository {
   dbAgent: DBAgent;
@@ -69,3 +68,19 @@ class CurrencyRepository {
 }
 
 export default CurrencyRepository;
+
+export interface DBGetCurrenciesForSyncJobResult extends mysql.RowDataPacket {
+  id: number;
+  code: string;
+  exchangeRate: number;
+}
+
+export interface DBGetCurrenciesResult extends mysql.RowDataPacket {
+  id: number;
+  code: number;
+  name: string;
+}
+
+export interface DBGetCurrencyFXRateResult extends mysql.RowDataPacket {
+  exchangeRate: number;
+}

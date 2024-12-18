@@ -1,11 +1,9 @@
-import { type ContainerCradle, type Env } from '../lib/types';
-import { type Job } from '../types/job.types';
+import { randomUUID } from 'crypto';
+import fs from 'fs/promises';
 import cron from 'node-cron';
 import path from 'path';
-import fs from 'fs/promises';
-import type FileRepository from '../repository/FileRepository';
 import sharp from 'sharp';
-import { randomUUID } from 'crypto';
+import type FileRepository from '../repository/FileRepository';
 
 class ImageResize implements Job {
   env: Env;

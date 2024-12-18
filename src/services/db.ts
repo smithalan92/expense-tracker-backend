@@ -1,5 +1,4 @@
 import mysql from 'mysql2/promise';
-import { type ContainerCradle } from '../lib/types';
 
 export default function makePool({ env }: ContainerCradle) {
   const pool = mysql.createPool({

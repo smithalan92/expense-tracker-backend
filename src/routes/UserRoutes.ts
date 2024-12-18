@@ -1,25 +1,35 @@
 import { type FastifyInstance } from 'fastify';
-import type UserController from '../controllers/UserController';
-import { type GetUsersResponse } from '../controllers/UserController.types';
-import { type Router, type ContainerCradle } from '../lib/types';
-import { type PossibleErrorResponse } from '../types/routes';
+import type UserRepository from '../repository/UserRepository';
+import { type DBUserResult } from '../repository/UserRepository';
 
 class UserRoutes implements Router {
-  controller: UserController;
+  userRepository: UserRepository;
 
-  constructor({ userController }: ContainerCradle) {
-    this.controller = userController;
+  constructor({ userRepository }: ContainerCradle) {
+    this.userRepository = userRepository;
   }
 
   configure(server: FastifyInstance) {
+    this.makeGetUsersRoute(server);
+  }
+
+  makeGetUsersRoute(server: FastifyInstance) {
     server.route<{
       Reply: PossibleErrorResponse<GetUsersResponse>;
     }>({
       method: 'GET',
       url: '/users',
-      handler: this.controller.getUsers,
+      handler: async (req, reply) => {
+        const users = await this.userRepository.getUsers();
+
+        return reply.code(201).send({ users });
+      },
     });
   }
 }
 
 export default UserRoutes;
+
+export interface GetUsersResponse {
+  users: DBUserResult[];
+}

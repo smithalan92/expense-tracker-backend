@@ -1,5 +1,4 @@
-import { type DBExpenseResult } from '../repository/ExpenseRepository.types';
-import { type ProcessedTripExpense } from './expenseParser.types';
+import { type DBExpenseResult } from '../repository/ExpenseRepository';
 
 export function parseExpenseForResponse(expense: DBExpenseResult): ProcessedTripExpense {
   return {
@@ -34,4 +33,47 @@ export function parseExpenseForResponse(expense: DBExpenseResult): ProcessedTrip
     createdAt: expense.createdAt,
     updatedAt: expense.updatedAt,
   };
+}
+
+export interface ExpenseCurrency {
+  id: number;
+  code: string;
+  name: string;
+}
+
+export interface ExpenseCategory {
+  id: number;
+  name: string;
+}
+
+export interface ExpenseCity {
+  id: number;
+  name: string;
+  timezone: string;
+}
+
+export interface ExpenseCountry {
+  id: number;
+  name: string;
+}
+
+export interface ExpenseUser {
+  id: number;
+  firstName: string;
+  lastName: string;
+}
+
+export interface ProcessedTripExpense {
+  id: number;
+  amount: string;
+  currency: ExpenseCurrency;
+  euroAmount: string;
+  localDateTime: string;
+  description: string;
+  category: ExpenseCategory;
+  city: ExpenseCity;
+  country: ExpenseCountry;
+  createdAt: Date;
+  updatedAt: Date;
+  user: ExpenseUser;
 }

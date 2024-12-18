@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-floating-promises */
 import configureContainer from './container';
-import { type Env } from './lib/types';
 import makeServer from './server';
 
 (async () => {
@@ -9,7 +8,6 @@ import makeServer from './server';
   try {
     container = await configureContainer();
   } catch (err) {
-    // eslint-disable-next-line no-console
     console.error(err);
     process.exit(1);
   }

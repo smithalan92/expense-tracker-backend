@@ -1,6 +1,5 @@
+import type mysql from 'mysql2';
 import type DBAgent from '../lib/DBAgent';
-import { type ContainerCradle } from '../lib/types';
-import { type DBCountriesResult, type DBGetCountriesByTripIDResult } from './CountryRepository.types';
 
 class CountryRepository {
   dbAgent: DBAgent;
@@ -37,3 +36,17 @@ class CountryRepository {
 }
 
 export default CountryRepository;
+
+export interface DBCountriesResult extends mysql.RowDataPacket {
+  id: number;
+  name: string;
+}
+
+export interface DBGetCountriesByTripIDResult extends mysql.RowDataPacket {
+  id: number;
+  name: string;
+  tripId: number;
+  currencyCode: string;
+  currencyId: number;
+  cityIds: string | null;
+}

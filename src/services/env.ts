@@ -1,5 +1,3 @@
-import { type Env } from '../lib/types';
-
 export default function makeEnv(): Env {
   return {
     SERVER_PORT: process.env.SERVER_PORT ? Number(process.env.SERVER_PORT) : 3520,

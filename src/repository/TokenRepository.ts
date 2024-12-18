@@ -1,9 +1,7 @@
 import { randomUUID } from 'crypto';
+import { addWeeks, format } from 'date-fns';
 import type mysql from 'mysql2';
 import type DBAgent from '../lib/DBAgent';
-import { type ContainerCradle } from '../lib/types';
-import { type CreateUserTokenResult, type DBFindValidTokenResult, type DBUserIDForTokenResult } from './TokenRepository.types';
-import { addWeeks, format } from 'date-fns';
 
 class TokenRepository {
   dbAgent: DBAgent;
@@ -65,3 +63,17 @@ class TokenRepository {
 }
 
 export default TokenRepository;
+
+export interface DBFindValidTokenResult extends mysql.RowDataPacket {
+  token: string;
+  expiry: string;
+}
+
+export interface CreateUserTokenResult {
+  token: string;
+  expiry: string;
+}
+
+export interface DBUserIDForTokenResult extends mysql.RowDataPacket {
+  id: number;
+}

@@ -1,19 +1,9 @@
 import * as awilix from 'awilix';
 import Server from './lib/Server';
-import { type Job } from './types/job.types';
 
 async function makeServer(container: awilix.AwilixContainer) {
   // Load all repositories to the container
   container.loadModules(['repository/**'], {
-    formatName: 'camelCase',
-    cwd: __dirname,
-    resolverOptions: {
-      lifetime: awilix.Lifetime.SCOPED,
-    },
-  });
-
-  // Load all controllers to the container
-  container.loadModules(['controllers/**'], {
     formatName: 'camelCase',
     cwd: __dirname,
     resolverOptions: {

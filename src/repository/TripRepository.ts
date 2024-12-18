@@ -1,10 +1,8 @@
 import type mysql from 'mysql2';
-import { type CreateTripCountry } from '../controllers/TripController.types';
 import type DBAgent from '../lib/DBAgent';
 import type DBTransaction from '../lib/DBTransaction';
 import knex from '../lib/knex';
-import { type ContainerCradle } from '../lib/types';
-import { type CreateTripParams, type DBFindUsersForTripResult, type DBTripResult, type UsersForTrip } from './TripRepository.types';
+import { type CreateTripBody, type CreateTripCountry } from '../routes/TripRoutes';
 
 class TripRepository {
   dbAgent: DBAgent;
@@ -17,8 +15,8 @@ class TripRepository {
     let query = knex
       .select(
         knex.raw(
-          `t.id, t.name, t.startDate, t.endDate, t.status, f.path as filePath, COALESCE(ROUND(SUM(te.euroAmount), 2), 0) as totalExpenseAmount`
-        )
+          `t.id, t.name, t.startDate, t.endDate, t.status, f.path as filePath, COALESCE(ROUND(SUM(te.euroAmount), 2), 0) as totalExpenseAmount`,
+        ),
       )
       .from('user_trips AS ut')
       .leftJoin('trips AS t', 't.id', 'ut.tripId')
@@ -156,7 +154,7 @@ class TripRepository {
       tripId: number;
       currentUserId: number;
     },
-    transaction?: DBTransaction
+    transaction?: DBTransaction,
   ) {
     let query = knex('trips').where('id', tripId);
 
@@ -225,3 +223,24 @@ class TripRepository {
 }
 
 export default TripRepository;
+
+export interface DBTripResult extends mysql.RowDataPacket {
+  id: number;
+  name: string;
+  startDate: string;
+  endDate: string;
+  status: 'active' | 'deleted';
+  filePath: string | null;
+  totalLocalAmount: number;
+  totalExpenseAmount: number;
+}
+
+export interface DBFindUsersForTripResult extends mysql.RowDataPacket {
+  id: number;
+  firstName: string;
+  lastName: string;
+}
+
+export type UsersForTrip = Record<number, Omit<DBFindUsersForTripResult, 'constructor' | 'id'>>;
+
+export type CreateTripParams = Omit<CreateTripBody, 'file'>;

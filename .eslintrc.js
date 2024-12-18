@@ -17,5 +17,5 @@ module.exports = {
     '@typescript-eslint/explicit-function-return-type': 0,
     '@typescript-eslint/return-await': 0,
   },
-  ignorePatterns: ['.eslintrc.js']
+  ignorePatterns: ['.eslintrc.js', 'dist'],
 };

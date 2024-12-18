@@ -1,27 +1,10 @@
 /* eslint-disable @typescript-eslint/no-floating-promises */
+import type mysql from 'mysql2';
 import { type OkPacket } from 'mysql2';
 import { CATEGORY_IDS } from '../constants';
 import type DBAgent from '../lib/DBAgent';
 import knex from '../lib/knex';
-import { type ContainerCradle } from '../lib/types';
 import { get12HourTimeFromHour } from '../utils/time';
-import {
-  type DBExpenseByUserBreakdownForTripResult,
-  type DBExpenseCategoryBreakdownForTripByUserResult,
-  type DBExpenseCategoryBreakdownForTripResult,
-  type DBExpenseResult,
-  type DBGetCityBreakdownResult,
-  type DBGetCountryBreakdownResult,
-  type DBGetDailyCostBreakdownResult,
-  type DBGetExpensiveTripDayResult,
-  type DBGetSingleExpenseResult,
-  type DBHourlyExpenseBreakdownResult,
-  type ExpenseCategoryBreakdownForTripByUser,
-  type GetTripExpenseStatsOptions,
-  type NewExpenseRecord,
-  type ParsedHourlyExpenseResult,
-  type UpdateExpenseParams,
-} from './ExpenseRepository.types';
 
 class ExpenseRepository {
   dbAgent: DBAgent;
@@ -441,3 +424,116 @@ class ExpenseRepository {
   }
 }
 export default ExpenseRepository;
+
+export interface DBExpenseResult extends mysql.RowDataPacket {
+  id: number;
+  amount: number;
+  currencyId: number;
+  currencyCode: string;
+  currencyName: string;
+  euroAmount: number;
+  localDateTime: Date;
+  description: string;
+  categoryId: number;
+  categoryName: string;
+  cityId: number;
+  cityName: string;
+  cityTimeZone: string;
+  countryId: number;
+  countryName: string;
+  createdAt: Date;
+  updatedAt: Date;
+  userId: number;
+  firstName: string;
+  lastName: string;
+}
+
+export interface NewExpenseRecord {
+  tripId: number;
+  amount: number;
+  currencyId: number;
+  euroAmount: number;
+  localDateTime: string;
+  description: string;
+  categoryId: number;
+  cityId: number;
+  userId: number;
+  createdByUserId: number;
+}
+
+export interface DBExpenseCategoryBreakdownForTripResult extends mysql.RowDataPacket {
+  categoryName: string;
+  totalEuroAmount: number;
+}
+
+export interface DBExpenseByUserBreakdownForTripResult extends mysql.RowDataPacket {
+  userFirstName: string;
+  totalEuroAmount: number;
+}
+
+export interface DBGetExpensiveTripDayResult extends mysql.RowDataPacket {
+  localDate: string;
+  totalEuroAmount: number;
+}
+
+export interface DBGetCountryBreakdownResult extends mysql.RowDataPacket {
+  name: string;
+  euroTotal: number;
+  localTotal: number;
+  localCurrency: string;
+}
+
+export interface DBGetCityBreakdownResult extends DBGetCountryBreakdownResult {}
+
+export interface DBGetDailyCostBreakdownResult extends mysql.RowDataPacket {
+  localDate: string;
+  euroTotal: number;
+}
+
+export interface DBExpenseCategoryBreakdownForTripByUserResult extends DBExpenseCategoryBreakdownForTripResult {
+  userId: number;
+}
+
+export type ExpenseCategoryBreakdownForTripByUser = Record<string, Array<Omit<DBExpenseCategoryBreakdownForTripResult, 'constructor'>>>;
+
+export interface UpdateExpenseParams {
+  amount?: number;
+  currencyId?: number;
+  euroAmount?: number;
+  localDateTime?: string;
+  description?: string;
+  categoryId?: number;
+  cityId?: number;
+  userId?: number;
+}
+
+export interface DBGetSingleExpenseResult extends mysql.RowDataPacket {
+  id: number;
+  amount: number;
+  currencyId: number;
+  euroAmount: number;
+  localDateTime: Date;
+  description: string;
+  categoryId: number;
+  cityId: number;
+  countryId: number;
+  createdAt: Date;
+  updatedAt: Date;
+  userId: number;
+  updatedByUserId: number | null;
+}
+
+export interface DBHourlyExpenseBreakdownResult extends mysql.RowDataPacket {
+  hour: number;
+  total: number;
+}
+
+export interface ParsedHourlyExpenseResult {
+  hour: string;
+  total: number;
+}
+
+export interface GetTripExpenseStatsOptions {
+  includeFlights?: boolean;
+  includeHotels?: boolean;
+}

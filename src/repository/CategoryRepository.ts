@@ -1,6 +1,5 @@
+import type mysql from 'mysql2';
 import type DBAgent from '../lib/DBAgent';
-import { type ContainerCradle } from '../lib/types';
-import { type DBGetCategoriesResult } from './CategoryRepository.types';
 
 class CategoryRepository {
   dbAgent: DBAgent;
@@ -23,3 +22,8 @@ class CategoryRepository {
 }
 
 export default CategoryRepository;
+
+export interface DBGetCategoriesResult extends mysql.RowDataPacket {
+  id: number;
+  name: string;
+}

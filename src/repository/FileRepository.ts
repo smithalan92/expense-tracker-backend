@@ -1,12 +1,10 @@
 import fs from 'fs/promises';
 import type mysql from 'mysql2';
-import type DBAgent from '../lib/DBAgent';
-import { type ContainerCradle, type Env } from '../lib/types';
-import { doesFileOrFolderExist } from '../utils/file';
-import knex from '../lib/knex';
 import path from 'path';
+import type DBAgent from '../lib/DBAgent';
 import type DBTransaction from '../lib/DBTransaction';
-import { type DBUnprocessedFileResult } from './FileRepository.types';
+import knex from '../lib/knex';
+import { doesFileOrFolderExist } from '../utils/file';
 
 class FileRepository {
   dbAgent: DBAgent;
@@ -73,3 +71,8 @@ class FileRepository {
 }
 
 export default FileRepository;
+
+export interface DBUnprocessedFileResult extends mysql.RowDataPacket {
+  id: number;
+  path: string;
+}
