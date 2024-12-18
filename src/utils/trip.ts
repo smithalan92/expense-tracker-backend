@@ -1,4 +1,4 @@
-import format from 'date-fns/format';
+import { format } from 'date-fns/format';
 import { type DBTripResult } from '../repository/TripRepository';
 import { type ParsedTrip } from '../routes/TripRoutes';
 import { getTripFileUrl } from './file';

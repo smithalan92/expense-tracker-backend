@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-floating-promises */
 import configureContainer from './container';
 import makeServer from './server';
 

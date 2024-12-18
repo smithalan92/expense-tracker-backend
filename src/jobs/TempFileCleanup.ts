@@ -1,4 +1,4 @@
-import differenceInMinutes from 'date-fns/differenceInMinutes';
+import { differenceInMinutes } from 'date-fns/differenceInMinutes';
 import fs from 'fs/promises';
 import cron from 'node-cron';
 import path from 'path';

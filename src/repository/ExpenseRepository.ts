@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-floating-promises */
 import type mysql from 'mysql2';
 import { type OkPacket } from 'mysql2';
 import { CATEGORY_IDS } from '../constants';
@@ -483,7 +482,7 @@ export interface DBGetCountryBreakdownResult extends mysql.RowDataPacket {
   localCurrency: string;
 }
 
-export interface DBGetCityBreakdownResult extends DBGetCountryBreakdownResult {}
+export type DBGetCityBreakdownResult = DBGetCountryBreakdownResult;
 
 export interface DBGetDailyCostBreakdownResult extends mysql.RowDataPacket {
   localDate: string;

@@ -52,12 +52,11 @@ class CurrencySyncJob implements Job {
             exchangeRate: data.fxRate,
             fxDate: date,
           });
-        } catch (err) {
+        } catch {
           console.error(`Failed to update fx rate for currency id ${data.id}`);
         }
       }
     } catch (err: any) {
-      console.error(err);
       sendErrorNotification({
         subject: 'Failed to sync currencies for Expense Tracker Backend',
         content: `Currenies failed to sync for expense tracker backend on ${new Date().toISOString()}`,
