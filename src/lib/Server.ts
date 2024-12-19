@@ -30,7 +30,10 @@ class Server {
       },
     });
 
-    void server.register(cors);
+    void server.register(cors, {
+      origin: true,
+    });
+
     void server.register(fastifyRequestContext, {
       defaultStoreValues: {
         userId: 0,
