@@ -1,5 +1,5 @@
 import type mysql from 'mysql2';
-import { type OkPacket } from 'mysql2';
+import { ResultSetHeader } from 'mysql2';
 import { CATEGORY_IDS } from '../constants';
 import type DBAgent from '../lib/DBAgent';
 import knex from '../lib/knex';
@@ -12,7 +12,7 @@ class ExpenseRepository {
     this.dbAgent = dbAgent;
   }
 
-  async findExpensesForTrip(tripId: number) {
+  async findExpensesForTrip(tripId: number, expenseIds?: number[]) {
     const results = await this.dbAgent.runQuery<DBExpenseResult[]>({
       query: `
         SELECT
@@ -44,6 +44,7 @@ class ExpenseRepository {
         JOIN countries co ON co.id = ci.countryId
         JOIN users us ON te.userId = us.id
         WHERE te.tripId = ?
+        ${expenseIds?.length ? `AND te.id IN (${this.dbAgent.prepareArrayForInValue(expenseIds)})` : ''}
         ORDER BY localDateTime DESC;
       `,
       values: [tripId],
@@ -85,12 +86,40 @@ class ExpenseRepository {
       })
       .toQuery();
 
-    const result = await this.dbAgent.runQuery<OkPacket>({
+    const result = await this.dbAgent.runQuery<ResultSetHeader>({
       query,
     });
 
     if (!result.insertId) {
       throw new Error('Failed to insert new expense');
+    }
+  }
+
+  async addExpensesForTrip(expenses: NewExpenseRecord[]) {
+    const transaction = await this.dbAgent.createTransaction();
+    const expenseIds: number[] = [];
+
+    try {
+      await transaction.begin();
+
+      for (const expense of expenses) {
+        const query = knex('trip_expenses').insert(expense).toQuery();
+        const result = await transaction.runQuery<ResultSetHeader>({ query });
+
+        if (!result.insertId) {
+          throw new Error('Failed to insert');
+        } else {
+          expenseIds.push(result.insertId);
+        }
+      }
+      await transaction.commit();
+
+      return expenseIds;
+    } catch (err: any) {
+      if (transaction?.hasStarted) {
+        await transaction.rollback();
+      }
+      throw err;
     }
   }
 
@@ -112,7 +141,7 @@ class ExpenseRepository {
 
     const sql = query.toQuery();
 
-    const result = await this.dbAgent.runQuery<OkPacket>({
+    const result = await this.dbAgent.runQuery<ResultSetHeader>({
       query: sql,
     });
 
@@ -123,7 +152,7 @@ class ExpenseRepository {
   }
 
   async deleteExpenseForTrip(tripId: number, expenseId: number) {
-    return this.dbAgent.runQuery<OkPacket>({
+    return this.dbAgent.runQuery<ResultSetHeader>({
       query: `
         DELETE FROM trip_expenses
         WHERE tripId = ?
@@ -219,7 +248,10 @@ class ExpenseRepository {
 
   private async getMostExpensiveTripDay(tripId: number, options: GetTripExpenseStatsOptions) {
     const query = knex('trip_expenses')
-      .select(knex.raw("DATE_FORMAT(localDateTime, '%Y-%m-%d') as localDate"), knex.raw('ROUND(SUM(te.euroAmount), 2) as totalEuroAmount'))
+      .select(
+        knex.raw("DATE_FORMAT(localDateTime, '%Y-%m-%d') as localDate"),
+        knex.raw('ROUND(SUM(te.euroAmount), 2) as totalEuroAmount'),
+      )
       .from('trip_expenses AS te')
       .where('te.tripId', tripId)
       .groupBy('localDate')
@@ -243,7 +275,10 @@ class ExpenseRepository {
 
   private async getLeastExpensiveTripDay(tripId: number, options: GetTripExpenseStatsOptions) {
     const query = knex('trip_expenses')
-      .select(knex.raw("DATE_FORMAT(localDateTime, '%Y-%m-%d') as localDate"), knex.raw('ROUND(SUM(te.euroAmount), 2) as totalEuroAmount'))
+      .select(
+        knex.raw("DATE_FORMAT(localDateTime, '%Y-%m-%d') as localDate"),
+        knex.raw('ROUND(SUM(te.euroAmount), 2) as totalEuroAmount'),
+      )
       .from('trip_expenses AS te')
       .where('te.tripId', tripId)
       .groupBy('localDate')
@@ -329,7 +364,10 @@ class ExpenseRepository {
 
   private async getDailyCostBreakdownForTrip(tripId: number, options: GetTripExpenseStatsOptions) {
     const query = knex('trip_expenses')
-      .select(knex.raw("DATE_FORMAT(localDateTime, '%Y-%m-%d') as localDate"), knex.raw('TRUNCATE(SUM(te.euroAmount), 2) as euroTotal'))
+      .select(
+        knex.raw("DATE_FORMAT(localDateTime, '%Y-%m-%d') as localDate"),
+        knex.raw('TRUNCATE(SUM(te.euroAmount), 2) as euroTotal'),
+      )
       .from('trip_expenses AS te')
       .where('te.tripId', tripId)
       .groupBy(knex.raw('YEAR(te.localDateTime), MONTH(te.localDateTime), DAY(te.localDateTime)'))
@@ -493,7 +531,10 @@ export interface DBExpenseCategoryBreakdownForTripByUserResult extends DBExpense
   userId: number;
 }
 
-export type ExpenseCategoryBreakdownForTripByUser = Record<string, Array<Omit<DBExpenseCategoryBreakdownForTripResult, 'constructor'>>>;
+export type ExpenseCategoryBreakdownForTripByUser = Record<
+  string,
+  Array<Omit<DBExpenseCategoryBreakdownForTripResult, 'constructor'>>
+>;
 
 export interface UpdateExpenseParams {
   amount?: number;

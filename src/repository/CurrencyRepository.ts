@@ -1,5 +1,5 @@
 import type mysql from 'mysql2';
-import { type OkPacket } from 'mysql2';
+import { ResultSetHeader } from 'mysql2';
 import type DBAgent from '../lib/DBAgent';
 
 class CurrencyRepository {
@@ -38,6 +38,18 @@ class CurrencyRepository {
     return result.exchangeRate;
   }
 
+  async getFXRatesForCurrencies__V2(currencyIds: number[]) {
+    const results = await this.dbAgent.runQuery<DBGetFXRatesForCurrencies__V2[]>({
+      query: `
+        SELECT id, exchangeRate
+        FROM currencies
+        WHERE id IN (${this.dbAgent.prepareArrayForInValue(currencyIds)})
+      `,
+    });
+
+    return results;
+  }
+
   async getCurrenciesForSyncJob() {
     const results = await this.dbAgent.runQuery<DBGetCurrenciesForSyncJobResult[]>({
       query: `
@@ -51,8 +63,16 @@ class CurrencyRepository {
     return results;
   }
 
-  async updateCurrencyExchangeRate({ currencyId, exchangeRate, fxDate }: { currencyId: number; exchangeRate: number; fxDate: string }) {
-    const result = await this.dbAgent.runQuery<OkPacket>({
+  async updateCurrencyExchangeRate({
+    currencyId,
+    exchangeRate,
+    fxDate,
+  }: {
+    currencyId: number;
+    exchangeRate: number;
+    fxDate: string;
+  }) {
+    const result = await this.dbAgent.runQuery<ResultSetHeader>({
       query: `
         UPDATE currencies
         SET exchangeRate = ?, exchangeRateDate = ?, updatedAt = NOW()
@@ -61,7 +81,7 @@ class CurrencyRepository {
       values: [exchangeRate, fxDate, currencyId],
     });
 
-    if (result.changedRows !== 1) {
+    if (result.affectedRows !== 1) {
       console.error(new Error(`Failed to update fx rate for currency ${currencyId}`));
     }
   }
@@ -82,5 +102,10 @@ export interface DBGetCurrenciesResult extends mysql.RowDataPacket {
 }
 
 export interface DBGetCurrencyFXRateResult extends mysql.RowDataPacket {
+  exchangeRate: number;
+}
+
+export interface DBGetFXRatesForCurrencies__V2 extends mysql.RowDataPacket {
+  id: number;
   exchangeRate: number;
 }

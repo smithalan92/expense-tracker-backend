@@ -1,4 +1,4 @@
-import type mysql from 'mysql2';
+import type { RowDataPacket } from 'mysql2';
 import type DBAgent from '../lib/DBAgent';
 
 class CountryRepository {
@@ -20,6 +20,27 @@ class CountryRepository {
     return results;
   }
 
+  async getCountries__V2() {
+    const results = await this.dbAgent.runQuery<DBGetCountriesResult__V2[]>({
+      query: `
+        SELECT co.id, co.name, cu.id as currencyId, cu.name as currencyName, cu.code as currencyCode
+        FROM countries co
+        JOIN currencies cu ON co.currencyId = cu.id
+        ORDER BY name ASC;
+      `,
+    });
+
+    return results.map<CountryWithCurrency>((result) => ({
+      id: result.id,
+      name: result.name,
+      currency: {
+        id: result.currencyId,
+        name: result.currencyName,
+        code: result.currencyCode,
+      },
+    }));
+  }
+
   async getCountriesForTrips(tripIds: number[]) {
     const results = await this.dbAgent.runQuery<DBGetCountriesByTripIDResult[]>({
       query: `
@@ -37,16 +58,34 @@ class CountryRepository {
 
 export default CountryRepository;
 
-export interface DBCountriesResult extends mysql.RowDataPacket {
+export interface DBCountriesResult extends RowDataPacket {
   id: number;
   name: string;
 }
 
-export interface DBGetCountriesByTripIDResult extends mysql.RowDataPacket {
+export interface DBGetCountriesByTripIDResult extends RowDataPacket {
   id: number;
   name: string;
   tripId: number;
   currencyCode: string;
   currencyId: number;
   cityIds: string | null;
+}
+
+interface DBGetCountriesResult__V2 extends RowDataPacket {
+  id: number;
+  name: string;
+  currencyId: number;
+  currencyName: string;
+  currencyCode: string;
+}
+
+export interface CountryWithCurrency {
+  id: number;
+  name: string;
+  currency: {
+    id: number;
+    name: string;
+    code: string;
+  };
 }

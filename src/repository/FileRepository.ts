@@ -38,7 +38,7 @@ class FileRepository {
       query = query.update('path', path);
     }
 
-    const result = await this.dbAgent.runQuery<mysql.OkPacket>({
+    const result = await this.dbAgent.runQuery<mysql.ResultSetHeader>({
       query: query.toQuery(),
     });
 
@@ -47,7 +47,10 @@ class FileRepository {
     }
   }
 
-  async saveTempFile({ userId, fileName, destPath }: { userId: number; fileName: string; destPath: string }, transaction?: DBTransaction) {
+  async saveTempFile(
+    { userId, fileName, destPath }: { userId: number; fileName: string; destPath: string },
+    transaction?: DBTransaction,
+  ) {
     const fullDestPath = path.join(this.env.EXPENSR_FILE_DIR, destPath);
     const doesDestPathExist = await doesFileOrFolderExist(fullDestPath);
 
@@ -57,7 +60,7 @@ class FileRepository {
 
     await fs.copyFile(path.join(this.env.EXPENSR_TMP_DIR, fileName), path.join(fullDestPath, fileName));
 
-    const { insertId } = await (transaction ?? this.dbAgent).runQuery<mysql.OkPacket>({
+    const { insertId } = await (transaction ?? this.dbAgent).runQuery<mysql.ResultSetHeader>({
       query: knex('files')
         .insert({
           path: path.join(destPath, fileName),

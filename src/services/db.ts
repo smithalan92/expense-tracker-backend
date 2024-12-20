@@ -7,7 +7,7 @@ export default function makePool({ env }: ContainerCradle) {
     user: env.MYSQL_EXPENSE_USER,
     database: 'expense_tracker',
     waitForConnections: true,
-    connectionLimit: 5,
+    connectionLimit: 10,
     queueLimit: 0,
   });
 

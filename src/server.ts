@@ -59,6 +59,26 @@ async function makeServer(container: awilix.AwilixContainer) {
       server.registerRoutes(container.resolve(name));
     });
 
+  const routesV2Glob = 'routesV2/**';
+
+  container.loadModules([routesV2Glob], {
+    formatName: 'camelCase',
+    cwd: __dirname,
+    resolverOptions: {
+      lifetime: awilix.Lifetime.SCOPED,
+    },
+  });
+
+  awilix
+    .listModules([routesV2Glob], {
+      cwd: __dirname,
+    })
+    .forEach((moduleDesc) => {
+      let { name } = moduleDesc;
+      name = name.slice(0, 1).toLowerCase() + name.slice(1);
+      server.registerRoutes(container.resolve(name));
+    });
+
   return server;
 }
 

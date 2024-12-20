@@ -300,7 +300,16 @@ class TripRoutes implements Router {
           return reply.code(400).send({ error: 'Trip not found' });
         }
 
-        const { localDateTime, cityId, amount, currencyId, categoryId, description, userId: expenseUserId, userIds: expenseUserIds } = req.body;
+        const {
+          localDateTime,
+          cityId,
+          amount,
+          currencyId,
+          categoryId,
+          description,
+          userId: expenseUserId,
+          userIds: expenseUserIds,
+        } = req.body;
 
         const currencyToEurFXRate = await this.currencyRepository.getCurrencyFXRate(currencyId);
 
@@ -388,7 +397,10 @@ class TripRoutes implements Router {
           return reply.code(400).send({ error: 'Not valid update data provided' });
         }
 
-        if ((updateData.amount && updateData.amount !== expense.amount) ?? (updateData.currencyId && updateData.currencyId !== expense.currencyId)) {
+        if (
+          (updateData.amount && updateData.amount !== expense.amount) ??
+          (updateData.currencyId && updateData.currencyId !== expense.currencyId)
+        ) {
           const amount = updateData.amount ?? expense.amount;
           const currencyId = updateData.currencyId ?? expense.currencyId;
           const currencyToEurFXRate = await this.currencyRepository.getCurrencyFXRate(currencyId);
@@ -422,7 +434,10 @@ class TripRoutes implements Router {
         const transaction = await this.dbAgent.createTransaction();
 
         try {
-          const tripId = await this.tripRepository.createTrip({ name, startDate, endDate, countries, userIds }, transaction);
+          const tripId = await this.tripRepository.createTrip(
+            { name, startDate, endDate, countries, userIds },
+            transaction,
+          );
 
           if (file) {
             const fileId = await this.fileRepository.saveTempFile(

@@ -2,16 +2,19 @@ import type mysql from 'mysql2/promise';
 
 class DBTransaction {
   connection: mysql.PoolConnection;
+  hasStarted: boolean;
 
   constructor(connection: mysql.PoolConnection) {
     this.connection = connection;
+    this.hasStarted = false;
   }
 
   async begin() {
     await this.connection.beginTransaction();
+    this.hasStarted = true;
   }
 
-  async runQuery<T extends mysql.RowDataPacket[] | mysql.OkPacket>({ query, values }: any) {
+  async runQuery<T extends mysql.RowDataPacket[] | mysql.ResultSetHeader>({ query, values }: any) {
     const [rows] = await this.connection.execute<T>(query, values);
     return rows;
   }
@@ -19,6 +22,7 @@ class DBTransaction {
   async rollback() {
     await this.connection.rollback();
     this.connection.release();
+    this.hasStarted = false;
   }
 
   async commit() {

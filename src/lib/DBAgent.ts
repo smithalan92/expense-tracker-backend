@@ -13,7 +13,7 @@ class DBAgent {
     this.pool = mysqlConnectionPool;
   }
 
-  async runQuery<T extends mysql.RowDataPacket[] | mysql.OkPacket>({ query, values }: RunQueryParams) {
+  async runQuery<T extends mysql.RowDataPacket[] | mysql.ResultSetHeader>({ query, values }: RunQueryParams) {
     const [rows] = await this.pool.execute<T>(query, values);
     return rows;
   }

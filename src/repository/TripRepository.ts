@@ -87,7 +87,7 @@ class TripRepository {
     await transactionToUse.begin();
 
     try {
-      const { insertId: tripId } = await transactionToUse.runQuery<mysql.OkPacket>({
+      const { insertId: tripId } = await transactionToUse.runQuery<mysql.ResultSetHeader>({
         query: knex('trips')
           .insert({
             name,
@@ -98,12 +98,15 @@ class TripRepository {
           .toQuery(),
       });
 
-      const countryInserts = countries.reduce<Array<{ tripId: number; countryId: number; cityIds: string | null }>>((acc, current) => {
-        const cityIds = current.cityIds?.join(',') ?? null;
+      const countryInserts = countries.reduce<Array<{ tripId: number; countryId: number; cityIds: string | null }>>(
+        (acc, current) => {
+          const cityIds = current.cityIds?.join(',') ?? null;
 
-        acc.push({ tripId, countryId: current.countryId, cityIds });
-        return acc;
-      }, []);
+          acc.push({ tripId, countryId: current.countryId, cityIds });
+          return acc;
+        },
+        [],
+      );
 
       const userInserts = userIds.reduce<Array<{ tripId: number; userId: number }>>((acc, current) => {
         acc.push({ tripId, userId: current });
@@ -125,7 +128,7 @@ class TripRepository {
 
       return tripId;
     } catch (err) {
-      if (!transaction) {
+      if (transaction) {
         await transactionToUse.rollback();
       }
       throw err;

@@ -29,7 +29,7 @@ class TokenRepository {
     // TODO - This could fuck up due to timezone mismatches
     const expiryDate = format(addWeeks(new Date(), 1), 'yyyy-MM-dd HH-mm-ss'); // Token expiry of 1 week;
 
-    const result = await this.dbAgent.runQuery<mysql.OkPacket>({
+    const result = await this.dbAgent.runQuery<mysql.ResultSetHeader>({
       query: `
         INSERT INTO auth_tokens (userId, token, expiry)
         VALUES (?, ?, ?);
