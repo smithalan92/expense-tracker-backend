@@ -40,7 +40,7 @@ class TripRepository {
   async findTripById({ userId, tripId }: { userId: number; tripId: number }): Promise<DBTripResult | null> {
     const [result] = await this.dbAgent.runQuery<DBTripResult[]>({
       query: `
-        SELECT t.id, t.name, t.startDate, t.endDate, t.status, f.path as filePath, COALESCE(ROUND(SUM(te.amount), 2), 0) as totalLocalAmount, COALESCE(ROUND(SUM(te.euroAmount), 2), 0) as totalExpenseAmount
+        SELECT t.id, t.name, t.startDate, t.endDate, t.status, f.path as filePath, (SELECT ROUND(SUM(euroAmount), 2) FROM trip_expenses WHERE tripId = ?) as totalExpenseAmount
         FROM user_trips ut
         LEFT JOIN trips t ON t.id = ut.tripId
         LEFT JOIN trip_expenses te ON te.tripId = t.id
@@ -50,7 +50,7 @@ class TripRepository {
         AND t.status = 'active'
         GROUP BY t.id;
       `,
-      values: [userId, tripId],
+      values: [tripId, userId, tripId],
     });
 
     return result ?? null;
@@ -234,7 +234,6 @@ export interface DBTripResult extends mysql.RowDataPacket {
   endDate: string;
   status: 'active' | 'deleted';
   filePath: string | null;
-  totalLocalAmount: number;
   totalExpenseAmount: number;
 }
 

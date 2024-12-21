@@ -58,7 +58,6 @@ export interface ParsedTrip {
   endDate: string;
   status: 'active' | 'deleted';
   image: string;
-  totalLocalAmount: number;
   totalExpenseAmount: number;
 }
 

@@ -13,7 +13,6 @@ export function parseTrip(trip: DBTripResult): ParsedTrip {
     endDate: format(new Date(trip.endDate), 'dd MMM yyyy'),
     status: trip.status,
     image,
-    totalLocalAmount: trip.totalLocalAmount,
     totalExpenseAmount: trip.totalExpenseAmount,
   };
 }
