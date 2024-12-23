@@ -1,24 +1,16 @@
-import configureContainer from './container';
-import makeServer from './server';
+import init from './init';
 
 (async () => {
-  let container;
-
   try {
-    container = await configureContainer();
-  } catch (err) {
-    console.error(err);
-    process.exit(1);
-  }
+    const { server, container } = await init();
 
-  const env: Env = container.resolve('env');
-
-  try {
-    const server = await makeServer(container);
+    const env: Env = container.resolve('env');
 
     server.start();
+
     console.log(`${env.serviceName} started on ${server.port}`);
   } catch (err) {
     console.error(err);
+    process.exit(1);
   }
 })();
