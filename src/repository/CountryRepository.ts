@@ -20,27 +20,6 @@ class CountryRepository {
     return results;
   }
 
-  async getCountries__V2() {
-    const results = await this.dbAgent.runQuery<DBGetCountriesResult__V2[]>({
-      query: `
-        SELECT co.id, co.name, cu.id as currencyId, cu.name as currencyName, cu.code as currencyCode
-        FROM countries co
-        JOIN currencies cu ON co.currencyId = cu.id
-        ORDER BY name ASC;
-      `,
-    });
-
-    return results.map<CountryWithCurrency>((result) => ({
-      id: result.id,
-      name: result.name,
-      currency: {
-        id: result.currencyId,
-        name: result.currencyName,
-        code: result.currencyCode,
-      },
-    }));
-  }
-
   async getCountriesForTrips(tripIds: number[]) {
     const results = await this.dbAgent.runQuery<DBGetCountriesByTripIDResult[]>({
       query: `
@@ -70,14 +49,6 @@ export interface DBGetCountriesByTripIDResult extends RowDataPacket {
   currencyCode: string;
   currencyId: number;
   cityIds: string | null;
-}
-
-interface DBGetCountriesResult__V2 extends RowDataPacket {
-  id: number;
-  name: string;
-  currencyId: number;
-  currencyName: string;
-  currencyCode: string;
 }
 
 export interface CountryWithCurrency {

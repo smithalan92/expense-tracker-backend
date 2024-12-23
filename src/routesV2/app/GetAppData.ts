@@ -1,15 +1,15 @@
 import { FastifyInstance } from 'fastify';
 import Server from '../../lib/Server';
-import CountryRepository, { CountryWithCurrency } from '../../repository/CountryRepository';
-import UserRepository from '../../repository/UserRepository';
+import CountryRepository__V2, { CountryWithCurrency } from '../../repository/CountryRepository__V2';
+import UserRepository__V2 from '../../repository/UserRepository__V2';
 
 class GetAppDataRoute {
-  userRepository: UserRepository;
-  countryRepository: CountryRepository;
+  userRepository: UserRepository__V2;
+  countryRepository: CountryRepository__V2;
 
-  constructor({ userRepository, countryRepository }: GetAppDataRouteParams) {
-    this.userRepository = userRepository;
-    this.countryRepository = countryRepository;
+  constructor({ userRepositoryV2, countryRepositoryV2 }: GetAppDataRouteParams) {
+    this.userRepository = userRepositoryV2;
+    this.countryRepository = countryRepositoryV2;
   }
 
   configure(server: FastifyInstance) {
@@ -20,7 +20,7 @@ class GetAppDataRoute {
       url: '/v2/app',
       handler: async () => {
         const [countries, users] = await Promise.all([
-          this.countryRepository.getCountries__V2(),
+          this.countryRepository.getCountries(),
           this.userRepository.getUsers(),
         ]);
 
@@ -39,8 +39,8 @@ export default GetAppDataRoute;
 
 interface GetAppDataRouteParams {
   server: Server;
-  userRepository: UserRepository;
-  countryRepository: CountryRepository;
+  userRepositoryV2: UserRepository__V2;
+  countryRepositoryV2: CountryRepository__V2;
 }
 
 interface GetAppDataResponse {

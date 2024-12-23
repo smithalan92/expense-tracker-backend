@@ -1,18 +1,18 @@
 import { FastifyInstance } from 'fastify';
-import CurrencyRepository from '../../repository/CurrencyRepository';
-import ExpenseRepository, { NewExpenseRecord } from '../../repository/ExpenseRepository';
-import TripRepository from '../../repository/TripRepository';
+import CurrencyRepository__V2 from '../../repository/CurrencyRepository__V2';
+import ExpenseRepository__V2, { NewExpenseRecord } from '../../repository/ExpenseRepository__V2';
+import TripRepository__V2 from '../../repository/TripRepository__V2';
 import { parseExpenseForResponse, ProcessedTripExpense } from '../../utils/expenseParser';
 
 class AddExpensesRoute {
-  expenseRepository: ExpenseRepository;
-  currencyRepository: CurrencyRepository;
-  tripRepository: TripRepository;
+  expenseRepository: ExpenseRepository__V2;
+  currencyRepository: CurrencyRepository__V2;
+  tripRepository: TripRepository__V2;
 
-  constructor({ expenseRepository, currencyRepository, tripRepository }: AddExpensesRouteParams) {
-    this.expenseRepository = expenseRepository;
-    this.currencyRepository = currencyRepository;
-    this.tripRepository = tripRepository;
+  constructor({ expenseRepositoryV2, currencyRepositoryV2, tripRepositoryV2 }: AddExpensesRouteParams) {
+    this.expenseRepository = expenseRepositoryV2;
+    this.currencyRepository = currencyRepositoryV2;
+    this.tripRepository = tripRepositoryV2;
   }
 
   configure(server: FastifyInstance) {
@@ -40,7 +40,7 @@ class AddExpensesRoute {
 
         const currencyIds = expenses.map((e) => e.currencyId);
 
-        const currenciesWithFXRates = await this.currencyRepository.getFXRatesForCurrencies__V2(currencyIds);
+        const currenciesWithFXRates = await this.currencyRepository.getFXRatesForCurrencies(currencyIds);
 
         const expensesToAdd = expenses.reduce<NewExpenseRecord[]>((acc, current) => {
           const currency = currenciesWithFXRates.find((c) => c.id === current.currencyId);
@@ -85,9 +85,9 @@ class AddExpensesRoute {
 export default AddExpensesRoute;
 
 interface AddExpensesRouteParams {
-  expenseRepository: ExpenseRepository;
-  currencyRepository: CurrencyRepository;
-  tripRepository: TripRepository;
+  expenseRepositoryV2: ExpenseRepository__V2;
+  currencyRepositoryV2: CurrencyRepository__V2;
+  tripRepositoryV2: TripRepository__V2;
 }
 
 export interface AddExpenseForTripParams {
