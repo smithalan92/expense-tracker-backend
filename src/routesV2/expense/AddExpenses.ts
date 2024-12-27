@@ -70,7 +70,7 @@ class AddExpensesRoute {
 
         const expenseIds = await this.expenseRepository.addExpensesForTrip(expensesToAdd);
 
-        const createdExpenses = await this.expenseRepository.findExpensesForTrip(tripId, expenseIds);
+        const createdExpenses = await this.expenseRepository.findExpensesForTrip({ tripId, expenseIds });
 
         const processedExpenses = createdExpenses.map(parseExpenseForResponse);
 

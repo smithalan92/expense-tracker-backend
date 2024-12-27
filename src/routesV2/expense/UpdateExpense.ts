@@ -29,7 +29,7 @@ class UpdateExpenseRoute {
         const userId = req.requestContext.get('userId')!;
         const updateData: UpdatedExpenseParams = req.body;
 
-        const existingExpense = await this.expenseRepository.canUpdateExpense({ expenseId, userId });
+        const [existingExpense] = await this.expenseRepository.findExpensesForTrip({ expenseIds: [expenseId], userId });
 
         if (!existingExpense) {
           return reply.code(404).send({ error: 'Trip or expense not found' });
@@ -54,7 +54,7 @@ class UpdateExpenseRoute {
           params: updateData,
         });
 
-        const [expense] = await this.expenseRepository.findExpensesForTrip(existingExpense.tripId, [expenseId]);
+        const [expense] = await this.expenseRepository.findExpensesForTrip({ expenseIds: [expenseId] });
 
         const processedExpense = parseExpenseForResponse(expense);
 

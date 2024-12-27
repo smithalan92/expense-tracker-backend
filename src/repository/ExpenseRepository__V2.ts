@@ -10,42 +10,62 @@ class ExpenseRepository__V2 {
     this.dbAgent = dbAgent;
   }
 
-  async findExpensesForTrip(tripId: number, expenseIds?: number[]) {
+  async findExpensesForTrip({
+    tripId,
+    expenseIds,
+    userId,
+  }: {
+    tripId?: number;
+    expenseIds?: number[];
+    userId?: number;
+  }) {
+    if (!tripId && (!expenseIds || !expenseIds.length)) throw new Error('Invalid args');
+
+    const query = knex
+      .select(
+        'te.id',
+        'te.amount',
+        'te.currencyId',
+        'cu.code as currencyCode',
+        'cu.name as currencyName',
+        'te.euroAmount',
+        'te.localDateTime',
+        'te.description',
+        'te.categoryId',
+        'ec.name as categoryName',
+        'te.cityId',
+        'ci.name as cityName',
+        'ci.timezoneName as cityTimeZone',
+        'co.id as countryId',
+        'co.name as countryName',
+        'te.createdAt',
+        'te.updatedAt',
+        'u.id as userId',
+        'u.firstName',
+        'u.lastName',
+      )
+      .from({ te: 'trip_expenses' })
+      .leftJoin({ ec: 'expense_categories' }, 'ec.id', 'te.categoryId')
+      .leftJoin({ cu: 'currencies' }, 'cu.id', 'te.currencyId')
+      .leftJoin({ ci: 'cities' }, 'ci.id', 'te.cityId')
+      .leftJoin({ co: 'countries' }, 'co.id', 'ci.countryId')
+      .leftJoin({ u: 'users' }, 'u.id', 'te.userId')
+      .orderBy('localDateTime', 'desc');
+
+    if (tripId) {
+      query.where('te.tripId', tripId);
+    }
+
+    if (expenseIds) {
+      query.whereIn('te.id', expenseIds);
+    }
+
+    if (userId) {
+      query.where('te.userId', userId);
+    }
+
     const results = await this.dbAgent.runQuery<DBExpenseResult[]>({
-      query: `
-        SELECT
-          te.id,
-          te.amount,
-          te.currencyId,
-          cu.code as currencyCode,
-          cu.name as currencyName,
-          te.euroAmount,
-          te.localDateTime,
-          te.description,
-          te.categoryId,
-          ca.name as categoryName,
-          te.cityId,
-          ci.name as cityName,
-          ci.timezoneName as cityTimeZone,
-          co.id as countryId,
-          co.name as countryName,
-          te.createdAt,
-          te.updatedAt,
-          us.id as userId,
-          us.firstName,
-          us.lastName
-        FROM trip_expenses te
-        JOIN expense_categories ec ON te.categoryId = ec.id
-        JOIN currencies cu ON cu.id=te.currencyId
-        JOIN expense_categories ca ON ca.id = te.categoryId
-        JOIN cities ci ON ci.id = te.cityId
-        JOIN countries co ON co.id = ci.countryId
-        JOIN users us ON te.userId = us.id
-        WHERE te.tripId = ?
-        ${expenseIds?.length ? `AND te.id IN (${this.dbAgent.prepareArrayForInValue(expenseIds)})` : ''}
-        ORDER BY localDateTime DESC;
-      `,
-      values: [tripId],
+      query: query.toQuery(),
     });
 
     return results;
@@ -79,23 +99,6 @@ class ExpenseRepository__V2 {
     }
   }
 
-  async canUpdateExpense({ expenseId, userId }: { expenseId: number; userId: number }) {
-    const [result] = await this.dbAgent.runQuery<DBExpenseForUpdate[]>({
-      query: `
-        SELECT e.id, e.tripId, e.amount, e.currencyId
-        FROM trip_expenses e
-        LEFT JOIN user_trips ut ON ut.tripId = e.tripId
-        LEFT JOIN trips t on t.id = e.tripId
-        WHERE e.id = ?
-        AND ut.userId = ?
-        AND t.status = 'active';
-      `,
-      values: [expenseId, userId],
-    });
-
-    return result;
-  }
-
   async updateExpenseForTrip({
     expenseId,
     userId,
@@ -127,6 +130,20 @@ class ExpenseRepository__V2 {
 
     if (result.affectedRows !== 1) {
       throw new Error('Failed to update expense');
+    }
+  }
+
+  async deleteExpense(expenseId: number) {
+    const result = await this.dbAgent.runQuery<ResultSetHeader>({
+      query: `
+        DELETE FROM trip_expenses
+        WHERE id = ?
+      `,
+      values: [expenseId],
+    });
+
+    if (result.affectedRows !== 1) {
+      throw new Error('Failed to delete expense');
     }
   }
 }
