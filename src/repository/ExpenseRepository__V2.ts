@@ -78,6 +78,57 @@ class ExpenseRepository__V2 {
       throw err;
     }
   }
+
+  async canUpdateExpense({ expenseId, userId }: { expenseId: number; userId: number }) {
+    const [result] = await this.dbAgent.runQuery<DBExpenseForUpdate[]>({
+      query: `
+        SELECT e.id, e.tripId, e.amount, e.currencyId
+        FROM trip_expenses e
+        LEFT JOIN user_trips ut ON ut.tripId = e.tripId
+        LEFT JOIN trips t on t.id = e.tripId
+        WHERE e.id = ?
+        AND ut.userId = ?
+        AND t.status = 'active';
+      `,
+      values: [expenseId, userId],
+    });
+
+    return result;
+  }
+
+  async updateExpenseForTrip({
+    expenseId,
+    userId,
+    params,
+  }: {
+    expenseId: number;
+    userId: number;
+    params: UpdatedExpenseParams;
+  }) {
+    let query = knex('trip_expenses')
+      .where('id', expenseId)
+      .update('updatedByUserId', userId)
+      .update('updatedAt', knex.raw('NOW()'));
+
+    if (params.amount) query = query.update('amount', params.amount);
+    if (params.euroAmount) query = query.update('euroAmount', params.euroAmount);
+    if (params.currencyId) query = query.update('currencyId', params.currencyId);
+    if (params.localDateTime) query = query.update('localDateTime', params.localDateTime);
+    if (params.description) query = query.update('description', params.description);
+    if (params.categoryId) query = query.update('categoryId', params.categoryId);
+    if (params.cityId) query = query.update('cityId', params.cityId);
+    if (params.userId) query = query.update('userId', params.userId);
+
+    const sql = query.toQuery();
+
+    const result = await this.dbAgent.runQuery<ResultSetHeader>({
+      query: sql,
+    });
+
+    if (result.affectedRows !== 1) {
+      throw new Error('Failed to update expense');
+    }
+  }
 }
 
 export default ExpenseRepository__V2;
@@ -116,4 +167,22 @@ export interface NewExpenseRecord {
   cityId: number;
   userId: number;
   createdByUserId: number;
+}
+
+export interface DBExpenseForUpdate extends mysql.RowDataPacket {
+  id: number;
+  tripId: number;
+  amount: number;
+  currencyId: number;
+}
+
+export interface UpdatedExpenseParams {
+  amount?: number;
+  currencyId?: number;
+  euroAmount?: number;
+  localDateTime?: string;
+  description?: string;
+  categoryId?: number;
+  cityId?: number;
+  userId?: number;
 }

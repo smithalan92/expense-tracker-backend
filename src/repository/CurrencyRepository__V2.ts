@@ -19,6 +19,23 @@ class CurrencyRepository__V2 {
 
     return results;
   }
+
+  async getCurrencyFXRate(currencyId: number) {
+    const [result] = await this.dbAgent.runQuery<DBGetCurrencyFXRateResult[]>({
+      query: `
+          SELECT exchangeRate
+          FROM currencies
+          WHERE id = ?
+        `,
+      values: [currencyId],
+    });
+
+    if (!result) {
+      throw new Error(`Could not find currency id ${currencyId}`);
+    }
+
+    return result.exchangeRate;
+  }
 }
 
 export default CurrencyRepository__V2;
@@ -41,5 +58,9 @@ export interface DBGetCurrencyFXRateResult extends mysql.RowDataPacket {
 
 export interface DBGetFXRatesForCurrencies__V2 extends mysql.RowDataPacket {
   id: number;
+  exchangeRate: number;
+}
+
+export interface DBGetCurrencyFXRateResult extends mysql.RowDataPacket {
   exchangeRate: number;
 }

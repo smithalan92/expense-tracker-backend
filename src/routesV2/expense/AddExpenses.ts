@@ -101,8 +101,7 @@ export interface NewExpenseData {
   currencyId: number;
   categoryId: number;
   description: string;
-  userId?: number;
-  userIds?: number[];
+  userId: number;
 }
 
 export interface AddExpenseForTripBody {

@@ -28,6 +28,19 @@ class CountryRepository__V2 {
       },
     }));
   }
+
+  async getCitiesForCountries(countryIds: number[]) {
+    const results = await this.dbAgent.runQuery<DBCityResult[]>({
+      query: `
+          SELECT id, name, countryId
+          FROM cities
+          WHERE countryId IN (${this.dbAgent.prepareArrayForInValue(countryIds)})
+          ORDER BY name ASC;
+        `,
+    });
+
+    return results;
+  }
 }
 
 export default CountryRepository__V2;
@@ -48,4 +61,10 @@ export interface CountryWithCurrency {
     name: string;
     code: string;
   };
+}
+
+export interface DBCityResult extends RowDataPacket {
+  id: number;
+  name: string;
+  countryId: number;
 }

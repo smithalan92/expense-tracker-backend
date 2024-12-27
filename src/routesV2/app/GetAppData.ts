@@ -1,7 +1,7 @@
 import { FastifyInstance } from 'fastify';
 import Server from '../../lib/Server';
 import CountryRepository__V2, { CountryWithCurrency } from '../../repository/CountryRepository__V2';
-import UserRepository__V2 from '../../repository/UserRepository__V2';
+import UserRepository__V2, { DBUserResult } from '../../repository/UserRepository__V2';
 
 class GetAppDataRoute {
   userRepository: UserRepository__V2;
@@ -43,7 +43,7 @@ interface GetAppDataRouteParams {
   countryRepositoryV2: CountryRepository__V2;
 }
 
-interface GetAppDataResponse {
+export interface GetAppDataResponse {
   countries: CountryWithCurrency[];
-  users: unknown[];
+  users: DBUserResult[];
 }
