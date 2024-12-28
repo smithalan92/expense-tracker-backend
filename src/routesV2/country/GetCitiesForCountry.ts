@@ -4,7 +4,7 @@ import CountryRepository__V2, { DBCityResult } from '../../repository/CountryRep
 class GetCitiesForCountry {
   countryRepository: CountryRepository__V2;
 
-  constructor({ countryRepositoryV2 }: GetCitiesForCountryParams) {
+  constructor({ countryRepositoryV2 }: ContainerCradle) {
     this.countryRepository = countryRepositoryV2;
   }
 
@@ -25,10 +25,6 @@ class GetCitiesForCountry {
 }
 
 export default GetCitiesForCountry;
-
-interface GetCitiesForCountryParams {
-  countryRepositoryV2: CountryRepository__V2;
-}
 
 interface GetCitiesForCountryParams {
   countryId: number;

@@ -3,15 +3,15 @@ import fs from 'fs/promises';
 import cron from 'node-cron';
 import path from 'path';
 import sharp from 'sharp';
-import type FileRepository from '../repository/FileRepository';
+import FileRepository__V2 from '../repository/FileRepository__V2';
 
 class ImageResize implements Job {
   env: Env;
-  fileRepository: FileRepository;
+  fileRepository: FileRepository__V2;
 
-  constructor({ env, fileRepository }: ContainerCradle) {
+  constructor({ env, fileRepositoryV2 }: ContainerCradle) {
     this.env = env;
-    this.fileRepository = fileRepository;
+    this.fileRepository = fileRepositoryV2;
   }
 
   start() {
@@ -29,7 +29,7 @@ class ImageResize implements Job {
     console.log('Running image resize');
     let resizeCount = 0;
 
-    const files = await this.fileRepository.getUnprocssedFiles();
+    const files = await this.fileRepository.getUnprocessedFiles();
 
     if (files.length === 0) {
       console.log('No images to resize');
@@ -43,8 +43,8 @@ class ImageResize implements Job {
 
         const fileSizeInKB = size / 1024;
 
-        // Max image size range before we resize is 400kb (+ a little tolerance)
-        if (fileSizeInKB / 400 <= 1.01) {
+        // Max image size range before we resize is 800kb (+ a little tolerance)
+        if (fileSizeInKB / 800 <= 1.01) {
           await this.fileRepository.updateFile({
             id: file.id,
             processed: 1,

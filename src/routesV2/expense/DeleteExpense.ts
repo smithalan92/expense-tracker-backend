@@ -4,7 +4,7 @@ import ExpenseRepository__V2 from '../../repository/ExpenseRepository__V2';
 class DeleteExpenseRoute {
   expenseRepository: ExpenseRepository__V2;
 
-  constructor({ expenseRepositoryV2 }: DeleteExpenseRouteParams) {
+  constructor({ expenseRepositoryV2 }: ContainerCradle) {
     this.expenseRepository = expenseRepositoryV2;
   }
 
@@ -34,10 +34,6 @@ class DeleteExpenseRoute {
 }
 
 export default DeleteExpenseRoute;
-
-interface DeleteExpenseRouteParams {
-  expenseRepositoryV2: ExpenseRepository__V2;
-}
 
 export interface DeleteExpenseParams {
   expenseId: number;

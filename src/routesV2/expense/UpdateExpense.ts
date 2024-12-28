@@ -10,7 +10,7 @@ class UpdateExpenseRoute {
   currencyRepository: CurrencyRepository__V2;
   tripRepository: TripRepository__V2;
 
-  constructor({ expenseRepositoryV2, currencyRepositoryV2, tripRepositoryV2 }: UpdateExpenseRouteParams) {
+  constructor({ expenseRepositoryV2, currencyRepositoryV2, tripRepositoryV2 }: ContainerCradle) {
     this.expenseRepository = expenseRepositoryV2;
     this.currencyRepository = currencyRepositoryV2;
     this.tripRepository = tripRepositoryV2;
@@ -67,12 +67,6 @@ class UpdateExpenseRoute {
 }
 
 export default UpdateExpenseRoute;
-
-interface UpdateExpenseRouteParams {
-  expenseRepositoryV2: ExpenseRepository__V2;
-  currencyRepositoryV2: CurrencyRepository__V2;
-  tripRepositoryV2: TripRepository__V2;
-}
 
 export interface UpdateExpenseParams {
   expenseId: number;

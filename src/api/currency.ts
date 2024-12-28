@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { type GetCurrencyResponse } from './currency.types';
 
 export async function getExchangeRatesForEUR() {
   const { data } = await axios.get<GetCurrencyResponse>(
@@ -7,4 +6,9 @@ export async function getExchangeRatesForEUR() {
   );
 
   return data;
+}
+
+interface GetCurrencyResponse {
+  date: string;
+  eur: Record<string, number>;
 }

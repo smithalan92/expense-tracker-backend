@@ -1,5 +1,4 @@
 import { FastifyInstance } from 'fastify';
-import Server from '../../lib/Server';
 import CountryRepository__V2, { CountryWithCurrency } from '../../repository/CountryRepository__V2';
 import UserRepository__V2, { DBUserResult } from '../../repository/UserRepository__V2';
 
@@ -7,7 +6,7 @@ class GetAppDataRoute {
   userRepository: UserRepository__V2;
   countryRepository: CountryRepository__V2;
 
-  constructor({ userRepositoryV2, countryRepositoryV2 }: GetAppDataRouteParams) {
+  constructor({ userRepositoryV2, countryRepositoryV2 }: ContainerCradle) {
     this.userRepository = userRepositoryV2;
     this.countryRepository = countryRepositoryV2;
   }
@@ -36,12 +35,6 @@ class GetAppDataRoute {
 }
 
 export default GetAppDataRoute;
-
-interface GetAppDataRouteParams {
-  server: Server;
-  userRepositoryV2: UserRepository__V2;
-  countryRepositoryV2: CountryRepository__V2;
-}
 
 export interface GetAppDataResponse {
   countries: CountryWithCurrency[];
