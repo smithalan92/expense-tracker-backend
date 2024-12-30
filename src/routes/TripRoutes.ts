@@ -26,7 +26,7 @@ import type TripRepository from '../repository/TripRepository';
 import { type UsersForTrip } from '../repository/TripRepository';
 import { parseExpenseForResponse, type ProcessedTripExpense } from '../utils/expenseParser';
 import { getTripFileUrl } from '../utils/file';
-import { parseTrip } from '../utils/trip';
+import { ParsedTrip, parseTrip } from '../utils/trip';
 
 class TripRoutes implements Router {
   tripRepository: TripRepository;
@@ -553,16 +553,6 @@ class TripRoutes implements Router {
 }
 
 export default TripRoutes;
-
-export interface ParsedTrip {
-  id: number;
-  name: string;
-  startDate: string;
-  endDate: string;
-  status: 'active' | 'deleted';
-  image: string;
-  totalExpenseAmount: number;
-}
 
 export interface ResponseTrip extends ParsedTrip {
   countries: DBGetCountriesByTripIDResult[];

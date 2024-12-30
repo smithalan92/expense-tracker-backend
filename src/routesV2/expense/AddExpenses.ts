@@ -26,7 +26,7 @@ class AddExpensesRoute {
       handler: async (req, reply) => {
         const { tripId } = req.params;
         const userId = req.requestContext.get('userId')!;
-        const trip = await this.tripRepository.findTripById({ userId, tripId });
+        const [trip] = await this.tripRepository.getTrips({ userId, tripIds: [tripId] });
 
         if (!trip) {
           return reply.code(400).send({ error: 'Trip not found' });

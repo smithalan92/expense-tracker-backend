@@ -1,16 +1,12 @@
 import { FastifyInstance } from 'fastify';
-import Server from '../../lib/Server';
-import CountryRepository, { type DBGetCountriesByTripIDResult } from '../../repository/CountryRepository';
-import TripRepository from '../../repository/TripRepository';
-import { parseTrip } from '../../utils/trip';
+import TripRepository__V2 from '../../repository/TripRepository__V2';
+import { ParsedTrip, parseTrip } from '../../utils/trip';
 
 class GetTripsRoute {
-  tripRepository: TripRepository;
-  countryRepository: CountryRepository;
+  tripRepository: TripRepository__V2;
 
-  constructor({ tripRepository, countryRepository }: GetTripsParams) {
-    this.tripRepository = tripRepository;
-    this.countryRepository = countryRepository;
+  constructor({ tripRepositoryV2 }: ContainerCradle) {
+    this.tripRepository = tripRepositoryV2;
   }
 
   configure(server: FastifyInstance) {
@@ -22,19 +18,10 @@ class GetTripsRoute {
       handler: async (req, reply) => {
         const userId: number = req.requestContext.get('userId')!;
 
-        const trips = await this.tripRepository.findTripsForUserId(userId);
-
-        const countriesIdsForTrips = trips.map((trip) => trip.id);
-
-        const countries = await this.countryRepository.getCountriesForTrips(countriesIdsForTrips);
+        const trips = await this.tripRepository.getTrips({ userId });
 
         const tripsWithFormattedDates = trips
-          .map<ResponseTrip>((t) => {
-            return {
-              ...parseTrip(t),
-              countries: countries.filter((c) => c.tripId === t.id),
-            };
-          })
+          .map(parseTrip)
           .sort((a, b) => new Date(b.endDate).getTime() - new Date(a.endDate).getTime());
 
         return reply.send({ trips: tripsWithFormattedDates }).code(200);
@@ -45,26 +32,6 @@ class GetTripsRoute {
 
 export default GetTripsRoute;
 
-interface GetTripsParams {
-  server: Server;
-  tripRepository: TripRepository;
-  countryRepository: CountryRepository;
-}
-
-export interface ParsedTrip {
-  id: number;
-  name: string;
-  startDate: string;
-  endDate: string;
-  status: 'active' | 'deleted';
-  image: string;
-  totalExpenseAmount: number;
-}
-
-export interface ResponseTrip extends ParsedTrip {
-  countries: DBGetCountriesByTripIDResult[];
-}
-
-export interface GetTripReponse {
-  trips: ResponseTrip[];
+interface GetTripReponse {
+  trips: ParsedTrip[];
 }
