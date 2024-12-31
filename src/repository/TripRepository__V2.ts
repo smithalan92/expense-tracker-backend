@@ -47,7 +47,10 @@ class TripRepository__V2 {
     return results;
   }
 
-  async createTrip({ name, startDate, endDate, countries, userIds }: CreateTripParams, transaction: DBTransaction) {
+  async createTrip(
+    { name, startDate, endDate, countries, fileId, userIds }: CreateTripParams,
+    transaction: DBTransaction,
+  ) {
     const { insertId: tripId } = await transaction.runQuery<ResultSetHeader>({
       query: knex('trips')
         .insert({
@@ -55,6 +58,7 @@ class TripRepository__V2 {
           startDate,
           endDate,
           status: 'active',
+          fileId,
         })
         .toQuery(),
     });
