@@ -108,10 +108,13 @@ class TripRepository {
         [],
       );
 
-      const userInserts = userIds.reduce<Array<{ tripId: number; userId: number }>>((acc, current) => {
-        acc.push({ tripId, userId: current });
-        return acc;
-      }, []);
+      const userInserts = Array.from(new Set(userIds)).reduce<Array<{ tripId: number; userId: number }>>(
+        (acc, current) => {
+          acc.push({ tripId, userId: current });
+          return acc;
+        },
+        [],
+      );
 
       await Promise.all([
         transactionToUse.runQuery({
@@ -186,13 +189,15 @@ class TripRepository {
     });
 
     if (userIds) {
+      const userIdsWithoutCurrent = Array.from(new Set(userIds)).filter((id) => id !== currentUserId);
+
       await (transaction ?? this.dbAgent).runQuery({
         query: 'DELETE FROM user_trips WHERE tripId = ? AND userId != ?;',
         values: [tripId, currentUserId],
       });
 
-      if (userIds.length) {
-        const usersToAdd = userIds.map((id) => ({ tripId, userId: id }));
+      if (userIdsWithoutCurrent.length) {
+        const usersToAdd = userIdsWithoutCurrent.map((id) => ({ tripId, userId: id }));
         await (transaction ?? this.dbAgent).runQuery({
           query: knex('user_trips').insert(usersToAdd).toQuery(),
         });
