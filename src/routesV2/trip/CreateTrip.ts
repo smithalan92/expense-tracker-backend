@@ -54,7 +54,7 @@ class CreateTripRoute {
           }
 
           const tripId = await this.tripRepository.createTrip(
-            { name, startDate, endDate, countries, userIds, fileId },
+            { name, startDate, endDate, countries, userIds: Array.from(new Set(userIds)), fileId },
             transaction,
           );
 
@@ -83,11 +83,6 @@ interface CreateTripBody {
   startDate: string;
   endDate: string;
   file?: string;
-  countries: CreateTripCountry[];
+  countries: { countryId: number; cityIds?: number[] }[];
   userIds: number[];
-}
-
-interface CreateTripCountry {
-  countryId: number;
-  cityIds?: number[];
 }

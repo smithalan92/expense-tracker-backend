@@ -65,6 +65,8 @@ declare global {
   interface Router {
     configure: (server: FastifyInstance) => void;
   }
+
+  type Nullable<T> = T | null;
 }
 
 export {};

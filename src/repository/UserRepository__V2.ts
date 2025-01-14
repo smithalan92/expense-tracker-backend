@@ -1,5 +1,6 @@
-import type mysql from 'mysql2/promise';
+import { RowDataPacket } from 'mysql2/promise';
 import type DBAgent from '../lib/DBAgent';
+import knex from '../lib/knex';
 
 class UserRepository__V2 {
   dbAgent: DBAgent;
@@ -15,12 +16,26 @@ class UserRepository__V2 {
 
     return users;
   }
+
+  async getUserIdsForTrip(tripId: number) {
+    const query = knex.select('userId').from('user_trips').where('tripId', tripId);
+
+    const results = await this.dbAgent.runQuery<DBUserIDResult[]>({
+      query: query.toQuery(),
+    });
+
+    return results.map((r) => r.userId);
+  }
 }
 
 export default UserRepository__V2;
 
-export interface DBUserResult extends mysql.RowDataPacket {
+export interface DBUserResult extends RowDataPacket {
   id: number;
   firstName: string;
   lastName: string;
+}
+
+export interface DBUserIDResult extends RowDataPacket {
+  userId: number;
 }

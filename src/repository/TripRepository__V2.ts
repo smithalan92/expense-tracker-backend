@@ -73,10 +73,13 @@ class TripRepository__V2 {
       [],
     );
 
-    const userInserts = userIds.reduce<Array<{ tripId: number; userId: number }>>((acc, current) => {
-      acc.push({ tripId, userId: current });
-      return acc;
-    }, []);
+    const userInserts = Array.from(new Set(userIds)).reduce<Array<{ tripId: number; userId: number }>>(
+      (acc, current) => {
+        acc.push({ tripId, userId: current });
+        return acc;
+      },
+      [],
+    );
 
     await Promise.all([
       transaction.runQuery({
@@ -93,36 +96,40 @@ class TripRepository__V2 {
   async updateTrip({ tripId, currentUserId, data, transaction }: UpdateTripParams) {
     const queryExecutor = transaction ?? this.dbAgent;
 
+    const { name, startDate, endDate, fileId, countries, userIds } = data;
+
     const query = knex('trips').where('id', tripId);
 
-    if (data.name) query.update('name', data.name);
+    if (name) query.update('name', name);
 
-    if (data.startDate) query.update('startDate', data.startDate);
+    if (startDate) query.update('startDate', startDate);
 
-    if (data.endDate) query.update('endDate', data.endDate);
+    if (endDate) query.update('endDate', endDate);
 
-    if (data.fileId !== undefined) query.update('fileId', data.fileId);
+    if (fileId !== undefined) query.update('fileId', fileId);
 
     await queryExecutor.runQuery({
       query: query.toQuery(),
     });
 
-    if (data.userIds) {
+    if (userIds) {
       await queryExecutor.runQuery({
         query: 'DELETE FROM user_trips WHERE tripId = ? AND userId != ?;',
         values: [tripId, currentUserId],
       });
 
-      if (data.userIds.length) {
-        const usersToAdd = data.userIds.map((id) => ({ tripId, userId: id }));
+      const userIdsWithoutCurrentUser = Array.from(new Set(userIds)).filter((id) => id !== currentUserId);
+
+      if (userIdsWithoutCurrentUser.length) {
+        const usersToAdd = userIdsWithoutCurrentUser.map((id) => ({ tripId, userId: id }));
         await queryExecutor.runQuery({
           query: knex('user_trips').insert(usersToAdd).toQuery(),
         });
       }
     }
 
-    if (data.countries) {
-      if (!data.countries.length) {
+    if (countries) {
+      if (!countries.length) {
         throw new Error('You need to have at least one country on a trip');
       }
 
@@ -131,7 +138,7 @@ class TripRepository__V2 {
         values: [tripId],
       });
 
-      const countryRows = data.countries.map((country) => {
+      const countryRows = countries.map((country) => {
         const cityIds = country.cityIds?.join(',') ?? null;
         return {
           tripId,

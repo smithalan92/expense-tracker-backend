@@ -9,6 +9,35 @@ class CurrencyRepository__V2 {
     this.dbAgent = dbAgent;
   }
 
+  async getCurrencies() {
+    const results = await this.dbAgent.runQuery<DBCurrency[]>({
+      query: `
+        SELECT id, name, code
+        FROM currencies
+      `,
+    });
+
+    return results;
+  }
+
+  async getCurrencyIdsForTrip(tripId: number) {
+    const results = await this.dbAgent.runQuery<DBCurrency[]>({
+      query: `
+        SELECT id
+        FROM currencies
+        WHERE id IN (
+          SELECT c.currencyId
+          FROM countries c
+          LEFT JOIN trip_countries tc ON tc.countryId = c.id
+          WHERE tc.tripId = ?
+        )
+      `,
+      values: [tripId],
+    });
+
+    return results.map(({ id }) => id);
+  }
+
   async getFXRatesForCurrencies(currencyIds: number[]) {
     const results = await this.dbAgent.runQuery<DBGetFXRatesForCurrencies__V2[]>({
       query: `
@@ -76,6 +105,16 @@ class CurrencyRepository__V2 {
 }
 
 export default CurrencyRepository__V2;
+
+export interface DBCurrency extends mysql.RowDataPacket {
+  id: number;
+  name: string;
+  code: string;
+}
+
+export interface DBCurrencyIDForTrip extends mysql.RowDataPacket {
+  id: number;
+}
 
 export interface DBGetCurrenciesForSyncJobResult extends mysql.RowDataPacket {
   id: number;
