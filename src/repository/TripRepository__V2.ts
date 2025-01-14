@@ -96,9 +96,9 @@ class TripRepository__V2 {
   async updateTrip({ tripId, currentUserId, data, transaction }: UpdateTripParams) {
     const queryExecutor = transaction ?? this.dbAgent;
 
-    const { name, startDate, endDate, fileId, countries, userIds } = data;
+    const { name, startDate, endDate, fileId, countries, userIds, status } = data;
 
-    const query = knex('trips').where('id', tripId);
+    const query = knex('trips').where('id', tripId).update('updatedAt', knex.raw('NOW()'));
 
     if (name) query.update('name', name);
 
@@ -107,6 +107,8 @@ class TripRepository__V2 {
     if (endDate) query.update('endDate', endDate);
 
     if (fileId !== undefined) query.update('fileId', fileId);
+
+    if (status) query.update('status', status);
 
     await queryExecutor.runQuery({
       query: query.toQuery(),
@@ -178,6 +180,7 @@ interface CreateTripParams {
   fileId?: number;
   countries: Array<{ countryId: number; cityIds?: number[] }>;
   userIds: number[];
+  status?: 'active' | 'deleted';
 }
 
 interface UpdateTripParams {

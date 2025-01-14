@@ -10,7 +10,7 @@ class TokenRepository {
     this.dbAgent = dbAgent;
   }
 
-  async findValidTokenForUser(userId: number): Promise<DBFindValidTokenResult | undefined> {
+  async findValidTokenForUser(userId: number) {
     const [token]: Array<DBFindValidTokenResult | undefined> = await this.dbAgent.runQuery<DBFindValidTokenResult[]>({
       query: `
         SELECT token, expiry FROM auth_tokens
@@ -21,10 +21,10 @@ class TokenRepository {
       values: [userId],
     });
 
-    return token;
+    return token ? { token: token.token, expiry: token.expiry } : null;
   }
 
-  async createUserToken(userId: number): Promise<CreateUserTokenResult> {
+  async createUserToken(userId: number) {
     const token = randomUUID();
     // TODO - This could fuck up due to timezone mismatches
     const expiryDate = format(addWeeks(new Date(), 1), 'yyyy-MM-dd HH-mm-ss'); // Token expiry of 1 week;
@@ -39,7 +39,7 @@ class TokenRepository {
 
     if (result.insertId) {
       return {
-        token,
+        token: token as string,
         expiry: expiryDate,
       };
     } else {
