@@ -42,7 +42,7 @@ class Server {
     void server.register(multipart);
 
     server.addHook('onRequest', async (request: FastifyRequest, reply: FastifyReply) => {
-      if (request.routeOptions.url?.endsWith('/login')) {
+      if (request.url.endsWith('/login')) {
         return;
       }
 

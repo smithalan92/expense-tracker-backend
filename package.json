@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "tsx src/index.ts",
-    "watch": "nodemon src/index.ts",
+    "watch": "tsx watch src/index.ts",
     "build": "rm -rf dist && tsc"
   },
   "author": "Alan Smith",
@@ -18,7 +18,7 @@
     "axios": "^1.7.9",
     "bcrypt": "^5.1.1",
     "date-fns": "^4.1.0",
-    "fastify": "^5.2.0",
+    "fastify": "^5.2.1",
     "knex": "^3.1.0",
     "mysql2": "^3.11.5",
     "node-cron": "^3.0.3",

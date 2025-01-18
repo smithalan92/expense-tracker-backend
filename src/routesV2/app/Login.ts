@@ -24,6 +24,10 @@ class LoginRoute {
       handler: async (req, reply) => {
         const { email, password } = req.body;
 
+        if (!email || !password) {
+          return reply.code(400).send({ error: 'Email and password are required' });
+        }
+
         const user = await this.userRepository.getUserByEmail(email);
 
         if (!user) {
