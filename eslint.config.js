@@ -9,7 +9,7 @@ module.exports = [
   ...tseslint.configs.recommended,
   eslintPluginPrettierRecommended,
   {
-    files: ['**/*.{js,mjs,cjs,ts}'],
+    files: ['**/*.{js,mjs,cjs,ts,d.ts}'],
 
     languageOptions: { globals: globals.node },
 

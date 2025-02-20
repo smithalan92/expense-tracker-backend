@@ -1,9 +1,8 @@
 import { format } from 'date-fns/format';
-import { type DBTripResult } from '../repository/TripRepository';
-import { DBGetTripsResult } from '../repository/TripRepository__V2';
+import type { DBGetTripsResult } from '../repository/TripRepository__V2';
 import { getTripFileUrl } from './file';
 
-export function parseTrip(trip: DBTripResult | DBGetTripsResult): ParsedTrip {
+export function parseTrip(trip: DBGetTripsResult): ParsedTrip {
   const image = getTripFileUrl(trip.filePath);
 
   return {
