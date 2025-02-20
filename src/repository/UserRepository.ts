@@ -2,7 +2,7 @@ import { RowDataPacket } from 'mysql2/promise';
 import type DBAgent from '../lib/DBAgent';
 import knex from '../lib/knex';
 
-class UserRepository__V2 {
+class UserRepository {
   dbAgent: DBAgent;
 
   constructor({ dbAgent }: ContainerCradle) {
@@ -37,7 +37,7 @@ class UserRepository__V2 {
   }
 }
 
-export default UserRepository__V2;
+export default UserRepository;
 
 export interface DBUserResult extends RowDataPacket {
   id: number;

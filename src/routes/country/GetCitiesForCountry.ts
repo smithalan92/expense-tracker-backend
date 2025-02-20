@@ -1,11 +1,11 @@
 import { FastifyInstance } from 'fastify';
-import CountryRepository__V2, { DBCityResult } from '../../repository/CountryRepository__V2';
+import CountryRepository, { DBCityResult } from '../../repository/CountryRepository';
 
 class GetCitiesForCountry {
-  countryRepository: CountryRepository__V2;
+  countryRepository: CountryRepository;
 
-  constructor({ countryRepositoryV2 }: ContainerCradle) {
-    this.countryRepository = countryRepositoryV2;
+  constructor({ countryRepository }: ContainerCradle) {
+    this.countryRepository = countryRepository;
   }
 
   configure(server: FastifyInstance) {

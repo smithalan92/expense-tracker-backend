@@ -1,13 +1,13 @@
 import { type FastifyInstance } from 'fastify';
 import type DBAgent from './lib/DBAgent';
 import type CategoryRepository from './repository/CategoryRepository';
-import type CountryRepository__V2 from './repository/CountryRepository__V2';
-import type CurrencyRepository__V2 from './repository/CurrencyRepository__V2';
-import type ExpenseRepository__V2 from './repository/ExpenseRepository__V2';
-import type FileRepository__V2 from './repository/FileRepository__V2';
+import type CountryRepository from './repository/CountryRepository';
+import type CurrencyRepository from './repository/CurrencyRepository';
+import type ExpenseRepository from './repository/ExpenseRepository';
+import type FileRepository from './repository/FileRepository';
 import type TokenRepository from './repository/TokenRepository';
-import type TripRepository__V2 from './repository/TripRepository__V2';
-import type UserRepository__V2 from './repository/UserRepository__V2';
+import type TripRepository from './repository/TripRepository';
+import type UserRepository from './repository/UserRepository';
 
 declare global {
   interface Job {
@@ -35,13 +35,13 @@ declare global {
     env: Env;
     dbAgent: DBAgent;
     categoryRepository: CategoryRepository;
-    countryRepositoryV2: CountryRepository__V2;
-    currencyRepositoryV2: CurrencyRepository__V2;
-    expenseRepositoryV2: ExpenseRepository__V2;
-    fileRepositoryV2: FileRepository__V2;
-    tripRepositoryV2: TripRepository__V2;
+    countryRepository: CountryRepository;
+    currencyRepository: CurrencyRepository;
+    expenseRepository: ExpenseRepository;
+    fileRepository: FileRepository;
+    tripRepository: TripRepository;
     tokenRepository: TokenRepository;
-    userRepositoryV2: UserRepository__V2;
+    userRepository: UserRepository;
   }
 
   interface Router {

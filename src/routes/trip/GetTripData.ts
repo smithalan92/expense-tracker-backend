@@ -1,35 +1,35 @@
 import { FastifyInstance } from 'fastify';
 import CategoryRepository, { DBGetCategoriesResult } from '../../repository/CategoryRepository';
-import CountryRepository__V2, { TripCountryWithCities } from '../../repository/CountryRepository__V2';
-import CurrencyRepository__V2 from '../../repository/CurrencyRepository__V2';
-import ExpenseRepository__V2 from '../../repository/ExpenseRepository__V2';
-import TripRepository__V2 from '../../repository/TripRepository__V2';
-import UserRepository__V2 from '../../repository/UserRepository__V2';
+import CountryRepository, { TripCountryWithCities } from '../../repository/CountryRepository';
+import CurrencyRepository from '../../repository/CurrencyRepository';
+import ExpenseRepository from '../../repository/ExpenseRepository';
+import TripRepository from '../../repository/TripRepository';
+import UserRepository from '../../repository/UserRepository';
 import { parseExpenseForResponse, ProcessedTripExpense } from '../../utils/expenseParser';
 import { ParsedTrip, parseTrip } from '../../utils/trip';
 
 class GetTripDataRoute {
-  tripRepository: TripRepository__V2;
-  countryRepository: CountryRepository__V2;
-  userRepository: UserRepository__V2;
-  currencyRepository: CurrencyRepository__V2;
+  tripRepository: TripRepository;
+  countryRepository: CountryRepository;
+  userRepository: UserRepository;
+  currencyRepository: CurrencyRepository;
   categoryRepository: CategoryRepository;
-  expenseRepository: ExpenseRepository__V2;
+  expenseRepository: ExpenseRepository;
 
   constructor({
-    tripRepositoryV2,
-    countryRepositoryV2,
-    userRepositoryV2,
-    currencyRepositoryV2,
+    tripRepository,
+    countryRepository,
+    userRepository,
+    currencyRepository,
     categoryRepository,
-    expenseRepositoryV2,
+    expenseRepository,
   }: ContainerCradle) {
-    this.tripRepository = tripRepositoryV2;
-    this.countryRepository = countryRepositoryV2;
-    this.userRepository = userRepositoryV2;
-    this.currencyRepository = currencyRepositoryV2;
+    this.tripRepository = tripRepository;
+    this.countryRepository = countryRepository;
+    this.userRepository = userRepository;
+    this.currencyRepository = currencyRepository;
     this.categoryRepository = categoryRepository;
-    this.expenseRepository = expenseRepositoryV2;
+    this.expenseRepository = expenseRepository;
   }
 
   configure(server: FastifyInstance) {

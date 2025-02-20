@@ -1,11 +1,11 @@
 import { FastifyInstance } from 'fastify';
-import ExpenseRepository__V2 from '../../repository/ExpenseRepository__V2';
+import ExpenseRepository from '../../repository/ExpenseRepository';
 
 class DeleteExpenseRoute {
-  expenseRepository: ExpenseRepository__V2;
+  expenseRepository: ExpenseRepository;
 
-  constructor({ expenseRepositoryV2 }: ContainerCradle) {
-    this.expenseRepository = expenseRepositoryV2;
+  constructor({ expenseRepository }: ContainerCradle) {
+    this.expenseRepository = expenseRepository;
   }
 
   configure(server: FastifyInstance) {

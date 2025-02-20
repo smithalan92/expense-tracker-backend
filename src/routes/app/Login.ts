@@ -1,16 +1,16 @@
 import { FastifyInstance } from 'fastify';
 import { isSame } from '../../lib/crypto';
-import { CountryWithCurrency } from '../../repository/CountryRepository__V2';
-import { DBCurrency } from '../../repository/CurrencyRepository__V2';
+import { CountryWithCurrency } from '../../repository/CountryRepository';
+import { DBCurrency } from '../../repository/CurrencyRepository';
 import TokenRepository from '../../repository/TokenRepository';
-import UserRepository__V2, { DBUserResult } from '../../repository/UserRepository__V2';
+import UserRepository, { DBUserResult } from '../../repository/UserRepository';
 
 class LoginRoute {
-  userRepository: UserRepository__V2;
+  userRepository: UserRepository;
   tokenRepository: TokenRepository;
 
-  constructor({ userRepositoryV2, tokenRepository }: ContainerCradle) {
-    this.userRepository = userRepositoryV2;
+  constructor({ userRepository, tokenRepository }: ContainerCradle) {
+    this.userRepository = userRepository;
     this.tokenRepository = tokenRepository;
   }
 

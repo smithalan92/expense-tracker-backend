@@ -2,7 +2,7 @@ import type { RowDataPacket } from 'mysql2';
 import type DBAgent from '../lib/DBAgent';
 import knex from '../lib/knex';
 
-class CountryRepository__V2 {
+class CountryRepository {
   dbAgent: DBAgent;
 
   constructor({ dbAgent }: ContainerCradle) {
@@ -90,7 +90,7 @@ class CountryRepository__V2 {
   }
 }
 
-export default CountryRepository__V2;
+export default CountryRepository;
 
 interface DBGetCountriesResult extends RowDataPacket {
   id: number;

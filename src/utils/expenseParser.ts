@@ -1,4 +1,4 @@
-import { type DBExpenseResult } from '../repository/ExpenseRepository__V2';
+import { type DBExpenseResult } from '../repository/ExpenseRepository';
 
 export function parseExpenseForResponse(expense: DBExpenseResult): ProcessedTripExpense {
   return {

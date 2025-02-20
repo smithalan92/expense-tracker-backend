@@ -1,12 +1,12 @@
 import { FastifyInstance } from 'fastify';
-import TripRepository__V2 from '../../repository/TripRepository__V2';
+import TripRepository from '../../repository/TripRepository';
 import { ParsedTrip, parseTrip } from '../../utils/trip';
 
 class GetTripsRoute {
-  tripRepository: TripRepository__V2;
+  tripRepository: TripRepository;
 
-  constructor({ tripRepositoryV2 }: ContainerCradle) {
-    this.tripRepository = tripRepositoryV2;
+  constructor({ tripRepository }: ContainerCradle) {
+    this.tripRepository = tripRepository;
   }
 
   configure(server: FastifyInstance) {

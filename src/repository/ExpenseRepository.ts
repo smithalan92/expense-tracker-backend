@@ -3,7 +3,7 @@ import { ResultSetHeader } from 'mysql2';
 import type DBAgent from '../lib/DBAgent';
 import knex from '../lib/knex';
 
-class ExpenseRepository__V2 {
+class ExpenseRepository {
   dbAgent: DBAgent;
 
   constructor({ dbAgent }: ContainerCradle) {
@@ -148,7 +148,7 @@ class ExpenseRepository__V2 {
   }
 }
 
-export default ExpenseRepository__V2;
+export default ExpenseRepository;
 
 export interface DBExpenseResult extends mysql.RowDataPacket {
   id: number;

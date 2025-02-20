@@ -4,7 +4,7 @@ import type DBAgent from '../lib/DBAgent';
 import DBTransaction from '../lib/DBTransaction';
 import knex from '../lib/knex';
 
-class TripRepository__V2 {
+class TripRepository {
   dbAgent: DBAgent;
 
   constructor({ dbAgent }: ContainerCradle) {
@@ -156,7 +156,7 @@ class TripRepository__V2 {
   }
 }
 
-export default TripRepository__V2;
+export default TripRepository;
 
 interface GetTripsFilters {
   userId?: number;

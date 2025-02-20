@@ -2,7 +2,7 @@ import type mysql from 'mysql2';
 import { ResultSetHeader } from 'mysql2';
 import type DBAgent from '../lib/DBAgent';
 
-class CurrencyRepository__V2 {
+class CurrencyRepository {
   dbAgent: DBAgent;
 
   constructor({ dbAgent }: ContainerCradle) {
@@ -39,7 +39,7 @@ class CurrencyRepository__V2 {
   }
 
   async getFXRatesForCurrencies(currencyIds: number[]) {
-    const results = await this.dbAgent.runQuery<DBGetFXRatesForCurrencies__V2[]>({
+    const results = await this.dbAgent.runQuery<DBGetFXRatesForCurrencies[]>({
       query: `
         SELECT id, exchangeRate
         FROM currencies
@@ -104,7 +104,7 @@ class CurrencyRepository__V2 {
   }
 }
 
-export default CurrencyRepository__V2;
+export default CurrencyRepository;
 
 export interface DBCurrency extends mysql.RowDataPacket {
   id: number;
@@ -132,7 +132,7 @@ export interface DBGetCurrencyFXRateResult extends mysql.RowDataPacket {
   exchangeRate: number;
 }
 
-export interface DBGetFXRatesForCurrencies__V2 extends mysql.RowDataPacket {
+export interface DBGetFXRatesForCurrencies extends mysql.RowDataPacket {
   id: number;
   exchangeRate: number;
 }

@@ -1,17 +1,17 @@
 import { randomUUID } from 'crypto';
 import { FastifyInstance } from 'fastify';
 import path from 'path';
-import { CountryWithCurrency } from '../../repository/CountryRepository__V2';
-import FileRepository__V2 from '../../repository/FileRepository__V2';
-import { DBUserResult } from '../../repository/UserRepository__V2';
+import { CountryWithCurrency } from '../../repository/CountryRepository';
+import FileRepository from '../../repository/FileRepository';
+import { DBUserResult } from '../../repository/UserRepository';
 import { saveTempFile } from '../../utils/file';
 
 class UploadFileRoute {
-  fileRepository: FileRepository__V2;
+  fileRepository: FileRepository;
   env: Env;
 
-  constructor({ fileRepositoryV2, env }: ContainerCradle) {
-    this.fileRepository = fileRepositoryV2;
+  constructor({ fileRepository, env }: ContainerCradle) {
+    this.fileRepository = fileRepository;
     this.env = env;
   }
 

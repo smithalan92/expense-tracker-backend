@@ -3,15 +3,15 @@ import fs from 'fs/promises';
 import cron from 'node-cron';
 import path from 'path';
 import sharp from 'sharp';
-import FileRepository__V2 from '../repository/FileRepository__V2';
+import FileRepository from '../repository/FileRepository';
 
 class ImageResize implements Job {
   env: Env;
-  fileRepository: FileRepository__V2;
+  fileRepository: FileRepository;
 
-  constructor({ env, fileRepositoryV2 }: ContainerCradle) {
+  constructor({ env, fileRepository }: ContainerCradle) {
     this.env = env;
-    this.fileRepository = fileRepositoryV2;
+    this.fileRepository = fileRepository;
   }
 
   start() {

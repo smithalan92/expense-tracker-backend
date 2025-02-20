@@ -1,34 +1,34 @@
 import { randomUUID } from 'crypto';
 import { FastifyInstance } from 'fastify';
 import DBAgent from '../../lib/DBAgent';
-import CountryRepository__V2, { TripCountryWithCities } from '../../repository/CountryRepository__V2';
-import CurrencyRepository__V2 from '../../repository/CurrencyRepository__V2';
-import FileRepository__V2 from '../../repository/FileRepository__V2';
-import TripRepository__V2 from '../../repository/TripRepository__V2';
-import UserRepository__V2 from '../../repository/UserRepository__V2';
+import CountryRepository, { TripCountryWithCities } from '../../repository/CountryRepository';
+import CurrencyRepository from '../../repository/CurrencyRepository';
+import FileRepository from '../../repository/FileRepository';
+import TripRepository from '../../repository/TripRepository';
+import UserRepository from '../../repository/UserRepository';
 import { ParsedTrip, parseTrip } from '../../utils/trip';
 
 class UpdateTripRoute {
-  tripRepository: TripRepository__V2;
-  fileRepository: FileRepository__V2;
-  countryRepository: CountryRepository__V2;
-  userRepository: UserRepository__V2;
-  currencyRepository: CurrencyRepository__V2;
+  tripRepository: TripRepository;
+  fileRepository: FileRepository;
+  countryRepository: CountryRepository;
+  userRepository: UserRepository;
+  currencyRepository: CurrencyRepository;
   dbAgent: DBAgent;
 
   constructor({
-    tripRepositoryV2,
-    fileRepositoryV2,
-    countryRepositoryV2,
-    userRepositoryV2,
-    currencyRepositoryV2,
+    tripRepository,
+    fileRepository,
+    countryRepository,
+    userRepository,
+    currencyRepository,
     dbAgent,
   }: ContainerCradle) {
-    this.tripRepository = tripRepositoryV2;
-    this.fileRepository = fileRepositoryV2;
-    this.countryRepository = countryRepositoryV2;
-    this.userRepository = userRepositoryV2;
-    this.currencyRepository = currencyRepositoryV2;
+    this.tripRepository = tripRepository;
+    this.fileRepository = fileRepository;
+    this.countryRepository = countryRepository;
+    this.userRepository = userRepository;
+    this.currencyRepository = currencyRepository;
     this.dbAgent = dbAgent;
   }
 

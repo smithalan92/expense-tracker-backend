@@ -35,10 +35,10 @@ function configureJobs(container: awilix.AwilixContainer) {
 }
 
 function configureRoutes(container: awilix.AwilixContainer, server: Server) {
-  const routesV2Glob = 'routesV2/**';
+  const routesGlob = 'routes/**';
 
   // Load routes
-  container.loadModules([routesV2Glob], {
+  container.loadModules([routesGlob], {
     formatName: 'camelCase',
     cwd: __dirname,
     resolverOptions: {
@@ -48,7 +48,7 @@ function configureRoutes(container: awilix.AwilixContainer, server: Server) {
 
   // Then register routes
   awilix
-    .listModules([routesV2Glob], {
+    .listModules([routesGlob], {
       cwd: __dirname,
     })
     .forEach((moduleDesc) => {

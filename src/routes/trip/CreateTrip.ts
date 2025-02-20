@@ -1,18 +1,18 @@
 import { randomUUID } from 'crypto';
 import { FastifyInstance } from 'fastify';
 import DBAgent from '../../lib/DBAgent';
-import FileRepository__V2 from '../../repository/FileRepository__V2';
-import TripRepository__V2 from '../../repository/TripRepository__V2';
+import FileRepository from '../../repository/FileRepository';
+import TripRepository from '../../repository/TripRepository';
 import { ParsedTrip, parseTrip } from '../../utils/trip';
 
 class CreateTripRoute {
-  tripRepository: TripRepository__V2;
-  fileRepository: FileRepository__V2;
+  tripRepository: TripRepository;
+  fileRepository: FileRepository;
   dbAgent: DBAgent;
 
-  constructor({ tripRepositoryV2, fileRepositoryV2, dbAgent }: ContainerCradle) {
-    this.tripRepository = tripRepositoryV2;
-    this.fileRepository = fileRepositoryV2;
+  constructor({ tripRepository, fileRepository, dbAgent }: ContainerCradle) {
+    this.tripRepository = tripRepository;
+    this.fileRepository = fileRepository;
     this.dbAgent = dbAgent;
   }
 

@@ -6,7 +6,7 @@ import type DBTransaction from '../lib/DBTransaction';
 import knex from '../lib/knex';
 import { doesFileOrFolderExist } from '../utils/file';
 
-class FileRepository__V2 {
+class FileRepository {
   dbAgent: DBAgent;
   env: Env;
 
@@ -73,7 +73,7 @@ class FileRepository__V2 {
   }
 }
 
-export default FileRepository__V2;
+export default FileRepository;
 
 export interface DBUnprocessedFileResult extends mysql.RowDataPacket {
   id: number;

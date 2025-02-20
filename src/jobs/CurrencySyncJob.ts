@@ -1,13 +1,13 @@
 import cron from 'node-cron';
 import { getExchangeRatesForEUR } from '../api/currency';
 import { sendErrorNotification } from '../api/error';
-import CurrencyRepository__V2 from '../repository/CurrencyRepository__V2';
+import CurrencyRepository from '../repository/CurrencyRepository';
 
 class CurrencySyncJob implements Job {
-  currencyRepository: CurrencyRepository__V2;
+  currencyRepository: CurrencyRepository;
 
-  constructor({ currencyRepositoryV2 }: ContainerCradle) {
-    this.currencyRepository = currencyRepositoryV2;
+  constructor({ currencyRepository }: ContainerCradle) {
+    this.currencyRepository = currencyRepository;
   }
 
   start() {

@@ -1,19 +1,19 @@
 import { FastifyInstance } from 'fastify';
-import CurrencyRepository__V2 from '../../repository/CurrencyRepository__V2';
-import ExpenseRepository__V2, { UpdatedExpenseParams } from '../../repository/ExpenseRepository__V2';
-import TripRepository__V2 from '../../repository/TripRepository__V2';
+import CurrencyRepository from '../../repository/CurrencyRepository';
+import ExpenseRepository, { UpdatedExpenseParams } from '../../repository/ExpenseRepository';
+import TripRepository from '../../repository/TripRepository';
 import { parseExpenseForResponse, ProcessedTripExpense } from '../../utils/expenseParser';
 import { NewExpenseData } from './AddExpenses';
 
 class UpdateExpenseRoute {
-  expenseRepository: ExpenseRepository__V2;
-  currencyRepository: CurrencyRepository__V2;
-  tripRepository: TripRepository__V2;
+  expenseRepository: ExpenseRepository;
+  currencyRepository: CurrencyRepository;
+  tripRepository: TripRepository;
 
-  constructor({ expenseRepositoryV2, currencyRepositoryV2, tripRepositoryV2 }: ContainerCradle) {
-    this.expenseRepository = expenseRepositoryV2;
-    this.currencyRepository = currencyRepositoryV2;
-    this.tripRepository = tripRepositoryV2;
+  constructor({ expenseRepository, currencyRepository, tripRepository }: ContainerCradle) {
+    this.expenseRepository = expenseRepository;
+    this.currencyRepository = currencyRepository;
+    this.tripRepository = tripRepository;
   }
 
   configure(server: FastifyInstance) {

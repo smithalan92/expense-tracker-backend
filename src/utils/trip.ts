@@ -1,5 +1,5 @@
 import { format } from 'date-fns/format';
-import type { DBGetTripsResult } from '../repository/TripRepository__V2';
+import type { DBGetTripsResult } from '../repository/TripRepository';
 import { getTripFileUrl } from './file';
 
 export function parseTrip(trip: DBGetTripsResult): ParsedTrip {
