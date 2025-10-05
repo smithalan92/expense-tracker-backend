@@ -32,6 +32,7 @@ class Server {
 
     void server.register(cors, {
       origin: true,
+      methods: ['GET', 'HEAD', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
     });
 
     void server.register(fastifyRequestContext, {
@@ -42,7 +43,7 @@ class Server {
     void server.register(multipart);
 
     server.addHook('onRequest', async (request: FastifyRequest, reply: FastifyReply) => {
-      if (request.url.endsWith('/login')) {
+      if (request.url.endsWith('/login') || request.method === 'OPTIONS') {
         return;
       }
 
