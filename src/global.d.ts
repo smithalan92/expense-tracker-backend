@@ -12,7 +12,7 @@ import type UserRepository from './repository/UserRepository';
 declare global {
   interface Job {
     start: () => void;
-    run: () => void;
+    run: () => Promise<void>;
   }
 
   interface ErrorResponse {

@@ -14,7 +14,13 @@ class DBTransaction {
     this.hasStarted = true;
   }
 
-  async runQuery<T extends mysql.RowDataPacket[] | mysql.ResultSetHeader>({ query, values }: any) {
+  async runQuery<T extends mysql.RowDataPacket[] | mysql.ResultSetHeader>({
+    query,
+    values,
+  }: {
+    query: string;
+    values?: unknown[];
+  }) {
     const [rows] = await this.connection.execute<T>(query, values);
     return rows;
   }

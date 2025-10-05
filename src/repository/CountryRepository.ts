@@ -121,6 +121,7 @@ interface DBCountryWithCity extends RowDataPacket {
   cityName: Nullable<string>;
   id: number;
   name: string;
+  currencyId: number;
 }
 
 export interface TripCountryWithCities {

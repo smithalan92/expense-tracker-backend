@@ -4,7 +4,7 @@ import Server from './lib/Server';
 import makePool from './services/db';
 import makeEnv from './services/env';
 
-function configureDB(container: awilix.AwilixContainer) {
+function configureDB(container: awilix.AwilixContainer<ContainerCradle>) {
   const mysqlPool = makePool(container.cradle);
   const dbAgent = new DBAgent(mysqlPool);
   container.register('dbAgent', awilix.asValue(dbAgent));
@@ -16,22 +16,16 @@ function configureJobs(container: awilix.AwilixContainer) {
   container.loadModules([jobsPath], {
     formatName: 'camelCase',
     cwd: __dirname,
-    resolverOptions: {
-      lifetime: awilix.Lifetime.SCOPED,
-    },
+    resolverOptions: { lifetime: awilix.Lifetime.SCOPED },
   });
 
   // Then schedule jobs
-  awilix
-    .listModules([jobsPath], {
-      cwd: __dirname,
-    })
-    .forEach((moduleDesc) => {
-      let { name } = moduleDesc;
-      name = name.slice(0, 1).toLowerCase() + name.slice(1);
-      const job: Job = container.resolve(name);
-      job.start();
-    });
+  awilix.listModules([jobsPath], { cwd: __dirname }).forEach((moduleDesc) => {
+    let { name } = moduleDesc;
+    name = name.slice(0, 1).toLowerCase() + name.slice(1);
+    const job = container.resolve(name) as unknown as Job;
+    job.start();
+  });
 }
 
 function configureRoutes(container: awilix.AwilixContainer, server: Server) {
@@ -41,21 +35,15 @@ function configureRoutes(container: awilix.AwilixContainer, server: Server) {
   container.loadModules([routesGlob], {
     formatName: 'camelCase',
     cwd: __dirname,
-    resolverOptions: {
-      lifetime: awilix.Lifetime.SCOPED,
-    },
+    resolverOptions: { lifetime: awilix.Lifetime.SCOPED },
   });
 
   // Then register routes
-  awilix
-    .listModules([routesGlob], {
-      cwd: __dirname,
-    })
-    .forEach((moduleDesc) => {
-      let { name } = moduleDesc;
-      name = name.slice(0, 1).toLowerCase() + name.slice(1);
-      server.registerRoutes(container.resolve(name));
-    });
+  awilix.listModules([routesGlob], { cwd: __dirname }).forEach((moduleDesc) => {
+    let { name } = moduleDesc;
+    name = name.slice(0, 1).toLowerCase() + name.slice(1);
+    server.registerRoutes(container.resolve(name) as unknown as Router);
+  });
 }
 
 export default function init() {
@@ -70,9 +58,7 @@ export default function init() {
   container.loadModules(['repository/**'], {
     formatName: 'camelCase',
     cwd: __dirname,
-    resolverOptions: {
-      lifetime: awilix.Lifetime.SCOPED,
-    },
+    resolverOptions: { lifetime: awilix.Lifetime.SCOPED },
   });
 
   configureJobs(container);

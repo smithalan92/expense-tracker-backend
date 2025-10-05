@@ -21,7 +21,7 @@ class ImageResize implements Job {
         console.error(err);
       });
     });
-    job.start();
+    void job.start();
     console.log('Scheduled ImageResize');
   }
 

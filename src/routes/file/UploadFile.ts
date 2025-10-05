@@ -28,7 +28,7 @@ class UploadFileRoute {
           return reply.code(400).send({ error: 'No file included in request' });
         }
 
-        const [extension] = fileData.filename.match(/\.\w+$/)!;
+        const [extension] = /\.\w+$/.exec(fileData.filename)!;
 
         const fileName = `${randomUUID()}${extension}`;
 

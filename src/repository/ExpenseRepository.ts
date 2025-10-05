@@ -19,7 +19,7 @@ class ExpenseRepository {
     expenseIds?: number[];
     userId?: number;
   }) {
-    if (!tripId && (!expenseIds || !expenseIds.length)) throw new Error('Invalid args');
+    if (!tripId && !expenseIds?.length) throw new Error('Invalid args');
 
     const query = knex
       .select(

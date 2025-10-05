@@ -34,7 +34,7 @@ class AddExpensesRoute {
 
         const { expenses } = req.body;
 
-        if (!expenses || !expenses.length) {
+        if (!expenses?.length) {
           return reply.code(400).send({ error: 'No expenses provided' });
         }
 
@@ -60,7 +60,7 @@ class AddExpensesRoute {
             description: current.description,
             categoryId: current.categoryId,
             cityId: current.cityId,
-            userId: current.userId!,
+            userId: current.userId,
             createdByUserId: userId,
           };
 

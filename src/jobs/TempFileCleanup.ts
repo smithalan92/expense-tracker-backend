@@ -17,7 +17,7 @@ class TempFileCleanup implements Job {
         console.error(err);
       });
     });
-    job.start();
+    void job.start();
     console.log('Scheduled TempFileCleanup');
   }
 
@@ -26,7 +26,7 @@ class TempFileCleanup implements Job {
     const files = await fs.readdir(this.env.EXPENSR_TMP_DIR);
     let removeCount = 0;
 
-    for await (const f of files) {
+    for (const f of files) {
       const filePath = path.join(this.env.EXPENSR_TMP_DIR, f);
       const { ctime } = await fs.stat(filePath);
       const minDiff = differenceInMinutes(new Date(), new Date(ctime));

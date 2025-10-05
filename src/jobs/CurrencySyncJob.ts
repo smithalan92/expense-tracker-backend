@@ -17,7 +17,7 @@ class CurrencySyncJob implements Job {
         console.error(err);
       });
     });
-    job.start();
+    void job.start();
     console.log('Scheduled CurrencySyncJob');
   }
 
@@ -26,7 +26,7 @@ class CurrencySyncJob implements Job {
       const { date, eur: fxRates } = await getExchangeRatesForEUR();
       const currencies = await this.currencyRepository.getCurrenciesForSyncJob();
 
-      const updateData: Array<{ id: number; fxRate: number }> = [];
+      const updateData: { id: number; fxRate: number }[] = [];
 
       currencies.forEach((currency) => {
         const { id, code, exchangeRate } = currency;
@@ -60,7 +60,7 @@ class CurrencySyncJob implements Job {
       sendErrorNotification({
         subject: 'Failed to sync currencies for Expense Tracker Backend',
         content: `Currenies failed to sync for expense tracker backend on ${new Date().toISOString()}`,
-        error: err,
+        error: err as Error,
       });
     }
   }
