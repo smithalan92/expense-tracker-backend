@@ -25,11 +25,7 @@ export function parseExpenseForResponse(expense: DBExpenseResult): ProcessedTrip
       id: expense.countryId,
       name: expense.countryName,
     },
-    user: {
-      id: expense.userId,
-      firstName: expense.firstName,
-      lastName: expense.lastName,
-    },
+    users: expense.users,
     createdAt: expense.createdAt,
     updatedAt: expense.updatedAt,
   };
@@ -75,5 +71,5 @@ export interface ProcessedTripExpense {
   country: ExpenseCountry;
   createdAt: Date;
   updatedAt: Date;
-  user: ExpenseUser;
+  users: ExpenseUser[];
 }

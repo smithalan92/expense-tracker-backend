@@ -60,7 +60,7 @@ class AddExpensesRoute {
             description: current.description,
             categoryId: current.categoryId,
             cityId: current.cityId,
-            userId: current.userId,
+            userIds: current.userIds,
             createdByUserId: userId,
           };
 
@@ -95,7 +95,7 @@ export interface NewExpenseData {
   currencyId: number;
   categoryId: number;
   description: string;
-  userId: number;
+  userIds: number[];
 }
 
 export interface AddExpenseForTripBody {
