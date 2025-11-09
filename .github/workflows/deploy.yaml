@@ -38,7 +38,7 @@ jobs:
           rm: true
           strip_components: 1
       - name: Restart service
-        uses: appleboy/ssh-action@master
+        uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.DEPLOY_HOST }}
           username: ${{ secrets.DEPLOY_USERNAME }}
