@@ -203,6 +203,75 @@ class ExpenseRepository {
       throw new Error('Failed to delete expense');
     }
   }
+
+  async getTotalExpenesForTripByUsers(tripId: number) {
+    const results = await this.dbAgent.runQuery<DBTotalExpensesForTripByUserResult[]>({
+      query: `
+        SELECT
+          u.id AS userId,
+          u.firstName,
+          u.lastName,
+          ROUND(SUM(te.euroAmount / uc.userCount), 2) AS totalEuroAmount
+        FROM trip_expense_users AS teu
+        JOIN trip_expenses AS te
+          ON te.id = teu.tripExpenseId
+        JOIN users AS u
+          ON u.id = teu.userId
+        JOIN (
+          SELECT
+            tripExpenseId,
+            COUNT(*) AS userCount
+          FROM trip_expense_users
+          GROUP BY tripExpenseId
+        ) AS uc
+          ON uc.tripExpenseId = teu.tripExpenseId
+        WHERE te.tripId = ?
+        GROUP BY
+          u.id,
+          u.firstName,
+          u.lastName
+        ORDER BY
+          totalEuroAmount DESC;
+      `,
+      values: [tripId],
+    });
+
+    return results;
+  }
+
+  async getTotalExpenesByCategoryAndUserForTrip(tripId: number) {
+    // Subquery: how many users per expense
+    const userCountSubquery = knex('trip_expense_users as teu2')
+      .select('teu2.tripExpenseId')
+      .count<{ userCount: number }>('* as userCount')
+      .groupBy('teu2.tripExpenseId')
+      .as('uc');
+
+    const query = knex
+      .select(
+        'u.id as userId',
+        'u.firstName',
+        'u.lastName',
+        'ec.id as categoryId',
+        'ec.name as categoryName',
+        knex.raw('ROUND(SUM(te.euroAmount / uc.userCount), 2) as totalEuroAmount'),
+      )
+      .from({ teu: 'trip_expense_users' })
+      .join({ te: 'trip_expenses' }, 'te.id', 'teu.tripExpenseId')
+      .join({ u: 'users' }, 'u.id', 'teu.userId')
+      .join({ ec: 'expense_categories' }, 'ec.id', 'te.categoryId')
+      .join(userCountSubquery, 'uc.tripExpenseId', 'teu.tripExpenseId')
+      .where('te.tripId', tripId)
+      .groupBy('u.id', 'u.firstName', 'u.lastName', 'ec.id', 'ec.name')
+      .orderBy('u.id')
+      .orderBy('totalEuroAmount', 'desc');
+
+    // however you normally run queries:
+    const sql = query.toQuery();
+    const results = await this.dbAgent.runQuery<DBExpensesByCategoryAndUserResult[]>({ query: sql });
+
+    return results;
+  }
 }
 
 export default ExpenseRepository;
@@ -268,4 +337,19 @@ export interface UpdatedExpenseParams {
   categoryId?: number;
   cityId?: number;
   userIds?: number[];
+}
+
+export interface DBTotalExpensesForTripByUserResult extends mysql.RowDataPacket {
+  userId: number;
+  firstName: string;
+  lastName: string;
+  totalEuroAmount: number;
+}
+
+export interface DBExpensesByCategoryAndUserResult extends mysql.RowDataPacket {
+  userId: number;
+  firstName: string | null;
+  lastName: string | null;
+  categoryId: number;
+  totalEuroAmount: number;
 }
