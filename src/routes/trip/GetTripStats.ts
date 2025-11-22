@@ -33,7 +33,7 @@ class GetTripStatsRoute {
   configure(server: FastifyInstance) {
     server.route<{
       Params: GetTripStatsParams;
-      Reply: PossibleErrorResponse<GetTripDataResponse>;
+      Reply: PossibleErrorResponse<GetTripStatsResponse>;
     }>({
       method: 'GET',
       url: '/v2/trip/:tripId/stats',
@@ -52,19 +52,18 @@ class GetTripStatsRoute {
           this.expenseRepository.getTotalExpenesByCategoryAndUserForTrip(tripId),
         ]);
 
-        const catgeoryExpensesByUserParsed = catgoryExpensesByUser.reduce<CategoryExpensesForUser>((acc, current) => {
-          if (!acc[current.userId]) {
-            acc[current.userId] = {};
-          }
+        const catgeoryExpensesByUserParsed = catgoryExpensesByUser.reduce<Record<string, CategoryExpensesForUser>>(
+          (acc, current) => {
+            if (!acc[current.userId]) {
+              acc[current.userId] = { categories: {} };
+            }
 
-          acc[current.userId][current.categoryId] = {
-            userFirstName: current.firstName,
-            userLastName: current.lastName,
-            totalEuroAmount: current.totalEuroAmount,
-          };
+            acc[current.userId].categories[current.categoryId] = current.totalEuroAmount;
 
-          return acc;
-        }, {});
+            return acc;
+          },
+          {},
+        );
 
         return reply.send({
           totalExpensesByUser,
@@ -81,15 +80,11 @@ interface GetTripStatsParams {
   tripId: number;
 }
 
-interface GetTripDataResponse {
+interface GetTripStatsResponse {
   totalExpensesByUser: DBTotalExpensesForTripByUserResult[];
-  categoryExpensesByUser: CategoryExpensesForUser;
+  categoryExpensesByUser: Record<string, CategoryExpensesForUser>;
 }
 
-type CategoryExpensesForUser = Record<string, Record<string, CatgeoryExpense>>;
-
-interface CatgeoryExpense {
-  userFirstName: string | null;
-  userLastName: string | null;
-  totalEuroAmount: number;
+interface CategoryExpensesForUser {
+  categories: Record<string, number>;
 }
