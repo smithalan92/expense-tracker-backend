@@ -44,7 +44,7 @@ class GetTripStatsRoute {
         const [trip] = await this.tripRepository.getTrips({ tripIds: [tripId], userId });
 
         if (!trip) {
-          return reply.code(404).send();
+          return reply.code(404).send({ error: 'Not found' });
         }
 
         const [totalExpensesByUser, catgoryExpensesByUser] = await Promise.all([

@@ -19,7 +19,7 @@ class DBTransaction {
     values,
   }: {
     query: string;
-    values?: unknown[];
+    values?: any[];
   }) {
     const [rows] = await this.connection.execute<T>(query, values);
     return rows;
