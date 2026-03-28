@@ -13,7 +13,7 @@ class CategoryRepository {
       query: `
         SELECT id, name
         FROM expense_categories
-        ORDER BY orderId ASC;
+        ORDER BY orderId IS NULL ASC, orderId ASC;
       `,
     });
 
