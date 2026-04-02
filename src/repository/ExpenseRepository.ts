@@ -10,15 +10,7 @@ class ExpenseRepository {
     this.dbAgent = dbAgent;
   }
 
-  async findExpensesForTrip({
-    tripId,
-    expenseIds,
-    userId,
-  }: {
-    tripId?: number;
-    expenseIds?: number[];
-    userId?: number;
-  }) {
+  async findExpensesForTrip({ tripId, expenseIds }: { tripId?: number; expenseIds?: number[] }) {
     if (!tripId && !expenseIds?.length) throw new Error('Invalid args');
 
     const usersSubquery = knex('trip_expense_users as teu')
@@ -56,6 +48,7 @@ class ExpenseRepository {
         'te.createdAt',
         'te.updatedAt',
         'teu_agg.users as users',
+        'te.tripId as tripId',
       )
       .from({ te: 'trip_expenses' })
       .leftJoin({ ec: 'expense_categories' }, 'ec.id', 'te.categoryId')
@@ -72,15 +65,6 @@ class ExpenseRepository {
 
     if (expenseIds) {
       query.whereIn('te.id', expenseIds);
-    }
-
-    if (userId) {
-      query.whereExists(function () {
-        this.select('*')
-          .from({ teu2: 'trip_expense_users' })
-          .whereRaw('teu2.tripExpenseId = te.id')
-          .andWhere('teu2.userId', userId);
-      });
     }
 
     const results = await this.dbAgent.runQuery<DBExpenseResult[]>({
@@ -301,6 +285,7 @@ export interface DBExpenseResult extends mysql.RowDataPacket {
   createdAt: Date;
   updatedAt: Date;
   users: DBExpenseUser[];
+  tripId: number;
 }
 
 export interface NewExpenseRecord {

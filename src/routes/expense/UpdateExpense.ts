@@ -29,10 +29,16 @@ class UpdateExpenseRoute {
         const userId = req.requestContext.get('userId')!;
         const updateData: UpdatedExpenseParams = req.body;
 
-        const [existingExpense] = await this.expenseRepository.findExpensesForTrip({ expenseIds: [expenseId], userId });
+        const [existingExpense] = await this.expenseRepository.findExpensesForTrip({ expenseIds: [expenseId] });
 
         if (!existingExpense) {
-          return reply.code(404).send({ error: 'Trip or expense not found' });
+          return reply.code(404).send({ error: 'Not found' });
+        }
+
+        const [trip] = await this.tripRepository.getTrips({ userId, tripIds: [existingExpense.tripId] });
+
+        if (!trip) {
+          return reply.code(400).send({ error: 'Trip not found' });
         }
 
         const hasValidUpdateData = !!Object.values(updateData).find((v) => v !== null && v !== undefined);

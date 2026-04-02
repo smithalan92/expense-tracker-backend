@@ -23,3 +23,4 @@ dist-ssr
 *.sln
 *.sw?
 start_ssh_db_tunnel
+*.sql
