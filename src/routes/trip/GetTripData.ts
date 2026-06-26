@@ -43,7 +43,7 @@ class GetTripDataRoute {
         const userId: number = req.requestContext.get('userId')!;
         const tripId = req.params.tripId;
 
-        const [trip] = await this.tripRepository.getTrips({ tripIds: [tripId], userId });
+        const [trip] = await this.tripRepository.getTrips({ tripIds: [tripId], userId, includeCountries: true });
 
         if (!trip) {
           return reply.code(404).send({ error: 'Not found' });

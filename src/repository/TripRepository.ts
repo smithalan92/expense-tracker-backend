@@ -11,7 +11,14 @@ class TripRepository {
     this.dbAgent = dbAgent;
   }
 
-  async getTrips({ userId, tripIds, includeDeleted }: GetTripsFilters) {
+  async getTrips({
+    userId,
+    tripIds,
+    includeDeleted,
+    includeCountries,
+    includeUsers,
+    includeExpenseCount,
+  }: GetTripsFilters) {
     const query = knex
       .select(
         't.id',
@@ -27,6 +34,26 @@ class TripRepository {
       .leftJoin({ te: 'trip_expenses' }, 'te.tripId', 't.id')
       .groupBy('t.id')
       .orderBy('t.startDate', 'desc');
+
+    if (includeCountries) {
+      query.column(
+        knex.raw(
+          `(SELECT JSON_ARRAYAGG(JSON_OBJECT('id', c.id, 'name', c.name, 'code', c.iso2)) FROM trip_countries tc JOIN countries c ON c.id = tc.countryId WHERE tc.tripId = t.id) as countries`,
+        ),
+      );
+    }
+
+    if (includeUsers) {
+      query.column(
+        knex.raw(
+          `(SELECT JSON_ARRAYAGG(JSON_OBJECT('id', u.id, 'name', CONCAT(u.firstName, ' ', u.lastName))) FROM user_trips ut2 JOIN users u ON u.id = ut2.userId WHERE ut2.tripId = t.id) as users`,
+        ),
+      );
+    }
+
+    if (includeExpenseCount) {
+      query.column(knex.raw('(SELECT COUNT(*) FROM trip_expenses te2 WHERE te2.tripId = t.id) as expenseCount'));
+    }
 
     if (!includeDeleted) {
       query.where('t.status', 'active');
@@ -162,6 +189,9 @@ interface GetTripsFilters {
   userId?: number;
   tripIds?: number[];
   includeDeleted?: boolean;
+  includeCountries?: boolean;
+  includeUsers?: boolean;
+  includeExpenseCount?: boolean;
 }
 
 export interface DBGetTripsResult extends mysql.RowDataPacket {
@@ -171,6 +201,9 @@ export interface DBGetTripsResult extends mysql.RowDataPacket {
   endDate: string;
   filePath: string | null;
   totalExpenseAmount: number;
+  countries?: Array<{ id: number; name: string; code: string }>;
+  users?: Array<{ id: number; name: string }>;
+  expenseCount?: number;
 }
 
 interface CreateTripParams {

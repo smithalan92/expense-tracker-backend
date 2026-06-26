@@ -18,7 +18,12 @@ class GetTripsRoute {
       handler: async (req, reply) => {
         const userId: number = req.requestContext.get('userId')!;
 
-        const trips = await this.tripRepository.getTrips({ userId });
+        const trips = await this.tripRepository.getTrips({
+          userId,
+          includeCountries: true,
+          includeExpenseCount: true,
+          includeUsers: true,
+        });
 
         const tripsWithFormattedDates = trips
           .map(parseTrip)

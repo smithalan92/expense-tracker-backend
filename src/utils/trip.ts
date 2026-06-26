@@ -12,6 +12,9 @@ export function parseTrip(trip: DBGetTripsResult): ParsedTrip {
     endDate: format(new Date(trip.endDate), 'dd MMM yyyy'),
     image,
     totalExpenseAmount: trip.totalExpenseAmount,
+    countries: trip.countries ?? [],
+    users: trip.users ?? [],
+    expenseCount: trip.expenseCount ?? 0,
   };
 }
 
@@ -22,4 +25,7 @@ export interface ParsedTrip {
   endDate: string;
   image: string;
   totalExpenseAmount: number;
+  countries: Array<{ id: number; name: string }>;
+  users: Array<{ id: number; name: string }>;
+  expenseCount: number;
 }

@@ -45,7 +45,14 @@ class CountryRepository {
 
   async getSelectedCountriesAndCitiesForTrip(tripId: number) {
     const query = knex
-      .select('ci.id as cityId', 'ci.name as cityName', 'c.id as id', 'c.currencyId as currencyId', 'c.name as name')
+      .select(
+        'ci.id as cityId',
+        'ci.name as cityName',
+        'c.id as id',
+        'c.currencyId as currencyId',
+        'c.name as name',
+        'c.iso2 as code',
+      )
       .from({ tc: 'trip_countries' })
       .leftJoin({ c: 'countries' }, 'c.id', 'tc.countryId')
       .leftJoin({ ci: 'cities' }, knex.raw('FIND_IN_SET(ci.id, tc.cityIds)'))
@@ -57,12 +64,12 @@ class CountryRepository {
     });
 
     const countries = results.reduce<TripCountryWithCities[]>((acc, current) => {
-      const { cityId, cityName, id, name, currencyId } = current;
+      const { cityId, cityName, id, name, currencyId, code } = current;
 
       const existingCountry = acc.find((c) => c.id === id);
 
       if (!existingCountry) {
-        const newCountry: TripCountryWithCities = { id, name, currencyId, cities: [] };
+        const newCountry: TripCountryWithCities = { id, name, currencyId, cities: [], code };
         if (cityId) newCountry.cities.push({ id: cityId, name: cityName! });
         acc.push(newCountry);
       } else {
@@ -122,6 +129,7 @@ interface DBCountryWithCity extends RowDataPacket {
   id: number;
   name: string;
   currencyId: number;
+  code: string;
 }
 
 export interface TripCountryWithCities {
@@ -129,4 +137,5 @@ export interface TripCountryWithCities {
   name: string;
   currencyId: number;
   cities: Array<{ id: number; name: string }>;
+  code: string;
 }
