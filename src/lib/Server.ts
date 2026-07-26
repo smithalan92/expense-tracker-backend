@@ -40,7 +40,14 @@ class Server {
         userId: 0,
       },
     });
-    void server.register(multipart);
+    // Without an explicit fileSize, @fastify/multipart falls back to Fastify's
+    // bodyLimit (1MiB) and silently truncates anything larger. Phone photos are
+    // routinely 5-15MB, so allow 25MB.
+    void server.register(multipart, {
+      limits: {
+        fileSize: 25 * 1024 * 1024,
+      },
+    });
 
     server.addHook('onRequest', async (request: FastifyRequest, reply: FastifyReply) => {
       if (request.url.endsWith('/login') || request.method === 'OPTIONS') {

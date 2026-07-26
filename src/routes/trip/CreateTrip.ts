@@ -41,7 +41,7 @@ class CreateTripRoute {
           let fileId: number | undefined = undefined;
 
           if (file) {
-            const fId = await this.fileRepository.saveTempFile(
+            const fId = await this.fileRepository.saveFile(
               {
                 userId,
                 fileName: file,

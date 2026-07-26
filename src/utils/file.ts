@@ -20,10 +20,27 @@ export function getTripFileUrl(filePath: string | null) {
   return `${FILES_URL}${finalPath}`;
 }
 
-export async function saveTempFile(fileData: MultipartFile, filePath: string): Promise<void> {
+export class FileTooLargeError extends Error {
+  constructor() {
+    super('Uploaded file exceeded the maximum allowed size');
+    this.name = 'FileTooLargeError';
+  }
+}
+
+export async function saveFileToDisk(fileData: MultipartFile, filePath: string): Promise<void> {
   const writeStream = fs.createWriteStream(filePath);
 
   await pipeline(fileData.file, writeStream);
 
   writeStream.close();
+
+  /*
+   * Busboy stops reading once the fileSize limit is hit and ends the stream
+   * normally, so the pipeline above resolves having written a partial file.
+   * Bail out rather than persisting a corrupt image.
+   */
+  if (fileData.file.truncated) {
+    await fsPromise.rm(filePath, { force: true });
+    throw new FileTooLargeError();
+  }
 }
