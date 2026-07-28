@@ -18,6 +18,7 @@ export default defineConfig(
       '**/*.d.ts',
       'eslint.config.*',
       '.prettierrc.*',
+      'ecosystem.config.*',
     ],
   },
 

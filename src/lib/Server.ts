@@ -24,7 +24,11 @@ class Server {
 
   createServer() {
     const server = Fastify({
-      querystringParser: (str) => qs.parse(str, { comma: true }),
+      // Router options must be nested under routerOptions; the top-level form
+      // warns with FSTDEP022 and is removed in fastify@6.
+      routerOptions: {
+        querystringParser: (str) => qs.parse(str, { comma: true }),
+      },
       logger: {
         level: 'info',
       },

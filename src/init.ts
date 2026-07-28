@@ -23,7 +23,7 @@ function configureJobs(container: awilix.AwilixContainer) {
   awilix.listModules([jobsPath], { cwd: __dirname }).forEach((moduleDesc) => {
     let { name } = moduleDesc;
     name = name.slice(0, 1).toLowerCase() + name.slice(1);
-    const job = container.resolve(name) as unknown as Job;
+    const job: Job = container.resolve(name);
     job.start();
   });
 }
@@ -42,7 +42,7 @@ function configureRoutes(container: awilix.AwilixContainer, server: Server) {
   awilix.listModules([routesGlob], { cwd: __dirname }).forEach((moduleDesc) => {
     let { name } = moduleDesc;
     name = name.slice(0, 1).toLowerCase() + name.slice(1);
-    server.registerRoutes(container.resolve(name) as unknown as Router);
+    server.registerRoutes(container.resolve(name));
   });
 }
 
