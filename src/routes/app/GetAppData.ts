@@ -21,16 +21,18 @@ class GetAppDataRoute {
       method: 'GET',
       url: '/v2/app',
       handler: async () => {
-        const [countries, users, currencies] = await Promise.all([
+        const [countries, users, currencies, lastCurrencySyncDateTime] = await Promise.all([
           this.countryRepository.getCountries(),
           this.userRepository.getUsers(),
           this.currencyRepository.getCurrencies(),
+          this.currencyRepository.getLastCurrencySyncDateTime(),
         ]);
 
         const response: GetAppDataResponse = {
           countries,
           users,
           currencies,
+          lastCurrencySyncDateTime,
         };
 
         return response;
@@ -45,4 +47,5 @@ export interface GetAppDataResponse {
   countries: CountryWithCurrency[];
   users: DBUserResult[];
   currencies: DBCurrency[];
+  lastCurrencySyncDateTime: string;
 }

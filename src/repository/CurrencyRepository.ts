@@ -102,6 +102,20 @@ class CurrencyRepository {
       console.error(new Error(`Failed to update fx rate for currency ${currencyId}`));
     }
   }
+
+  async getLastCurrencySyncDateTime() {
+    const result = await this.dbAgent.runQuery<LastCurrencySyncDateTime[]>({
+      query: 'SELECT MAX(updatedAt) as lastUpdated FROM currencies;',
+    });
+
+    const [res] = result;
+
+    if (!res) {
+      return '1970-01-01 00:00:00';
+    }
+
+    return res.lastUpdated;
+  }
 }
 
 export default CurrencyRepository;
@@ -139,4 +153,8 @@ export interface DBGetFXRatesForCurrencies extends mysql.RowDataPacket {
 
 export interface DBGetCurrencyFXRateResult extends mysql.RowDataPacket {
   exchangeRate: number;
+}
+
+export interface LastCurrencySyncDateTime extends mysql.RowDataPacket {
+  lastUpdated: string;
 }
