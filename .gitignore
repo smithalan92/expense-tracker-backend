@@ -24,3 +24,4 @@ dist-ssr
 *.sw?
 start_ssh_db_tunnel
 *.sql
+migrations/*.sql
