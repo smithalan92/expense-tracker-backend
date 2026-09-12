@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "description": "An API handle to expense tracking",
   "main": "index.js",
+  "packageManager": "pnpm@12.3.4",
   "scripts": {
     "start": "tsx src/index.ts",
     "watch": "tsx watch src/index.ts",
