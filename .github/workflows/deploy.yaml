@@ -26,7 +26,7 @@ jobs:
         run: pnpm run build
       - name: Stage runtime files
         shell: bash
-        run: cp package.json pnpm-lock.yaml ecosystem.config.js .node-version dist/
+        run: cp package.json pnpm-lock.yaml pnpm-workspace.yaml ecosystem.config.js .node-version dist/
       - name: Deploy app
         uses: appleboy/scp-action@master
         with:
