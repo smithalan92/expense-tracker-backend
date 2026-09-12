@@ -44,40 +44,39 @@ class CountryRepository {
   }
 
   async getSelectedCountriesAndCitiesForTrip(tripId: number) {
-    const query = knex
-      .select(
-        'ci.id as cityId',
-        'ci.name as cityName',
-        'c.id as id',
-        'c.currencyId as currencyId',
-        'c.name as name',
-        'c.iso2 as code',
-      )
+    const countriesQuery = knex
+      .select('c.id', 'c.name', 'c.currencyId', 'c.iso2 as code')
       .from({ tc: 'trip_countries' })
-      .leftJoin({ c: 'countries' }, 'c.id', 'tc.countryId')
-      .leftJoin({ ci: 'cities' }, knex.raw('FIND_IN_SET(ci.id, tc.cityIds)'))
+      .join({ c: 'countries' }, 'c.id', 'tc.countryId')
       .where('tc.tripId', tripId)
+      .orderBy('c.name', 'asc');
+
+    const citiesQuery = knex
+      .select('ci.id', 'ci.name', 'ci.countryId')
+      .from({ tcity: 'trip_cities' })
+      .join({ ci: 'cities' }, 'ci.id', 'tcity.cityId')
+      .where('tcity.tripId', tripId)
       .orderBy('ci.name', 'asc');
 
-    const results = await this.dbAgent.runQuery<DBCountryWithCity[]>({
-      query: query.toQuery(),
-    });
+    const [countryResults, cityResults] = await Promise.all([
+      this.dbAgent.runQuery<DBCountryResult[]>({ query: countriesQuery.toQuery() }),
+      this.dbAgent.runQuery<DBCityResult[]>({ query: citiesQuery.toQuery() }),
+    ]);
 
-    const countries = results.reduce<TripCountryWithCities[]>((acc, current) => {
-      const { cityId, cityName, id, name, currencyId, code } = current;
+    const countries: TripCountryWithCities[] = countryResults.map((c) => ({
+      id: c.id,
+      name: c.name,
+      currencyId: c.currencyId,
+      code: c.code,
+      cities: [],
+    }));
 
-      const existingCountry = acc.find((c) => c.id === id);
-
-      if (!existingCountry) {
-        const newCountry: TripCountryWithCities = { id, name, currencyId, cities: [], code };
-        if (cityId) newCountry.cities.push({ id: cityId, name: cityName! });
-        acc.push(newCountry);
-      } else {
-        if (cityId) existingCountry.cities.push({ id: cityId, name: cityName! });
+    cityResults.forEach((city) => {
+      const country = countries.find((c) => c.id === city.countryId);
+      if (country) {
+        country.cities.push({ id: city.id, name: city.name });
       }
-
-      return acc;
-    }, []);
+    });
 
     const countriesToGetAllCitiesFor = countries.reduce<number[]>((acc, country) => {
       if (country.cities.length === 0) acc.push(country.id);
@@ -123,9 +122,7 @@ export interface DBCityResult extends RowDataPacket {
   countryId: number;
 }
 
-interface DBCountryWithCity extends RowDataPacket {
-  cityId: Nullable<number>;
-  cityName: Nullable<string>;
+export interface DBCountryResult extends RowDataPacket {
   id: number;
   name: string;
   currencyId: number;

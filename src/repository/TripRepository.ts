@@ -90,32 +90,36 @@ class TripRepository {
         .toQuery(),
     });
 
-    const countryInserts = countries.reduce<Array<{ tripId: number; countryId: number; cityIds: string | null }>>(
-      (acc, current) => {
-        const cityIds = current.cityIds?.join(',') ?? null;
+    const countryInserts = countries.map((current) => ({
+      tripId,
+      countryId: current.countryId,
+    }));
 
-        acc.push({ tripId, countryId: current.countryId, cityIds });
-        return acc;
-      },
-      [],
-    );
+    const cityInserts = countries.flatMap((current) => (current.cityIds ?? []).map((cityId) => ({ tripId, cityId })));
 
-    const userInserts = Array.from(new Set(userIds)).reduce<Array<{ tripId: number; userId: number }>>(
-      (acc, current) => {
-        acc.push({ tripId, userId: current });
-        return acc;
-      },
-      [],
-    );
+    const userInserts = Array.from(new Set(userIds)).map((current) => ({
+      tripId,
+      userId: current,
+    }));
 
-    await Promise.all([
+    const insertPromises: Promise<unknown>[] = [
       transaction.runQuery({
         query: knex('trip_countries').insert(countryInserts).toQuery(),
       }),
       transaction.runQuery({
         query: knex('user_trips').insert(userInserts).toQuery(),
       }),
-    ]);
+    ];
+
+    if (cityInserts.length) {
+      insertPromises.push(
+        transaction.runQuery({
+          query: knex('trip_cities').insert(cityInserts).toQuery(),
+        }),
+      );
+    }
+
+    await Promise.all(insertPromises);
 
     return tripId;
   }
@@ -167,18 +171,33 @@ class TripRepository {
         values: [tripId],
       });
 
-      const countryRows = countries.map((country) => {
-        const cityIds = country.cityIds?.join(',') ?? null;
-        return {
-          tripId,
-          countryId: country.countryId,
-          cityIds,
-        };
+      await queryExecutor.runQuery({
+        query: 'DELETE FROM trip_cities WHERE tripId = ?;',
+        values: [tripId],
       });
 
-      await queryExecutor.runQuery({
-        query: knex('trip_countries').insert(countryRows).toQuery(),
-      });
+      const countryRows = countries.map((country) => ({
+        tripId,
+        countryId: country.countryId,
+      }));
+
+      const cityRows = countries.flatMap((country) => (country.cityIds ?? []).map((cityId) => ({ tripId, cityId })));
+
+      const updatePromises: Promise<unknown>[] = [
+        queryExecutor.runQuery({
+          query: knex('trip_countries').insert(countryRows).toQuery(),
+        }),
+      ];
+
+      if (cityRows.length) {
+        updatePromises.push(
+          queryExecutor.runQuery({
+            query: knex('trip_cities').insert(cityRows).toQuery(),
+          }),
+        );
+      }
+
+      await Promise.all(updatePromises);
     }
   }
 }

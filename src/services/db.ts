@@ -6,6 +6,7 @@ export default function makePool({ env }: ContainerCradle) {
     password: env.MYSQL_EXPENSE_PASSWORD,
     user: env.MYSQL_EXPENSE_USER,
     database: 'expense_tracker',
+    decimalNumbers: true,
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0,
