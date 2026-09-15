@@ -1,7 +1,7 @@
 import { randomUUID } from 'crypto';
 import { FastifyInstance } from 'fastify';
 import DBAgent from '../../lib/DBAgent';
-import CountryRepository, { TripCountryWithCities } from '../../repository/CountryRepository';
+import CountryRepository from '../../repository/CountryRepository';
 import CurrencyRepository from '../../repository/CurrencyRepository';
 import FileRepository from '../../repository/FileRepository';
 import TripRepository from '../../repository/TripRepository';
@@ -85,18 +85,15 @@ class UpdateTripRoute {
 
           await transaction.commit();
 
-          const [[trip], updatedCountriesWithCities, updatedUserIds, updatedCurrencyIds] = await Promise.all([
-            this.tripRepository.getTrips({ tripIds: [tripId] }),
-            this.countryRepository.getSelectedCountriesAndCitiesForTrip(tripId),
-            this.userRepository.getUserIdsForTrip(tripId),
-            this.currencyRepository.getCurrencyIdsForTrip(tripId),
-          ]);
+          const [trip] = await this.tripRepository.getTrips({
+            tripIds: [tripId],
+            includeCountries: true,
+            includeExpenseCount: true,
+            includeUsers: true,
+          });
 
           return reply.code(201).send({
             trip: parseTrip(trip),
-            countries: updatedCountriesWithCities,
-            userIds: updatedUserIds,
-            currencyIds: updatedCurrencyIds,
           });
         } catch (err) {
           await transaction.rollback();
@@ -115,9 +112,6 @@ interface UpdateTripRouteParams {
 
 interface UpdateTripResponse {
   trip: ParsedTrip;
-  countries: TripCountryWithCities[];
-  userIds: number[];
-  currencyIds: number[];
 }
 
 interface UpdateTripBody {
