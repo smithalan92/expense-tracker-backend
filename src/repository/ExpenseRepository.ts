@@ -49,6 +49,7 @@ class ExpenseRepository {
         'te.updatedAt',
         'teu_agg.users as users',
         'te.tripId as tripId',
+        'te.latlong as latlong',
       )
       .from({ te: 'trip_expenses' })
       .leftJoin({ ec: 'expense_categories' }, 'ec.id', 'te.categoryId')
@@ -217,6 +218,7 @@ export interface DBExpenseResult extends mysql.RowDataPacket {
   updatedAt: Date;
   users: DBExpenseUser[];
   tripId: number;
+  latlong: string | null;
 }
 
 export interface NewExpenseRecord {
@@ -230,6 +232,7 @@ export interface NewExpenseRecord {
   cityId: number;
   userIds: number[];
   createdByUserId: number;
+  latlong: string | null;
 }
 
 interface ExpenseUserRecord {

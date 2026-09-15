@@ -62,6 +62,7 @@ class AddExpensesRoute {
             cityId: current.cityId,
             userIds: current.userIds,
             createdByUserId: userId,
+            latlong: current.latlong ?? null,
           };
 
           acc.push(expense);
@@ -96,6 +97,7 @@ export interface NewExpenseData {
   categoryId: number;
   description: string;
   userIds: number[];
+  latlong?: string;
 }
 
 export interface AddExpenseForTripBody {

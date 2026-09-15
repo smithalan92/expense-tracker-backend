@@ -28,6 +28,7 @@ export function parseExpenseForResponse(expense: DBExpenseResult): ProcessedTrip
     users: expense.users,
     createdAt: expense.createdAt,
     updatedAt: expense.updatedAt,
+    latlong: expense.latlong,
   };
 }
 
@@ -72,4 +73,5 @@ export interface ProcessedTripExpense {
   createdAt: Date;
   updatedAt: Date;
   users: ExpenseUser[];
+  latlong: string | null;
 }
