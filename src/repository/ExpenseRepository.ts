@@ -49,7 +49,8 @@ class ExpenseRepository {
         'te.updatedAt',
         'teu_agg.users as users',
         'te.tripId as tripId',
-        'te.latlong as latlong',
+        // fall back to the city's coordinates when the expense has no latlong of its own
+        knex.raw("COALESCE(te.latlong, CONCAT(ci.lat, ',', ci.lng)) as latlong"),
       )
       .from({ te: 'trip_expenses' })
       .leftJoin({ ec: 'expense_categories' }, 'ec.id', 'te.categoryId')
