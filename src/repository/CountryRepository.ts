@@ -30,10 +30,10 @@ class CountryRepository {
     }));
   }
 
-  async getCitiesForCountries(countryIds: number[]) {
+  async getCitiesForCountries(countryIds: number[], { includeCoordinates = false } = {}) {
     const results = await this.dbAgent.runQuery<DBCityResult[]>({
       query: `
-          SELECT id, name, countryId
+          SELECT id, name, countryId${includeCoordinates ? ', lat AS latitude, lng AS longitude' : ''}
           FROM cities
           WHERE countryId IN (${this.dbAgent.prepareArrayForInValue(countryIds)})
           ORDER BY name ASC;
@@ -52,7 +52,7 @@ class CountryRepository {
       .orderBy('c.name', 'asc');
 
     const citiesQuery = knex
-      .select('ci.id', 'ci.name', 'ci.countryId')
+      .select('ci.id', 'ci.name', 'ci.countryId', 'ci.lat as latitude', 'ci.lng as longitude')
       .from({ tcity: 'trip_cities' })
       .join({ ci: 'cities' }, 'ci.id', 'tcity.cityId')
       .where('tcity.tripId', tripId)
@@ -74,7 +74,7 @@ class CountryRepository {
     cityResults.forEach((city) => {
       const country = countries.find((c) => c.id === city.countryId);
       if (country) {
-        country.cities.push({ id: city.id, name: city.name });
+        country.cities.push({ id: city.id, name: city.name, latitude: city.latitude!, longitude: city.longitude! });
       }
     });
 
@@ -85,11 +85,11 @@ class CountryRepository {
 
     if (!countriesToGetAllCitiesFor.length) return countries;
 
-    const missingCities = await this.getCitiesForCountries(countriesToGetAllCitiesFor);
+    const missingCities = await this.getCitiesForCountries(countriesToGetAllCitiesFor, { includeCoordinates: true });
 
     missingCities.forEach((city) => {
       const country = countries.find((c) => c.id === city.countryId);
-      country!.cities.push({ id: city.id, name: city.name });
+      country!.cities.push({ id: city.id, name: city.name, latitude: city.latitude!, longitude: city.longitude! });
     });
 
     return countries;
@@ -120,6 +120,8 @@ export interface DBCityResult extends RowDataPacket {
   id: number;
   name: string;
   countryId: number;
+  latitude?: number;
+  longitude?: number;
 }
 
 export interface DBCountryResult extends RowDataPacket {
@@ -133,6 +135,6 @@ export interface TripCountryWithCities {
   id: number;
   name: string;
   currencyId: number;
-  cities: Array<{ id: number; name: string }>;
+  cities: Array<{ id: number; name: string; latitude: number; longitude: number }>;
   code: string;
 }
