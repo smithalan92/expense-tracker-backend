@@ -1,5 +1,6 @@
 import { type FastifyInstance } from 'fastify';
 import type DBAgent from './lib/DBAgent';
+import type EventHub from './lib/EventHub';
 import type CategoryRepository from './repository/CategoryRepository';
 import type CountryRepository from './repository/CountryRepository';
 import type CurrencyRepository from './repository/CurrencyRepository';
@@ -34,6 +35,7 @@ declare global {
   interface ContainerCradle {
     env: Env;
     dbAgent: DBAgent;
+    eventHub: EventHub;
     categoryRepository: CategoryRepository;
     countryRepository: CountryRepository;
     currencyRepository: CurrencyRepository;

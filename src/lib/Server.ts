@@ -8,6 +8,7 @@ import type TokenRepository from '../repository/TokenRepository';
 declare module '@fastify/request-context' {
   interface RequestContextData {
     userId: number;
+    clientId?: string;
   }
 }
 
@@ -56,6 +57,14 @@ class Server {
     server.addHook('onRequest', async (request: FastifyRequest, reply: FastifyReply) => {
       // request.url includes the query string, so compare the path only
       const path = request.url.split('?')[0];
+
+      // Identifies the calling app instance so SSE events can skip the client
+      // that made the change (but still reach the same user's other clients).
+      const clientId = request.headers['x-client-id'];
+
+      if (typeof clientId === 'string' && clientId.length > 0 && clientId.length <= 64) {
+        request.requestContext.set('clientId', clientId);
+      }
 
       if (path === '/v2/login' || request.method === 'OPTIONS') {
         return;

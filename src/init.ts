@@ -1,5 +1,6 @@
 import * as awilix from 'awilix';
 import DBAgent from './lib/DBAgent';
+import EventHub from './lib/EventHub';
 import Server from './lib/Server';
 import makePool from './services/db';
 import makeEnv from './services/env';
@@ -60,6 +61,9 @@ export default function init() {
     cwd: __dirname,
     resolverOptions: { lifetime: awilix.Lifetime.SCOPED },
   });
+
+  // Must be a singleton: it holds the open SSE connections
+  container.register('eventHub', awilix.asClass(EventHub).singleton());
 
   configureJobs(container);
 

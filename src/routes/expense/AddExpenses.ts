@@ -1,4 +1,5 @@
 import { FastifyInstance } from 'fastify';
+import type EventHub from '../../lib/EventHub';
 import CurrencyRepository from '../../repository/CurrencyRepository';
 import ExpenseRepository, { NewExpenseRecord } from '../../repository/ExpenseRepository';
 import TripRepository from '../../repository/TripRepository';
@@ -8,11 +9,13 @@ class AddExpensesRoute {
   expenseRepository: ExpenseRepository;
   currencyRepository: CurrencyRepository;
   tripRepository: TripRepository;
+  eventHub: EventHub;
 
-  constructor({ expenseRepository, currencyRepository, tripRepository }: ContainerCradle) {
+  constructor({ expenseRepository, currencyRepository, tripRepository, eventHub }: ContainerCradle) {
     this.expenseRepository = expenseRepository;
     this.currencyRepository = currencyRepository;
     this.tripRepository = tripRepository;
+    this.eventHub = eventHub;
   }
 
   configure(server: FastifyInstance) {
@@ -23,6 +26,15 @@ class AddExpensesRoute {
     }>({
       method: 'POST',
       url: '/v2/expenses/:tripId/add',
+      // Fastify doesn't coerce params without a schema, so without this `tripId`
+      // would be a string at runtime despite being typed as a number.
+      schema: {
+        params: {
+          type: 'object',
+          properties: { tripId: { type: 'integer' } },
+          required: ['tripId'],
+        },
+      },
       handler: async (req, reply) => {
         const { tripId } = req.params;
         const userId = req.requestContext.get('userId')!;
@@ -74,6 +86,13 @@ class AddExpensesRoute {
         const createdExpenses = await this.expenseRepository.findExpensesForTrip({ tripId, expenseIds });
 
         const processedExpenses = createdExpenses.map(parseExpenseForResponse);
+
+        void this.eventHub.publishExpenseEvent({
+          tripId,
+          event: 'expense.added',
+          data: { tripId, expenses: processedExpenses },
+          excludeClientId: req.requestContext.get('clientId'),
+        });
 
         return reply.status(201).send({
           expenses: processedExpenses,
