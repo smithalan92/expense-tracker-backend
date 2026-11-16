@@ -54,7 +54,10 @@ class Server {
     });
 
     server.addHook('onRequest', async (request: FastifyRequest, reply: FastifyReply) => {
-      if (request.url.endsWith('/login') || request.method === 'OPTIONS') {
+      // request.url includes the query string, so compare the path only
+      const path = request.url.split('?')[0];
+
+      if (path === '/v2/login' || request.method === 'OPTIONS') {
         return;
       }
 
